@@ -1,0 +1,52 @@
+---
+import "@styles/global.css";
+const {
+  title = "Tu Producto",
+  description = "Solución moderna, rápida y sencilla para tu negocio.",
+  image = "/assets/og-image.svg",
+} = Astro.props;
+---
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta name="theme-color" content="#0b0f19" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#inicio" class="brand">TuMarca</a>
+
+        <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
+        <label for="nav-toggle" class="nav-toggle-btn" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </label>
+
+        <nav class="nav">
+          <a href="#caracteristicas">Características</a>
+          <a href="#sobre">Sobre</a>
+          <a href="#demo">Demo</a>
+          <a href="#precios">Precios</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contacto" class="btn btn-sm">Contacto</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="inicio">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© {new Date().getFullYear()} TuMarca — Todos los derechos reservados.</p>
+      </div>
+    </footer>
+  </body>
+</html>

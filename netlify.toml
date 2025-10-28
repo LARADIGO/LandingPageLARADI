@@ -1,9 +1,18 @@
 [build]
-  publish = "dist"
   command = "npm run build"
-[build.processing.html]
-  pretty_urls = false
+  publish = "dist"
+
+# Cache agresiva para assets
 [[headers]]
-  for = "/_astro/*"
+  for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Cabeceras de seguridad básicas
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
