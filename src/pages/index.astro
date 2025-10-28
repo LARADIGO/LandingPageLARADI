@@ -1,0 +1,52 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+<BaseLayout title="Tu POS, sin complicaciones" description="Vende más rápido con un POS diseñado para tiendas modernas. Compatible con escáner, tickets e inventario.">
+  <section class="hero container">
+    <h1>Tu POS, sin complicaciones</h1>
+    <p>Interfaz clara, cobros en segundos y control total de inventario. Funciona en PC y tablet. Ideal para retail y hostelería.</p>
+    <a href="#demo" class="cta">Ver demo</a>
+  </section>
+
+  <section class="section container">
+    <div class="grid">
+      <div class="card">
+        <h3>Rápido en caja</h3>
+        <p>Flujo de cobro optimizado, atajos de teclado y lector de código de barras.</p>
+      </div>
+      <div class="card">
+        <h3>Inventario</h3>
+        <p>Altas, bajas y ajustes. Variantes y niveles de stock por tienda.</p>
+      </div>
+      <div class="card">
+        <h3>Tickets y cierres</h3>
+        <p>Historial, devoluciones, arqueos y exportación contable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo" class="section container">
+    <h2>Vídeo demo (1 min)</h2>
+    <div class="media">
+      <video controls preload="metadata" poster="/assets/pos-poster.jpg">
+        <source src="/media/pos-demo-720p.mp4" type="video/mp4" />
+        Tu navegador no soporta video HTML5.
+      </video>
+    </div>
+    <p style="color:var(--muted);margin-top:8px;font-size:14px;">
+      Consejo: sube versiones comprimidas (720p) para una carga más rápida.
+    </p>
+  </section>
+
+  <section class="section container">
+    <h2>Galería</h2>
+    <div class="media">
+      <img src="/assets/pos-screen-1.jpg" alt="Pantalla de venta" loading="lazy" />
+      <img src="/assets/pos-screen-2.jpg" alt="Inventario" loading="lazy" />
+    </div>
+  </section>
+
+  <footer class="footer container">
+    © {new Date().getFullYear()} Tu Marca. Todos los derechos reservados.
+  </footer>
+</BaseLayout>

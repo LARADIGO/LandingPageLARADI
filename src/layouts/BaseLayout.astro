@@ -1,0 +1,21 @@
+---
+const { title = "POS Software", description = "Software POS rápido, simple y moderno", image = "/assets/og.jpg" } = Astro.props;
+---
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta name="theme-color" content="#0b0f19" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/assets/hero-screenshot.jpg" as="image" />
+    <link rel="stylesheet" href="/global.css" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,8 @@
+# Node
+node_modules
+dist
+.astro
+
+# Editors
+.vscode
+.DS_Store
