@@ -154,3 +154,31 @@ input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3p
   color: var(--muted);
   border-top: 1px solid var(--border);
 }
+
+/* Hero image: rellena y recorta lo que no entra, manteniendo proporción */
+.hero-img {
+  display: block;
+  width: 100%;
+  /* Elige una altura adaptativa. Puedes ajustar estos números. */
+  height: clamp(260px, 45vw, 520px);
+  object-fit: cover;         /* rellena recortando */
+  object-position: center;   /* encuadre: 'top', 'center', 'bottom' */
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* Si quieres altura distinta en móvil */
+@media (max-width: 600px) {
+  .hero-img {
+    height: clamp(200px, 50vw, 360px);
+    object-position: center top; /* ejemplo de encuadre distinto en móvil */
+  }
+}
+
+/* Honeypot Netlify (oculto) */
+.hp {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px; overflow: hidden;
+}
