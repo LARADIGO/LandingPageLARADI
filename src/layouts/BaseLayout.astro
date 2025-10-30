@@ -1,5 +1,6 @@
 ---
 import "@styles/global.css";
+import ThemeToggle from '@components/ThemeToggle.astro';
 const {
   title = "Tu Producto",
   description = "Solución moderna, rápida y sencilla para tu negocio.",
@@ -21,7 +22,7 @@ const {
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="#inicio" class="brand">TuMarca</a>
+        <a href="#inicio" class="brand">LARADI</a>
 
         <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
         <label for="nav-toggle" class="nav-toggle-btn" aria-hidden="true">
@@ -35,6 +36,7 @@ const {
           <a href="#precios">Precios</a>
           <a href="#faq">FAQ</a>
           <a href="#contacto" class="btn btn-sm">Contacto</a>
+          <ThemeToggle />
         </nav>
       </div>
     </header>

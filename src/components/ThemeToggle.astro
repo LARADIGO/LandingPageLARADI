@@ -1,0 +1,35 @@
+---
+/* Componente UI muy pequeño: botón que alterna tema.
+   No necesita props. */
+---
+<button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema" aria-pressed="false">
+  <!-- icono sencillo: sol/luna -->
+  <span class="icon-sun" aria-hidden="true">☀️</span>
+  <span class="icon-moon" aria-hidden="true" style="display:none">🌙</span>
+</button>
+
+<script type="module" client:load>
+  const btn = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+
+  // Inicializa desde localStorage (si hay) o respetamos prefers-color-scheme
+  const saved = localStorage.getItem('theme'); // 'dark' | 'light' | null
+  if (saved === 'dark') root.classList.add('dark-theme');
+  else if (saved === 'light') root.classList.remove('dark-theme');
+
+  const updateUI = () => {
+    const isDark = root.classList.contains('dark-theme');
+    btn.setAttribute('aria-pressed', String(isDark));
+    // mostramos/ocultamos iconos
+    btn.querySelector('.icon-sun').style.display = isDark ? 'none' : '';
+    btn.querySelector('.icon-moon').style.display = isDark ? '' : 'none';
+  };
+
+  updateUI();
+
+  btn.addEventListener('click', () => {
+    const isNowDark = root.classList.toggle('dark-theme');
+    localStorage.setItem('theme', isNowDark ? 'dark' : 'light');
+    updateUI();
+  });
+</script>

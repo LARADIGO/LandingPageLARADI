@@ -1,0 +1,52 @@
+---
+/* HeroTech: título a la izquierda, ilustración SVG a la derecha */
+const title = Astro.props.title ?? "Tu producto de marketing digital";
+const lead = Astro.props.lead ?? "Plataforma pensada para crecer tu negocio con analítica, automatización y campañas.";
+---
+<section class="section hero">
+  <div class="container grid-2" style="align-items:center; gap:32px;">
+    <div class="col">
+      <h1 class="display" style="color:var(--text)">{title}</h1>
+      <p class="lead" style="color:var(--muted)">{lead}</p>
+      <div class="actions" style="margin-top:18px;">
+        <a class="btn btn-lg" href="#demo">Ver demo</a>
+        <a class="btn btn-lg btn-ghost" href="#caracteristicas">Características</a>
+      </div>
+    </div>
+
+    <div class="col hero-visual" aria-hidden="true">
+      <!-- SVG illustration: blob + lines + dots (personalízalo) -->
+      <svg viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg" role="img">
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1">
+            <stop offset="0%" stop-color="var(--primary)" stop-opacity="1"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="1"/>
+          </linearGradient>
+          <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="18" result="b"/>
+          </filter>
+        </defs>
+
+        <!-- big soft blob -->
+        <g transform="translate(50,10)">
+          <path d="M140 20 C220 -10 360 10 420 80 C490 160 470 280 360 320 C250 360 120 330 60 260 C-10 180 40 50 140 20Z"
+            fill="url(#g1)" opacity="0.95" filter="url(#blur)"></path>
+        </g>
+
+        <!-- tech lines / nodes -->
+        <g stroke="rgba(255,255,255,.7)" stroke-width="2" stroke-linecap="round" opacity="0.9" transform="translate(30,30)">
+          <line x1="70" y1="90" x2="200" y2="40" stroke="rgba(255,255,255,.12)"/>
+          <circle cx="70" cy="90" r="6" fill="#fff" opacity="0.12"/>
+          <circle cx="200" cy="40" r="5" fill="#fff" opacity="0.12"/>
+        </g>
+
+        <!-- small UI card mockup -->
+        <g transform="translate(280,180)" fill="#fff" opacity="0.95">
+          <rect x="0" y="0" rx="12" width="160" height="100" fill="#fff" opacity="0.06" />
+          <rect x="12" y="14" rx="8" width="136" height="18" fill="#fff" opacity="0.12" />
+          <rect x="12" y="40" rx="6" width="100" height="10" fill="#fff" opacity="0.08" />
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>

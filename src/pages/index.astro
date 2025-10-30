@@ -1,40 +1,15 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import HeroLeaf from '@components/HeroLeaf.astro';
+
 ---
 <BaseLayout
   title="Tu POS, sin complicaciones"
   description="Interfaz clara, cobros en segundos y control total de inventario. Funciona en PC y tablet."
 >
   <!-- HERO -->
-  <section class="section hero">
-    <div class="container grid-2">
-      <div class="col">
-        <h1 class="display">Tu TPV, sin complicaciones</h1>
-        <p class="lead">
-          Interfaz clara, cobros en segundos y control total de inventario.
-          Compatible con lector de códigos y tickets. Ideal para retail y hostelería.
-        </p>
-        <div class="actions">
-          <a class="btn btn-lg" href="#demo">Ver demo</a>
-          <a class="btn btn-lg btn-ghost" href="#caracteristicas">Ver características</a>
-        </div>
-        <ul class="badges">
-          <li>Sin instalación</li>
-          <li>Actualizaciones automáticas</li>
-          <li>Soporte en español</li>
-        </ul>
-      </div>
-      <div class="col">
-        <img
-          class="hero-img"
-          src="/assets/zelda.jpg"
-          alt="Pantalla principal del POS"
-          width="1200"
-          height="800"
-        />
-      </div>
-    </div>
-  </section>
+<HeroLeaf title="Plataforma de marketing para equipos técnicos" lead="Analítica, automatización y contenido gobernado por datos, todo en un solo sitio." />
+
 
   <!-- CARACTERÍSTICAS -->
   <section id="caracteristicas" class="section">
