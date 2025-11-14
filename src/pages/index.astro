@@ -1,21 +1,26 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import HeroLeaf from '@components/HeroLeaf.astro';
-
+/* HERO NUEVO: diorama */
+import HeroDiorama from "@components/HeroDiorama.astro";
 ---
 <BaseLayout
   title="Tu POS, sin complicaciones"
   description="Interfaz clara, cobros en segundos y control total de inventario. Funciona en PC y tablet."
 >
-  <!-- HERO -->
-<HeroLeaf title="Plataforma de marketing para equipos técnicos" lead="Analítica, automatización y contenido gobernado por datos, todo en un solo sitio." />
-
+  <!-- HERO DIORAMA -->
+  <HeroDiorama
+    title="El TPV para tu tienda, simple y en regla"
+    subtitle="Cobra, emite tickets y facturas, controla inventario y cumple con VeriFactu."
+    ctaHref="#contacto"
+    cta2Href="#precios"
+    imageSrc="/images/tpv-diorama.jpg"
+  />
 
   <!-- CARACTERÍSTICAS -->
   <section id="caracteristicas" class="section">
     <div class="container">
       <h2 class="h2 center">Características clave</h2>
-      <p class="muted center max-680">Todo lo que necesitas para vender más rápido y gestionar mejor.</p>
+      <p class="muted center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
 
       <div class="cards">
         <article class="card">
@@ -42,31 +47,60 @@ import HeroLeaf from '@components/HeroLeaf.astro';
     </div>
   </section>
 
-  <!-- SOBRE -->
-  <section id="sobre" class="section alt">
-    <div class="container grid-2">
-      <div class="col">
-        <img
-          class="hero-img"
-          src="/assets/zelda.jpg"
-          alt="Pantalla principal del POS"
-          width="1200"
-          height="800"
-        />      </div>
-      <div class="col">
-        <h2 class="h2">Diseñado para tu día a día</h2>
-        <p>
-          Minimalista y enfocado en la caja. Menos clicks, menos esperas.
-          Compatible con impresoras de tickets y periféricos habituales.
+<!-- Sección VeriFactu -->
+<section id="verifactu" class="section alt verifactu-section">
+  <div class="container">
+    <h2 class="h2 center">VeriFactu</h2>
+    <p class="muted center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
+
+    <div class="verifactu-features">
+      <article class="card">
+        <div class="card-ico">🛡️</div>
+        <h3 style="margin:0 0 8px;">¿Qué es VeriFactu?</h3>
+        <p style="margin:0;">
+          Sistema de la Agencia Tributaria que exige facturación/tickets íntegros, trazables y verificables
+          para luchar contra el fraude y asegurar la conservación de registros.
         </p>
-        <ul class="list">
-          <li>Multi-tienda con stocks por ubicación</li>
-          <li>Perfiles y permisos por rol</li>
-          <li>Modo offline básico</li>
-        </ul>
-      </div>
+      </article>
+
+      <article class="card">
+        <div class="card-ico">📅</div>
+        <h3 style="margin:0 0 8px;">Entrada obligatoria 2026</h3>
+        <p style="margin:0;">
+          Su adopción será exigida progresivamente a partir de 2026. Adaptarte antes reduce riesgos,
+          costes de última hora y posibles sanciones administrativas.
+        </p>
+      </article>
+
+      <article class="card">
+        <div class="card-ico">⚙️</div>
+        <h3 style="margin:0 0 8px;">Impacto técnico</h3>
+        <p style="margin:0;">
+          Implica secuencialidad, firma o hash de comprobantes, almacenamiento seguro,
+          y posible envío telemático según especificación. Tu TPV debe generar
+          formatos compatibles y conservar datos varios años.
+        </p>
+      </article>
     </div>
-  </section>
+
+<!-- ...URL Agencia Tributaria -->
+<p class="center" style="margin-top:26px;">
+  <span class="vf-cta">
+    <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
+    <!-- Logo a la derecha del enlace -->
+    <img
+      src="/assets/logos/aeat.svg"
+      alt="Agencia Tributaria"
+      class="vf-cta__logo"
+      width="28"
+      height="28"
+      loading="lazy"
+      decoding="async"
+    />
+  </span>
+</p>
+  </div>
+</section>
 
   <!-- DEMO -->
   <section id="demo" class="section">
@@ -75,12 +109,6 @@ import HeroLeaf from '@components/HeroLeaf.astro';
       <p class="muted center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
 
       <div class="media-grid">
-        <!-- Si añades un video, descomenta y reemplaza el src -->
-        <!--
-        <video class="rounded" controls preload="metadata" poster="/assets/hero-placeholder.svg">
-          <source src="/media/demo.mp4" type="video/mp4" />
-        </video>
-        -->
         <img class="rounded" src="/assets/screen-2.svg" alt="Flujo de caja" width="960" height="640" />
         <img class="rounded" src="/assets/screen-3.svg" alt="Cierre de caja" width="960" height="640" />
       </div>
@@ -90,31 +118,31 @@ import HeroLeaf from '@components/HeroLeaf.astro';
   <!-- PRECIOS -->
   <section id="precios" class="section alt">
     <div class="container">
-      <h2 class="h2 center">Precios simples</h2>
-      <div class="pricing">
-        <div class="price-card">
-          <h3>Starter</h3>
-          <p class="price"><span>€</span>19<span>/mes</span></p>
+      <h2 class="h2 center">Escoge tu plan</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card featured">
+          <h3>Esencial</h3>
+          <p class="price"><span>€</span>9,90<span>/mes</span></p>
           <ul>
             <li>1 tienda</li>
-            <li>Usuarios ilimitados</li>
+            <li>Usuarios limitados</li>
             <li>Soporte por email</li>
           </ul>
-          <a href="#contacto" class="btn btn-block">Empezar</a>
+          <a href="#contacto" class="btn btn-block">Contactar</a>
         </div>
-        <div class="price-card featured">
-          <h3>Pro</h3>
-          <p class="price"><span>€</span>49<span>/mes</span></p>
+        <div class="pricing-card featured">
+          <h3>Avanzado</h3>
+          <p class="price"><span>€</span>12,90<span>/mes</span></p>
           <ul>
             <li>Hasta 3 tiendas</li>
             <li>Inventario avanzado</li>
             <li>Soporte prioritario</li>
           </ul>
-          <a href="#contacto" class="btn btn-block">Probar Pro</a>
+          <a href="#contacto" class="btn btn-block">Contactar</a>
         </div>
-        <div class="price-card">
-          <h3>Enterprise</h3>
-          <p class="price"><span>€</span>—</p>
+        <div class="pricing-card featured">
+          <h3>Pro</h3>
+          <p class="price"><span>€</span>15,90<span>/mes</span></p>
           <ul>
             <li>Tiendas ilimitadas</li>
             <li>Integraciones a medida</li>
@@ -125,6 +153,41 @@ import HeroLeaf from '@components/HeroLeaf.astro';
       </div>
     </div>
   </section>
+
+ <!-- QUIENES SOMOS -->
+  <section id="sobre" class="section alt">
+    <div class="container">
+      <h2 class="h2 center">Quiénes somos</h2>
+      <p class="muted center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
+
+      <div class="cards" style="margin-top:12px;">
+        <article class="card">
+          <div class="card-ico">🤝</div>
+          <h3>Soporte cercano</h3>
+          <p>Atención y tiempos de respuesta rápidos (normalmente en menos de 24h).</p>
+        </article>
+
+        <article class="card">
+          <div class="card-ico">🛍️</div>
+          <h3>Experiencia en retail</h3>
+          <p>Conocimiento práctico de caja, inventario y periféricos (impresoras, cajón, lector, etc.).</p>
+        </article>
+
+        <article class="card">
+          <div class="card-ico">🔐</div>
+          <h3>Seguridad y cumplimiento</h3>
+          <p>Buenas prácticas de seguridad y alineados con los requisitos de VeriFactu.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-ico">🚀</div>
+          <h3>Evolución continua</h3>
+          <p>Mejoras frecuentes y hoja de ruta enfocada en lo que aporta valor en tienda.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
 
   <!-- FAQ -->
   <section id="faq" class="section">
@@ -151,7 +214,7 @@ import HeroLeaf from '@components/HeroLeaf.astro';
   <section id="contacto" class="section alt">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
-      <p class="muted center max-680">Cuéntanos sobre tu negocio y te responderemos en menos de 24h.</p>
+      <p class="muted center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
 
       <form
         name="contact"
@@ -161,14 +224,10 @@ import HeroLeaf from '@components/HeroLeaf.astro';
         netlify-honeypot="bot-field"
         class="form"
       >
-        <!-- Campo honeypot (anti-spam). Mantener este input oculto -->
         <p class="hp" aria-hidden="true">
           <label>No rellenar: <input name="bot-field" /></label>
         </p>
-
-        <!-- Necesario para que Netlify detecte el formulario -->
         <input type="hidden" name="form-name" value="contact" />
-
         <div class="form-grid">
           <div>
             <label>Nombre</label>
@@ -183,7 +242,6 @@ import HeroLeaf from '@components/HeroLeaf.astro';
             <textarea name="message" rows="4" required placeholder="¿Qué necesitas?"></textarea>
           </div>
         </div>
-
         <button type="submit" class="btn btn-lg">Enviar</button>
       </form>
     </div>

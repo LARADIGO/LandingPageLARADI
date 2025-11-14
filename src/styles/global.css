@@ -12,27 +12,6 @@
   --paper-noise: url('/assets/textures/paper-noise.png'); /* optional */
 }
 
-.paper-layer {
-  position: absolute;
-  left: 0; right: 0;
-  height: 360px;
-  background: var(--paper-brown);
-  border-radius: 30px;
-  box-shadow:
-    0 24px 50px rgba(10,10,10,0.35),
-    inset 0 2px 0 rgba(255,255,255,0.06);
-  transform: rotate(-6deg);
-  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-}
-
-.leaf {
-  position: absolute;
-  filter: drop-shadow(0 18px 30px rgba(8,10,10,0.45));
-  transform-origin: center;
-  transition: transform .45s ease;
-}
-.leaf:hover { transform: translateY(-6px) rotate(-2deg) scale(1.03); }
-
 /* Dark-theme override (aplícalo con .dark-theme en <html> o <body>) */
 .dark-theme {
   --bg: #0b0f19;
@@ -196,34 +175,6 @@ body{
   box-shadow: 0 18px 42px rgba(6,8,10,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-.tech-card {
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,240,233,0.98));
-  box-shadow: 0 20px 40px rgba(6,8,10,0.14);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  overflow: visible;
-}
-
-.tech-card::after {
-  content: "";
-  position: absolute;
-  left: 18px;
-  bottom: 12px;
-  width: calc(100% - 36px);
-  height: 12px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, rgba(0,0,0,0.06), rgba(0,0,0,0));
-  transform: translateY(10px);
-  filter: blur(8px);
-  z-index: -1;
-}
-
 /* Hero: utilidades para colocación de SVG y overlay */
 .hero-visual {
   position: relative;
@@ -316,3 +267,153 @@ input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3p
 .dark-theme .theme-toggle:hover { background: rgba(255,255,255,.03); transform: translateY(-1px); }
 .theme-toggle:active { transform: translateY(0); }
 .theme-toggle .icon-sun, .theme-toggle .icon-moon { line-height: 1; }
+
+/* === AÑADIR AL FINAL DEL ARCHIVO === */
+
+/* 1) Fuente Inter global (si quieres toda la web con Inter) */
+body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif; }
+
+/* 2) Cabecera con fondo SÓLIDO en tema claro (sin transparencia ni blur) */
+.site-header{
+  position: sticky; top:0; z-index:60;
+  /* Fondo sólido claro tipo pastel, no translúcido */
+  background: linear-gradient(180deg, #EAF2ED 0%, #EDF1F4 100%);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  color: var(--text);
+  backdrop-filter: none;           /* quitar blur */
+}
+
+/* Enlaces del nav en oscuro en claro */
+:not(.dark-theme) .site-header .nav a {
+  color: var(--text);
+  text-decoration: none;
+}
+:not(.dark-theme) .site-header .nav a:hover {
+  color: var(--text);
+  background: rgba(0,0,0,.03);
+}
+
+/* 3) Cabecera sólida en modo oscuro (también sin transparencia) */
+.dark-theme .site-header {
+  background: linear-gradient(180deg, #0F1624 0%, #0D1420 100%);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  backdrop-filter: none;           /* quitar blur */
+}
+.dark-theme .site-header .nav a { color: var(--muted); }
+.dark-theme .site-header .nav a:hover { color: var(--text); background: rgba(255,255,255,.04); }
+
+/* 4) Botón pastel del header */
+.btn.cta-pastel{
+  background: #CFEFD9;     /* verde pastel */
+  border-color: #CFEFD9;
+  color: #0F172A;          /* texto oscuro para contraste */
+}
+.btn.cta-pastel:hover{
+  background: #BEE8CC;
+  border-color: #BEE8CC;
+}
+
+/* === Utilidad para listas centradas en bloques de texto centrado === */
+.centered-list {
+  display: inline-block;       /* se contrae al ancho del contenido */
+  text-align: left;            /* el texto e items quedan alineados a la izquierda */
+  margin: 12px auto 0;         /* centrado horizontal */
+}
+
+/* ===== Pricing: destacar tarjeta y desenfocar las demás =====
+   - Aplicar .featured a las tarjetas que quieras que muestren
+     siempre el borde verde (ej. Esencial, Pro, Avanzado).
+   - Asegúrate de que las tarjetas están dentro de un contenedor
+     con la clase .pricing-grid y cada tarjeta tiene .pricing-card.
+*/
+.pricing-grid {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  /* Ajusta flex-wrap o layout según necesites para móviles */
+  flex-wrap: wrap;
+}
+
+/* Estilos base de cada tarjeta de precio */
+.pricing-card {
+  position: relative;
+  flex: 1 1 220px; /* ajustar ancho base como prefieras */
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: var(--card-bg, #fff);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1),
+              box-shadow 220ms ease,
+              border-color 160ms ease,
+              filter 220ms ease;
+  will-change: transform, filter, border-color, box-shadow;
+}
+
+/* Tarjetas que muestran el recuadro verde por defecto */
+.pricing-card.featured {
+  border-color: #22c55e; /* verde claro */
+  box-shadow: 0 10px 30px rgba(34,197,94,0.08);
+}
+
+/* Al pasar el cursor por la rejilla, desenfoca y atenúa todas las tarjetas */
+.pricing-grid:hover .pricing-card {
+  filter: blur(4px) brightness(.92);
+  transform: none;
+  transition: filter 220ms ease, transform 220ms ease;
+  z-index: 0;
+}
+
+/* La tarjeta bajo el cursor (o con foco) se destaca: escala, sin blur, encima de las demás */
+.pricing-grid .pricing-card:hover,
+.pricing-grid .pricing-card:focus-within {
+  filter: none;
+  transform: scale(1.06);
+  z-index: 20;
+  box-shadow: 0 18px 42px rgba(2,6,23,0.12);
+}
+
+/* Asegura que al hacer hover la tarjeta recupera el borde verde si tiene .featured */
+.pricing-grid .pricing-card.featured:hover {
+  border-color: #16a34a; /* verde más oscuro al hover */
+  box-shadow: 0 20px 50px rgba(16,185,129,0.12);
+}
+
+/* Soporte de teclado: focus-visible para accesibilidad */
+.pricing-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(34,197,94,0.12);
+}
+
+/* Ajustes responsivos opcionales: en pantallas pequeñas evita el efecto de blur */
+@media (hover: none), (pointer: coarse) {
+  .pricing-grid:hover .pricing-card { filter: none; }
+  .pricing-grid .pricing-card { transform: none; }
+}
+
+/* Ocultar solo el botón central del hero (marcado con .center-cta) */
+.center-cta {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* CTA de VeriFactu con logo a la derecha */
+.vf-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;              /* separación entre el enlace y el logo */
+}
+
+.vf-cta__logo {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  vertical-align: middle;
+  /* Si usas modo oscuro y quieres igualar contraste, puedes ajustar con filter */
+  /* filter: saturate(0.9) contrast(1.05); */
+}
+
+.vf-cta { display: inline-flex; align-items: center; gap: 0.7em; }
+.vf-cta__logo { width: 3.2em; height: 3.2em; object-fit: contain; }

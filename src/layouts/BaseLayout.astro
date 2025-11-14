@@ -18,11 +18,14 @@ const {
     <meta property="og:image" content={image} />
     <meta name="theme-color" content="#0b0f19" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Fuente Inter (la del diseño) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="#inicio" class="brand">LARADI</a>
+        <a href="#inicio" class="brand">TePeuVe</a>
 
         <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
         <label for="nav-toggle" class="nav-toggle-btn" aria-hidden="true">
@@ -30,12 +33,15 @@ const {
         </label>
 
         <nav class="nav">
-          <a href="#caracteristicas">Características</a>
-          <a href="#sobre">Sobre</a>
-          <a href="#demo">Demo</a>
+          <!-- Menú con los textos solicitados -->
+          <a href="#caracteristicas">Funcionalidades</a>
+          <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
-          <a href="#faq">FAQ</a>
-          <a href="#contacto" class="btn btn-sm">Contacto</a>
+          <a href="#sobre">Quiénes somos</a>
+
+          <!-- CTA pastel -->
+          <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
+
           <ThemeToggle />
         </nav>
       </div>

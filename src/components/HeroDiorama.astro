@@ -1,0 +1,58 @@
+---
+import "@styles/diorama.css";
+
+interface Props{
+  title?: string; subtitle?: string; string;
+  ctaText?: string; ctaHref?: string; cta2Text?: string; cta2Href?: string;
+  imageSrc?: string;  // /public/images/...
+  splineUrl?: string; // opcional
+}
+const {
+  title = 'El TPV para tu tienda, simple y en regla',
+  subtitle = 'Cobra, emite tickets y facturas, controla inventario y cumple con VeriFactu.',
+  ctaText = 'Probar gratis', ctaHref = '#contacto',
+  cta2Text = 'Ver precios', cta2Href = '#precios',
+  imageSrc = '/images/tpv-diorama.jpg',
+  splineUrl = ''
+} = Astro.props as Props;
+---
+<section class="diorama-page" aria-label="Hero estilo diorama">
+  <div class="wrap">
+    <div class="hero-card">
+      <!-- Barra decorativa eliminada para no “pisar” tu cabecera real -->
+
+      <div class="hero-grid">
+        <div>
+          <h1>{title}</h1>
+          <p class="lead">{subtitle}</p>
+            <div class="ctas">
+            <!-- Añadimos la clase center-cta al botón que queremos ocultar -->
+            <a class="btn primary1 center-cta" href={ctaHref}>{ctaText}</a>
+            <a class="btn primary2 center-cta" href={cta2Href}>{cta2Text}</a>
+            </div>
+          <div class="bullets">
+            <div>• Cobro rápido: efectivo y tarjeta</div>
+            <div>• Facturas al instante por email</div>
+            <div>• Cumplimiento VeriFactu</div>
+          </div>
+        </div>
+
+        <div class="stage" role="img" aria-label="Escena tipo diorama con TPV">
+          <div class="media">
+            {splineUrl
+              ? <iframe src={splineUrl} title="Diorama 3D" frameborder="0" allow="autoplay; fullscreen" loading="lazy"></iframe>
+              : <img src={imageSrc} alt="TPV en mostrador" />
+            }
+          </div>
+        </div>
+      </div>
+
+      <svg class="waves" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+        <path class="wave-path" d="M0,80 C160,20 320,20 480,80 C640,140 800,140 960,80 C1120,20 1280,20 1440,80 L1440,160 L0,160 Z"></path>
+      </svg>
+
+    
+      </div>
+    </div>
+  </div>
+</section>
