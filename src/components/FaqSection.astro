@@ -1,0 +1,289 @@
+---
+import "../styles/faq.css";
+
+/**
+ * FaqSection.astro (versión con estilos externos y script mejorado)
+ */
+const {
+  title = "Preguntas frecuentes",
+  description = "",
+  items = [],
+  ...attrs
+} = Astro.props;
+
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .substring(0, 64);
+}
+
+const hashPrefix = attrs['data-hash-prefix'] || 'faq-';
+const prepared = items.map((it, i) => ({
+  ...it,
+  id: hashPrefix + (slugify(it.question) || i)
+}));
+---
+
+<section id="faq" class="section faq-section">
+  <div class="container">
+    <h2 class="h2 center">{title}</h2>
+    {description && <p class="lead center max-680">{description}</p>}
+
+    <div class="center" style="margin:0 0 18px;">
+      <span id="faq-count" class="muted small"></span>
+    </div>
+
+    <div class="faq-controls center">
+      <button type="button" class="btn btn-sm faq-expand-all">Expandir todo</button>
+      <button type="button" class="btn btn-sm btn-ghost faq-collapse-all">Colapsar todo</button>
+    </div>
+
+    <div
+      class="faq-enhanced"
+      {...attrs}
+      data-component="faq"
+      data-hash-prefix={hashPrefix}
+      data-length={prepared.length}
+    >
+      {prepared.map((item, idx) => (
+        <details class="faq-item" id={item.id} data-index={idx}>
+          <summary>
+            <span class="faq-icon" aria-hidden="true"></span>
+            <span class="faq-question">{item.question}</span>
+          </summary>
+          <div class="faq-panel">
+            <div class="faq-answer">
+              <p>{item.answer}</p>
+            </div>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+(function(){
+  const root = document.querySelector('[data-component="faq"]');
+  if(!root) return;
+
+  const section = root.closest('.faq-section') || document;
+  const items = Array.from(root.querySelectorAll('.faq-item'));
+  if(!items.length) return;
+
+  const accordion     = root.dataset.accordion === 'true';
+  const persist       = !accordion && root.dataset.persist === 'true';
+  const iconType      = (root.dataset.icon || 'chevron').toLowerCase();
+  const autoscroll    = root.dataset.autoscroll === 'true';
+  const hashPrefix    = root.dataset.hashPrefix || 'faq-';
+  const counterSel    = root.dataset.counterTarget || '#faq-count';
+  const scrollBlock   = root.dataset.scrollBlock || 'center';
+  const expandCollapse= root.dataset.expandCollapse === 'true';
+  const defaultOpenRaw= root.dataset.defaultOpen || '';
+  const defaultOpenIndexes = defaultOpenRaw.split(',')
+    .map(s=>s.trim()).filter(Boolean)
+    .map(s=>parseInt(s,10))
+    .filter(n=>!isNaN(n));
+
+  const counterTarget = section.querySelector(counterSel);
+  const controlsWrap  = section.querySelector('.faq-controls');
+
+  // Ocultar controles si no se pide
+  if(controlsWrap && !expandCollapse){
+    controlsWrap.style.display = 'none';
+  }
+
+  // Preparar iconos
+  items.forEach(d => {
+    const iconSpan = d.querySelector('.faq-icon');
+    if(iconSpan){
+      iconSpan.dataset.iconType = iconType;
+    }
+  });
+
+  // Persistencia
+  const LS_KEY = 'faqOpenIds';
+  function loadPersisted(){
+    if(!persist) return [];
+    try {
+      return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    } catch(_) { return []; }
+  }
+  function savePersisted(openIds){
+    if(!persist) return;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(openIds)); } catch(_){}
+  }
+
+  // Estado inicial: hash > persistencia > default
+  const currentHash = decodeURIComponent(location.hash.replace('#',''));
+  const toOpenSet = new Set();
+  if(currentHash && currentHash.startsWith(hashPrefix)){
+    const match = items.find(d => d.id === currentHash);
+    if(match) toOpenSet.add(match.id);
+  } else {
+    const persisted = loadPersisted();
+    if(persisted.length){
+      persisted.forEach(id => toOpenSet.add(id));
+    } else {
+      defaultOpenIndexes.forEach(i => {
+        const det = items[i];
+        if(det) toOpenSet.add(det.id);
+      });
+    }
+  }
+
+  // Inicializar (sin animación)
+  items.forEach(d => {
+    const panel = d.querySelector('.faq-panel');
+    if(!panel) return;
+    if(toOpenSet.has(d.id)){
+      d.setAttribute('open','');
+      panel.style.height='auto';
+      panel.style.opacity='1';
+    } else {
+      d.removeAttribute('open');
+      panel.style.height='0px';
+      panel.style.opacity='0';
+      panel.style.overflow='hidden';
+    }
+  });
+
+  // Contador
+  function updateCounter(){
+    if(!counterTarget) return;
+    const openCount = items.filter(d=>d.open).length;
+    const total = items.length;
+    counterTarget.textContent = openCount
+      ? `Abiertas: ${openCount}/${total}`
+      : `Sin preguntas abiertas (${total})`;
+  }
+  updateCounter();
+
+  // Animación altura
+  function animate(details, opening){
+    const panel = details.querySelector('.faq-panel');
+    if(!panel) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    panel.style.overflow='hidden';
+    if(reduce){
+      if(opening){
+        panel.style.height='auto'; panel.style.opacity='1';
+      } else {
+        panel.style.height='0px'; panel.style.opacity='0';
+      }
+      return;
+    }
+    if(opening){
+      panel.style.height='0px';
+      panel.style.opacity='0';
+      requestAnimationFrame(()=>{
+        panel.style.transition='height .38s cubic-bezier(.25,.9,.25,1), opacity .32s ease';
+        panel.style.height=panel.scrollHeight+'px';
+        panel.style.opacity='1';
+      });
+      panel.addEventListener('transitionend', function end(e){
+        if(e.propertyName==='height'){
+          panel.style.height='auto';
+          panel.style.overflow='';
+          panel.removeEventListener('transitionend', end);
+        }
+      });
+    } else {
+      panel.style.height=panel.scrollHeight+'px';
+      panel.style.opacity='1';
+      requestAnimationFrame(()=>{
+        panel.style.transition='height .32s ease, opacity .28s ease';
+        panel.style.height='0px';
+        panel.style.opacity='0';
+      });
+      panel.addEventListener('transitionend', function end(e){
+        if(e.propertyName==='height'){
+          panel.style.overflow='';
+          panel.removeEventListener('transitionend', end);
+        }
+      });
+    }
+  }
+
+  function openItem(details, {scroll=true, updateHash=true}={}){
+    if(details.open) return;
+    if(accordion){
+      items.forEach(d=>{
+        if(d!==details && d.open) closeItem(d,{updateHash:false});
+      });
+    }
+    details.setAttribute('open','');
+    animate(details,true);
+    if(updateHash){
+      history.replaceState(null,'','#'+details.id);
+    }
+    if(scroll && autoscroll){
+      details.scrollIntoView({behavior:'smooth', block:scrollBlock});
+    }
+  }
+
+  function closeItem(details,{updateHash=true}={}){
+    if(!details.open) return;
+    details.removeAttribute('open');
+    animate(details,false);
+    if(updateHash && location.hash==='#'+details.id){
+      history.replaceState(null,'','#');
+    }
+  }
+
+  // Eventos en summary
+  items.forEach(d=>{
+    const summary = d.querySelector('summary');
+    summary?.addEventListener('click', e=>{
+      e.preventDefault();
+      d.open ? closeItem(d) : openItem(d);
+      persistState();
+      updateCounter();
+    });
+    summary?.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        d.open ? closeItem(d) : openItem(d);
+        persistState();
+        updateCounter();
+      }
+    });
+  });
+
+  function persistState(){
+    if(!persist) return;
+    const openIds = items.filter(d=>d.open).map(d=>d.id);
+    savePersisted(openIds);
+  }
+
+  // Controles expand / collapse
+  if(controlsWrap && expandCollapse){
+    const btnExpand = controlsWrap.querySelector('.faq-expand-all');
+    const btnCollapse = controlsWrap.querySelector('.faq-collapse-all');
+    btnExpand?.addEventListener('click', ()=>{
+      items.forEach(d=>openItem(d,{scroll:false, updateHash:false}));
+      persistState();
+      updateCounter();
+    });
+    btnCollapse?.addEventListener('click', ()=>{
+      items.forEach(d=>closeItem(d,{updateHash:false}));
+      persistState();
+      updateCounter();
+    });
+  }
+
+  // Scroll inicial si hash
+  if(currentHash){
+    const target = items.find(d=>d.id===currentHash);
+    if(target && autoscroll){
+      requestAnimationFrame(()=>{
+        target.scrollIntoView({behavior:'smooth', block:scrollBlock});
+      });
+    }
+  }
+})();
+</script>

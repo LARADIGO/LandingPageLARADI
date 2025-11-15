@@ -1,0 +1,72 @@
+/* Cookie Consent Banner Styles */
+.cc-wrap {
+  position: fixed;
+  inset: auto 16px 16px 16px;
+  z-index: 90;
+  display: none;
+  max-width: 560px;
+  animation: cc-fade-slide .38s cubic-bezier(.25,.9,.25,1);
+  font-family: var(--font-sans);
+}
+.cc-wrap[data-state="ask"] { display: block; }
+@media (max-width:640px){ .cc-wrap { left:8px; right:8px; } }
+.cc-card {
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(2,6,23,.10);
+  padding:14px 16px 16px;
+  display:grid;
+  gap:10px;
+  grid-template-columns:1fr auto;
+  align-items:flex-start;
+  position:relative;
+}
+@media (max-width:640px){ .cc-card { grid-template-columns:1fr; } }
+.dark-theme .cc-card { background: var(--surface-2); box-shadow:0 10px 30px rgba(0,0,0,.45); }
+.cc-text { color: var(--text); font-size:14px; line-height:1.45; font-weight:500; }
+.cc-link { color: var(--text-strong); font-weight:600; text-decoration:underline; }
+.dark-theme .cc-link { color: var(--text); }
+.cc-actions { display:inline-flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+.cc-btn {
+  background:linear-gradient(135deg,var(--primary), var(--primary-2));
+  color:#0F172A;
+  font-weight:700;
+  padding:8px 14px;
+  border-radius:10px;
+  border:1px solid rgba(2,6,23,.08);
+  cursor:pointer;
+  font-size:14px;
+  font-family:var(--font-display);
+  transition:filter .15s ease, transform .15s ease;
+}
+.cc-btn:hover { filter:brightness(1.05); }
+.cc-btn:active { transform:translateY(1px); }
+.dark-theme .cc-btn { color:#081121; }
+.cc-btn.cc-ghost { background:transparent; color:var(--text-strong); border:1px solid var(--border); }
+.dark-theme .cc-btn.cc-ghost { color:var(--text); }
+.cc-manage {
+  justify-self:end;
+  font-size:13px;
+  color:var(--muted);
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  text-decoration:underline;
+  padding:4px 6px;
+  line-height:1;
+  font-family:var(--font-sans);
+}
+.cc-manage:hover { color: var(--text-strong); }
+.dark-theme .cc-manage:hover { color: var(--text); }
+.hp { position:absolute !important; left:-9999px !important; width:1px; height:1px; overflow:hidden; }
+@keyframes cc-fade-slide { from { opacity:0; transform:translateY(12px);} to { opacity:1; transform:translateY(0);} }
+.cc-btn:focus-visible, .cc-manage:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:2px;
+  border-radius:6px;
+}
+@media (prefers-reduced-motion: reduce){
+  .cc-wrap { animation:none; }
+  .cc-btn { transition:none; }
+}

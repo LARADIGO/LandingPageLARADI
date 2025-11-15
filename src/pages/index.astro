@@ -1,13 +1,15 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-/* HERO NUEVO: diorama */
 import HeroDiorama from "@components/HeroDiorama.astro";
+import FaqSection from "@components/FaqSection.astro";
+import FeatureShowcase from "@components/FeatureShowcase.astro";
+import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio.astro";
 ---
+
 <BaseLayout
   title="Tu POS, sin complicaciones"
   description="Interfaz clara, cobros en segundos y control total de inventario. Funciona en PC y tablet."
 >
-  <!-- HERO DIORAMA -->
   <HeroDiorama
     title="El TPV para tu tienda, simple y en regla"
     subtitle="Cobra, emite tickets y facturas, controla inventario y cumple con VeriFactu."
@@ -20,7 +22,7 @@ import HeroDiorama from "@components/HeroDiorama.astro";
   <section id="caracteristicas" class="section">
     <div class="container">
       <h2 class="h2 center">Características clave</h2>
-      <p class="muted center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
+      <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
 
       <div class="cards">
         <article class="card">
@@ -47,67 +49,57 @@ import HeroDiorama from "@components/HeroDiorama.astro";
     </div>
   </section>
 
-<!-- Sección VeriFactu -->
-<section id="verifactu" class="section alt verifactu-section">
-  <div class="container">
-    <h2 class="h2 center">VeriFactu</h2>
-    <p class="muted center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
-
-    <div class="verifactu-features">
-      <article class="card">
-        <div class="card-ico">🛡️</div>
-        <h3 style="margin:0 0 8px;">¿Qué es VeriFactu?</h3>
-        <p style="margin:0;">
-          Sistema de la Agencia Tributaria que exige facturación/tickets íntegros, trazables y verificables
-          para luchar contra el fraude y asegurar la conservación de registros.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="card-ico">📅</div>
-        <h3 style="margin:0 0 8px;">Entrada obligatoria 2026</h3>
-        <p style="margin:0;">
-          Su adopción será exigida progresivamente a partir de 2026. Adaptarte antes reduce riesgos,
-          costes de última hora y posibles sanciones administrativas.
-        </p>
-      </article>
-
-      <article class="card">
-        <div class="card-ico">⚙️</div>
-        <h3 style="margin:0 0 8px;">Impacto técnico</h3>
-        <p style="margin:0;">
-          Implica secuencialidad, firma o hash de comprobantes, almacenamiento seguro,
-          y posible envío telemático según especificación. Tu TPV debe generar
-          formatos compatibles y conservar datos varios años.
-        </p>
-      </article>
-    </div>
-
-<!-- ...URL Agencia Tributaria -->
-<p class="center" style="margin-top:26px;">
-  <span class="vf-cta">
-    <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
-    <!-- Logo a la derecha del enlace -->
-    <img
-      src="/assets/logos/aeat.svg"
-      alt="Agencia Tributaria"
-      class="vf-cta__logo"
-      width="28"
-      height="28"
-      loading="lazy"
-      decoding="async"
-    />
-  </span>
-</p>
-  </div>
-</section>
+  <!-- FUNCIONALIDADES FULL-BLEED mejoradas -->
+  <FeatureShowcaseDynamicRatio
+    items={[
+      {
+        title:"Venta rápida en mostrador",
+        text:"Búsqueda instantánea, lector de códigos y atajos.",
+        img:"/assets/features/welcome_page_claro.png",
+        alt:"Pantalla de venta rápida",
+        mediaAnim:"zoom-in",
+        contentAnim:"slide-left",
+        altBg:false,
+        cover:true
+      },
+      {
+        title:"Inventario con variantes",
+        text:"Stock por tienda, tallas/colores, coste medio.",
+        img:"/assets/features/welcome_page.png",
+        alt:"Gestión de inventario",
+        mediaAnim:"scale-up",
+        contentAnim:"slide-right",
+        altBg:true,
+        cover:true
+      },
+      {
+        title:"Facturación y tickets",
+        text:"Tickets, facturas, devoluciones y cierres.",
+        img:"/assets/features/welcome_page_claro.png",
+        alt:"Emisión de documentos",
+        mediaAnim:"rotate-in",
+        contentAnim:"lift-in",
+        altBg:false,
+        cover:true
+      },
+      {
+        title:"Informes claros",
+        text:"Ventas por día, producto y empleado.",
+        img:"/assets/features/welcome_page.png",
+        alt:"Informes y analítica",
+        mediaAnim:"blur-in",
+        contentAnim:"fade-in",
+        altBg:true,
+        cover:true
+      }
+    ]}
+  />
 
   <!-- DEMO -->
   <section id="demo" class="section">
     <div class="container">
       <h2 class="h2 center">Demo rápida</h2>
-      <p class="muted center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
-
+      <p class="lead center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
       <div class="media-grid">
         <img class="rounded" src="/assets/screen-2.svg" alt="Flujo de caja" width="960" height="640" />
         <img class="rounded" src="/assets/screen-3.svg" alt="Cierre de caja" width="960" height="640" />
@@ -154,31 +146,58 @@ import HeroDiorama from "@components/HeroDiorama.astro";
     </div>
   </section>
 
- <!-- QUIENES SOMOS -->
+  <!-- VeriFactu -->
+  <section id="verifactu" class="section alt verifactu-section">
+    <div class="container">
+      <h2 class="h2 center">VeriFactu</h2>
+      <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
+      <div class="verifactu-features">
+        <article class="card">
+          <div class="card-ico">🛡️</div>
+          <h3>¿Qué es VeriFactu?</h3>
+          <p>Sistema de la Agencia Tributaria que exige facturación/tickets íntegros, trazables y verificables para luchar contra el fraude y asegurar la conservación de registros.</p>
+        </article>
+        <article class="card">
+          <div class="card-ico">📅</div>
+          <h3>Entrada obligatoria 2026</h3>
+          <p>Su adopción será exigida progresivamente a partir de 2026. Adaptarte antes reduce riesgos, costes de última hora y posibles sanciones administrativas.</p>
+        </article>
+        <article class="card">
+          <div class="card-ico">⚙️</div>
+          <h3>Impacto técnico</h3>
+          <p>Implica secuencialidad, firma o hash de comprobantes, almacenamiento seguro y posible envío telemático. Tu TPV debe generar formatos compatibles y conservar datos varios años.</p>
+        </article>
+      </div>
+      <p class="center" style="margin-top:26px;">
+        <span class="vf-cta">
+          <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
+          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria" class="vf-cta__logo" width="28" height="28" loading="lazy" decoding="async" />
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <!-- QUIÉNES SOMOS -->
   <section id="sobre" class="section alt">
     <div class="container">
       <h2 class="h2 center">Quiénes somos</h2>
-      <p class="muted center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
-
-      <div class="cards" style="margin-top:12px;">
+      <p class="lead center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
+      <div class="cards">
         <article class="card">
           <div class="card-ico">🤝</div>
           <h3>Soporte cercano</h3>
           <p>Atención y tiempos de respuesta rápidos (normalmente en menos de 24h).</p>
         </article>
-
         <article class="card">
           <div class="card-ico">🛍️</div>
           <h3>Experiencia en retail</h3>
           <p>Conocimiento práctico de caja, inventario y periféricos (impresoras, cajón, lector, etc.).</p>
         </article>
-
         <article class="card">
           <div class="card-ico">🔐</div>
           <h3>Seguridad y cumplimiento</h3>
           <p>Buenas prácticas de seguridad y alineados con los requisitos de VeriFactu.</p>
         </article>
-
         <article class="card">
           <div class="card-ico">🚀</div>
           <h3>Evolución continua</h3>
@@ -188,34 +207,33 @@ import HeroDiorama from "@components/HeroDiorama.astro";
     </div>
   </section>
 
-
   <!-- FAQ -->
-  <section id="faq" class="section">
-    <div class="container">
-      <h2 class="h2 center">Preguntas frecuentes</h2>
-      <div class="faq">
-        <details class="faq-item">
-          <summary>¿Necesito hardware especial?</summary>
-          <p>Funciona con periféricos estándar: lector de códigos, cajón y ticketera.</p>
-        </details>
-        <details class="faq-item">
-          <summary>¿Puedo importar productos?</summary>
-          <p>Sí, mediante plantillas CSV; podemos ayudarte en la migración.</p>
-        </details>
-        <details class="faq-item">
-          <summary>¿Hay contrato de permanencia?</summary>
-          <p>No. Puedes cancelar cuando quieras.</p>
-        </details>
-      </div>
-    </div>
-  </section>
+  <FaqSection
+    title="Preguntas frecuentes"
+    description="Resolvemos las dudas más comunes sobre el TPV y VeriFactu."
+    items={[
+      { question: "¿Necesito hardware especial?", answer: "Funciona con periféricos estándar: lector de códigos, cajón y ticketera." },
+      { question: "¿Puedo importar productos?", answer: "Sí, mediante plantillas CSV; podemos ayudarte en la migración inicial." },
+      { question: "¿Hay contrato de permanencia?", answer: "No. Puedes cancelar cuando quieras sin penalizaciones." },
+      { question: "¿Ofrecéis soporte prioritario?", answer: "Sí, en planes avanzados y Pro, con SLA reducido." },
+      { question: "¿Cumple con VeriFactu?", answer: "Se prepara para los requisitos de integridad, secuencialidad y trazabilidad exigidos." }
+    ]}
+    data-accordion="false"
+    data-persist="true"
+    data-icon="chevron"
+    data-autoscroll="true"
+    data-expand-collapse="true"
+    data-counter-target="#faq-count"
+    data-default-open="0"
+    data-scroll-block="center"
+    data-hash-prefix="faq-"
+  />
 
   <!-- CONTACTO -->
   <section id="contacto" class="section alt">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
-      <p class="muted center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
-
+      <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
       <form
         name="contact"
         method="POST"

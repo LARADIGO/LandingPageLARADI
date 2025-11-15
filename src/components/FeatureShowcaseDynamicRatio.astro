@@ -1,0 +1,87 @@
+---
+import "../styles/feature-showcase.css";
+type Side = 'left' | 'right';
+type Anim =
+  | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down'
+  | 'zoom-in' | 'fade-in' | 'blur-in' | 'rotate-in' | 'scale-up' | 'lift-in';
+
+interface Item {
+  title:string; text:string; img:string; alt:string;
+  side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
+}
+
+const { items = [] as Item[] } = Astro.props;
+const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in","scale-up"];
+---
+<section id="funcionalidades" class="section features-section full-bleed">
+  <div class="features-list">
+    {
+      items.map((it,i) => {
+        const side = it.side || (i % 2 === 0 ? 'left':'right');
+        const mediaAnim = it.mediaAnim || cycle[i % cycle.length];
+        const contentAnim = it.contentAnim || cycle[(i+1) % cycle.length];
+        const mediaFirst = side === 'left';
+        return (
+          <article class={`feature-row feature-${side} ${it.altBg?'feature-alt':''}`}>
+            <div class="feature-row-inner">
+              {mediaFirst ? (
+                <>
+                  <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger="0" style="--stagger-delay:0s;">
+                    <div class="feature-media-inner dynamic-ratio">
+                      <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
+                    </div>
+                  </div>
+                  <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger="1" style="--stagger-delay:.14s;">
+                    <h3>{it.title}</h3><p>{it.text}</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger="0" style="--stagger-delay:0s;">
+                    <h3>{it.title}</h3><p>{it.text}</p>
+                  </div>
+                  <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger="1" style="--stagger-delay:.14s;">
+                    <div class="feature-media-inner dynamic-ratio">
+                      <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+</section>
+
+<script is:inline>
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = document.querySelectorAll('[data-reveal]');
+  const conts = document.querySelectorAll('.feature-media-inner.dynamic-ratio img');
+
+  conts.forEach(img => {
+    if (img.complete) applyRatio(img);
+    else img.addEventListener('load', () => applyRatio(img));
+  });
+
+  function applyRatio(img){
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    if (w && h) {
+      img.closest('.feature-media-inner').style.aspectRatio = `${w}/${h}`;
+    }
+  }
+
+  if (reduce) { els.forEach(e=>e.classList.add('is-visible')); return; }
+
+  const io = new IntersectionObserver((entries)=>{
+    for(const e of entries){
+      if(e.isIntersecting) e.target.classList.add('is-visible');
+      else e.target.classList.remove('is-visible');
+    }
+  }, {threshold:.25});
+  els.forEach(e=>io.observe(e));
+})();
+</script>

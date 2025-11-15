@@ -1,0 +1,92 @@
+---
+import "../styles/cookie-consent.css";
+/**
+ * Banner Consent Mode GA4 con expiración 7 días.
+ */
+---
+<div id="cookie-consent" class="cc-wrap" data-state="init" aria-live="polite">
+  <div class="cc-card">
+    <div class="cc-text">
+      Usamos analítica de Google (GA4) para mejorar el sitio. Puedes aceptar o rechazar las cookies de analítica.
+      <a href="/politica-privacidad" class="cc-link">Más info</a>
+    </div>
+    <div class="cc-actions">
+      <button class="cc-btn cc-ghost" data-action="reject" type="button">Rechazar</button>
+      <button class="cc-btn" data-action="accept" type="button">Aceptar</button>
+    </div>
+    <button class="cc-manage hp" data-action="manage" type="button" aria-label="Cambiar preferencia de cookies">
+      Cambiar preferencia
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const wrap = document.getElementById('cookie-consent');
+    if (!wrap) return;
+    const KEY = 'cookie_consent';
+    const EXP_MS = 7 * 24 * 60 * 60 * 1000;
+
+    const gtag = window.gtag || function(){ (window.dataLayer = window.dataLayer || []).push(arguments); };
+    const now = () => Date.now();
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || !obj.value || !obj.ts) return null;
+        if (now() - obj.ts > EXP_MS) return null;
+        return obj;
+      } catch { return null; }
+    }
+    function save(value) {
+      try { localStorage.setItem(KEY, JSON.stringify({ value, ts: now() })); } catch {}
+    }
+    function apply(value) {
+      if (value === 'accepted') {
+        gtag('consent', 'update', {
+          analytics_storage: 'granted',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          ad_storage: 'denied'
+        });
+      } else {
+        gtag('consent', 'update', {
+          analytics_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          ad_storage: 'denied'
+        });
+      }
+    }
+
+    const stored = load();
+    if (stored) {
+      wrap.dataset.state = 'done';
+      wrap.querySelector('.cc-manage')?.classList.remove('hp');
+      apply(stored.value);
+    } else {
+      wrap.dataset.state = 'ask';
+      wrap.querySelector('.cc-manage')?.classList.add('hp');
+    }
+
+    wrap.addEventListener('click', (ev) => {
+      const target = ev.target.closest('[data-action]');
+      if (!target) return;
+      const action = target.getAttribute('data-action');
+      if (action === 'accept') {
+        save('accepted'); apply('accepted');
+        wrap.dataset.state = 'done';
+        wrap.querySelector('.cc-manage')?.classList.remove('hp');
+      } else if (action === 'reject') {
+        save('rejected'); apply('rejected');
+        wrap.dataset.state = 'done';
+        wrap.querySelector('.cc-manage')?.classList.remove('hp');
+      } else if (action === 'manage') {
+        wrap.dataset.state = 'ask';
+        wrap.querySelector('.cc-manage')?.classList.add('hp');
+      }
+    });
+  })();
+</script>

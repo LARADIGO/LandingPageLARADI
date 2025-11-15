@@ -1,0 +1,86 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+const pageTitle = "Política de Privacidad";
+const pageDescription = "Información sobre tratamiento de datos, cookies y derechos del usuario.";
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="section">
+    <div class="container max-680">
+      <h1 class="h2 center">{pageTitle}</h1>
+      <p class="lead center">Cómo tratamos tus datos y cómo ejercer tus derechos.</p>
+
+      <article class="card">
+        <h3>1. Responsable</h3>
+        <p>
+          Responsable: <strong>TODO: Nombre / Razón Social</strong> — NIF/CIF: <strong>TODO</strong><br/>
+          Dirección: <strong>TODO: Dirección completa</strong><br/>
+          Email de contacto: <strong>TODO: Email</strong>
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>2. Finalidades</h3>
+        <ul>
+          <li>Responder tus solicitudes del formulario (consentimiento / medidas precontractuales).</li>
+          <li>Analítica web (GA4) para mejorar experiencia (solo con tu consentimiento).</li>
+          <li>Seguridad y mantenimiento técnico del sitio (interés legítimo).</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>3. Datos recopilados</h3>
+        <ul>
+          <li>Formulario: nombre, email y mensaje.</li>
+          <li>Analítica: páginas vistas, interacción con precios y FAQ (eventos agregados).</li>
+          <li>Metadatos técnicos anónimos (navegador, dispositivo) vía GA4 si aceptas cookies.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>4. Cookies y Consent Mode</h3>
+        <p>
+          GA4 usa <strong>Consent Mode v2</strong>. Hasta que aceptes, las cookies analíticas permanecen desactivadas
+          (<code>analytics_storage: denied</code>). Puedes cambiar tu elección en “Preferencias de cookies”.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>5. Destinatarios</h3>
+        <p>No vendemos datos. Proveedores técnicos mínimos (hosting y Google Analytics si consientes).</p>
+      </article>
+
+      <article class="card">
+        <h3>6. Conservación</h3>
+        <ul>
+          <li>Consultas: hasta 12 meses o antes si solicitas supresión.</li>
+          <li>Eventos analíticos: según retención configurada en GA4.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3>7. Derechos</h3>
+        <p>
+          Acceso, rectificación, supresión, limitación, oposición, portabilidad y retirada de consentimiento.
+          Contacto: <strong>TODO: Email</strong>. Reclamaciones: <a href="https://www.aepd.es" target="_blank" rel="noopener">AEPD</a>.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>8. Seguridad</h3>
+        <p>Aplicamos medidas razonables de protección (HTTPS, control interno, buenas prácticas de desarrollo).</p>
+      </article>
+
+      <article class="card">
+        <h3>9. Transferencias internacionales</h3>
+        <p>Posibles con GA4 (Estados Unidos) bajo cláusulas contractuales tipo. Avisaremos de cambios futuros.</p>
+      </article>
+
+      <article class="card">
+        <h3>10. Actualizaciones</h3>
+        <p>Esta política puede cambiar por motivos legales o técnicos. Consulta la fecha de actualización.</p>
+      </article>
+
+      <p class="muted" style="margin-top:28px; font-size:13px;">Última actualización: TODO: Fecha</p>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,77 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+const pageTitle = "Términos y Condiciones";
+const pageDescription = "Condiciones de uso y contratación de los servicios TPV.";
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="section">
+    <div class="container max-680">
+      <h1 class="h2 center">{pageTitle}</h1>
+      <p class="lead center">Lee estas condiciones antes de contratar o utilizar las funcionalidades del producto.</p>
+
+      <article class="card">
+        <h3>1. Definiciones</h3>
+        <p>
+          “Servicio” alude al software TPV ofrecido. “Usuario” es la persona física/jurídica que accede o contrata. “Plan”
+          es la modalidad de precio y alcance funcional.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>2. Registro y acceso</h3>
+        <p>El acceso a funcionalidades avanzadas puede requerir registro. Debes aportar datos veraces y mantener la confidencialidad de credenciales.</p>
+      </article>
+
+      <article class="card">
+        <h3>3. Planes y pagos</h3>
+        <p>
+          Precios según la sección “Precios”. Facturación periódica mensual o anual (según elección). Impuestos y retenciones
+          se aplican conforme a la normativa vigente. TODO: Detallar condiciones reales de facturación.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>4. Cancelación</h3>
+        <p>Puedes cancelar en cualquier momento y no se generarán nuevos cargos desde el siguiente ciclo. No hay permanencia.</p>
+      </article>
+
+      <article class="card">
+        <h3>5. Uso permitido</h3>
+        <p>Prohibido descompilar, realizar ingeniería inversa, explotar vulnerabilidades o utilizar el servicio para fines ilegales.</p>
+      </article>
+
+      <article class="card">
+        <h3>6. Disponibilidad</h3>
+        <p>
+          Buscamos alta disponibilidad, pero puede haber interrupciones por mantenimiento o causas externas. Nos esforzamos
+          en restablecer el servicio con la mayor rapidez posible.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>7. Limitación de responsabilidad</h3>
+        <p>
+          No respondemos por pérdidas indirectas (lucro cesante, daños consecuenciales). La responsabilidad directa se
+          limitará, en su caso, al importe pagado en el último periodo de facturación. TODO: Ajustar según asesor.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>8. Soporte</h3>
+        <p>Niveles de soporte según el plan contratado (básico, prioritario, etc.). TODO: Añadir SLA real si aplica.</p>
+      </article>
+
+      <article class="card">
+        <h3>9. Modificaciones de condiciones</h3>
+        <p>Podemos actualizar términos por razones legales o de producto. Se notificará con antelación razonable si afecta a condiciones económicas.</p>
+      </article>
+
+      <article class="card">
+        <h3>10. Ley aplicable y jurisdicción</h3>
+        <p>Legislación española. Conflictos se canalizan preferentemente de forma amistosa; en su defecto tribunales competentes.</p>
+      </article>
+
+      <p class="muted" style="margin-top:28px; font-size:13px;">Última actualización: TODO: Fecha</p>
+    </div>
+  </section>
+</BaseLayout>

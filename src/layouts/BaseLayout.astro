@@ -1,6 +1,9 @@
 ---
 import "@styles/global.css";
 import ThemeToggle from '@components/ThemeToggle.astro';
+import CookieConsent from '@components/CookieConsent.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+
 const {
   title = "Tu Producto",
   description = "Solución moderna, rápida y sencilla para tu negocio.",
@@ -16,16 +19,49 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
-    <meta name="theme-color" content="#0b0f19" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <!-- Fuente Inter (la del diseño) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Consent Mode v2: estado inicial denied -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        ad_storage: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'granted',
+        security_storage: 'granted'
+      });
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6QB73LYVYN"></script>
+    <script is:inline>
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-6QB73LYVYN', {
+        anonymize_ip: true,
+        send_page_view: true,
+        transport_type: 'beacon'
+      });
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        gtag('config', 'G-6QB73LYVYN', { debug_mode: true });
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
       <div class="container header-inner">
-        <a href="#inicio" class="brand">TePeuVe</a>
+        <a href="/" class="brand">TePeuVe</a>
 
         <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
         <label for="nav-toggle" class="nav-toggle-btn" aria-hidden="true">
@@ -33,15 +69,11 @@ const {
         </label>
 
         <nav class="nav">
-          <!-- Menú con los textos solicitados -->
           <a href="#caracteristicas">Funcionalidades</a>
           <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
-
-          <!-- CTA pastel -->
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
-
           <ThemeToggle />
         </nav>
       </div>
@@ -51,10 +83,12 @@ const {
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="container">
-        <p>© {new Date().getFullYear()} TuMarca — Todos los derechos reservados.</p>
-      </div>
-    </footer>
+    <SiteFooter />
+
+    <script type="module" is:inline>
+      import '/src/scripts/ga4.events.client.ts';
+    </script>
+
+    <CookieConsent />
   </body>
 </html>

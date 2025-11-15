@@ -1,0 +1,39 @@
+---
+/**
+ * Footer del sitio con enlaces legales y control de cookies.
+ * El botón "Preferencias de cookies" reabre el banner (CookieConsent).
+ */
+import "../styles/footer.css";
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <strong>TePeuVe</strong>
+      <span class="footer-copy">© {year} — Todos los derechos reservados.</span>
+    </div>
+
+    <nav class="footer-nav" aria-label="Enlaces legales">
+      <a href="/politica-privacidad">Política de Privacidad</a>
+      <a href="/aviso-legal">Aviso Legal</a>
+      <a href="/terminos">Términos y Condiciones</a>
+      <button type="button" class="footer-link-btn" data-cookie-pref>Preferencias de cookies</button>
+      <a href="#contacto">Contacto</a>
+    </nav>
+  </div>
+</footer>
+
+<script is:inline>
+  (() => {
+    // Reabrir banner de cookies
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-cookie-pref]');
+      if (!btn) return;
+      const banner = document.getElementById('cookie-consent');
+      if (!banner) return;
+      banner.dataset.state = 'ask';
+      // Ocultar el botón de manage dentro del banner hasta que el usuario vuelva a elegir
+      banner.querySelector('.cc-manage')?.classList.add('hp');
+    });
+  })();
+</script>

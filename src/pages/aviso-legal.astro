@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+const pageTitle = "Aviso Legal";
+const pageDescription = "Información legal y condiciones generales de uso del sitio.";
+---
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <section class="section">
+    <div class="container max-680">
+      <h1 class="h2 center">{pageTitle}</h1>
+      <p class="lead center">Datos identificativos y condiciones básicas de utilización del sitio.</p>
+
+      <article class="card">
+        <h3>1. Identificación</h3>
+        <p>
+          Titular: <strong>TODO: Nombre / Razón Social</strong> — NIF/CIF: <strong>TODO</strong><br/>
+          Dirección: <strong>TODO: Dirección completa</strong><br/>
+          Email: <strong>TODO: Email</strong>
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>2. Objeto</h3>
+        <p>Este sitio ofrece información sobre el producto TPV y funcionalidades relacionadas para comercios.</p>
+      </article>
+
+      <article class="card">
+        <h3>3. Uso adecuado</h3>
+        <p>Te comprometes a no utilizar el sitio con fines ilícitos, difamatorios, para distribuir malware o vulnerar derechos de terceros.</p>
+      </article>
+
+      <article class="card">
+        <h3>4. Propiedad intelectual</h3>
+        <p>
+          El contenido (textos, imágenes, logotipos y diseño) pertenece al titular o se utiliza con licencia. No se permite su
+          reproducción sin autorización previa.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>5. Responsabilidad</h3>
+        <p>
+          Procuramos exactitud, pero no garantizamos ausencia total de errores. No somos responsables de daños derivados de
+          decisiones basadas en la información del sitio.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>6. Enlaces externos</h3>
+        <p>
+          Enlaces a sitios de terceros se ofrecen como referencia. No controlamos ni respondemos por su contenido o política
+          de privacidad.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3>7. Modificaciones</h3>
+        <p>Podemos actualizar contenidos o condiciones sin previo aviso para mejorar o reflejar cambios legales.</p>
+      </article>
+
+      <article class="card">
+        <h3>8. Ley aplicable</h3>
+        <p>La relación se rige por la legislación española. Conflictos se someten a los tribunales del domicilio del titular o del usuario según normativa.</p>
+      </article>
+
+      <p class="muted" style="margin-top:28px; font-size:13px;">Última actualización: TODO: Fecha</p>
+    </div>
+  </section>
+</BaseLayout>
