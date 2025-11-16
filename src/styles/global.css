@@ -328,16 +328,6 @@ h2:not(.h2) { font-weight:600; letter-spacing:-0.3px; }
   outline-offset:3px;
 }
 
-/* Reduce motion */
-@media (prefers-reduced-motion: reduce) {
-  .card,
-  .card-ico,
-  .btn {
-    transition:none;
-    transform:none !important;
-  }
-}
-
 /* =========================
    VeriFactu features
    ========================= */
@@ -515,71 +505,5 @@ input:focus, textarea:focus {
   .hero-img {
     height:clamp(200px,50vw,360px);
     object-position:center top;
-  }
-}
-
-/* Zoom global: desenfoca todo salvo overlay */
-body.zoom-global-active {
-  overflow: hidden;
-}
-
-body.zoom-global-active > *:not(.zoom-overlay) {
-  filter: blur(18px) brightness(.85) saturate(.92);
-  transition: filter .45s ease;
-  pointer-events: none;
-}
-
-.zoom-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  background: rgba(0,0,0,0.40);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  animation: zoom-fade-in .35s ease;
-}
-
-@keyframes zoom-fade-in {
-  from { opacity:0; }
-  to   { opacity:1; }
-}
-
-.zoom-overlay img.zoomed-focus {
-  position: relative;
-  max-width: 90vw;
-  max-height: 85vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 28px;
-  box-shadow:
-    0 40px 120px rgba(0,0,0,.45),
-    0 16px 42px rgba(0,0,0,.35),
-    0 4px 12px rgba(0,0,0,.25);
-  transform: scale(1.95);
-  transition: transform .65s cubic-bezier(.2,.8,.2,1);
-  pointer-events: auto;
-  cursor: zoom-out;
-  background: #fff;
-}
-
-@media (hover:none), (pointer:coarse) {
-  body.zoom-global-active > *:not(.zoom-overlay) {
-    filter: none;
-  }
-  .zoom-overlay { display:none !important; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .zoom-overlay img.zoomed-focus {
-    transform: scale(1.2);
-    transition: none;
-  }
-  body.zoom-global-active > *:not(.zoom-overlay) {
-    filter: blur(8px) brightness(.9);
   }
 }
