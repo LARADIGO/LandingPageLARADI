@@ -49,48 +49,51 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
     </div>
   </section>
 
-  <!-- FUNCIONALIDADES FULL-BLEED mejoradas -->
+  <!-- FUNCIONALIDADES FULL-BLEED con imágenes por tema en 2, 3 y 4 -->
   <FeatureShowcaseDynamicRatio
     items={[
       {
         title:"Venta rápida en mostrador",
         text:"Búsqueda instantánea, lector de códigos y atajos.",
+        // Sin variantes -> usa una sola imagen
         img:"/assets/features/welcome_page_claro.png",
         alt:"Pantalla de venta rápida",
         mediaAnim:"zoom-in",
         contentAnim:"slide-left",
-        altBg:false,
-        cover:true
+        altBg:false
       },
       {
         title:"Inventario con variantes",
         text:"Stock por tienda, tallas/colores, coste medio.",
-        img:"/assets/features/welcome_page.png",
+        // VARIANTES por tema (2)
+        imgLight:"/assets/features/arqueo_caja.png",
+        imgDark:"/assets/features/arqueo_caja_oscuro.png",
         alt:"Gestión de inventario",
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
-        altBg:true,
-        cover:true
+        altBg:true
       },
       {
         title:"Facturación y tickets",
         text:"Tickets, facturas, devoluciones y cierres.",
-        img:"/assets/features/welcome_page_claro.png",
+        // VARIANTES por tema (3)
+        imgLight:"/assets/features/welcome_page_claro.png",
+        imgDark:"/assets/features/welcome_page.png",
         alt:"Emisión de documentos",
         mediaAnim:"rotate-in",
         contentAnim:"lift-in",
-        altBg:false,
-        cover:true
+        altBg:false
       },
       {
         title:"Informes claros",
         text:"Ventas por día, producto y empleado.",
-        img:"/assets/features/welcome_page.png",
+        // VARIANTES por tema (4)
+        imgLight:"/assets/features/welcome_page_claro.png",
+        imgDark:"/assets/features/welcome_page.png",
         alt:"Informes y analítica",
         mediaAnim:"blur-in",
         contentAnim:"fade-in",
-        altBg:true,
-        cover:true
+        altBg:true
       }
     ]}
   />

@@ -6,7 +6,10 @@ type Anim =
   | 'zoom-in' | 'fade-in' | 'blur-in' | 'rotate-in' | 'scale-up' | 'lift-in';
 
 interface Item {
-  title:string; text:string; img:string; alt:string;
+  title:string; text:string; alt:string;
+  img?:string;
+  imgLight?:string;
+  imgDark?:string;
   side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
 }
 
@@ -21,32 +24,38 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
         const mediaAnim = it.mediaAnim || cycle[i % cycle.length];
         const contentAnim = it.contentAnim || cycle[(i+1) % cycle.length];
         const mediaFirst = side === 'left';
+        const hasThemeVariants = Boolean(it.imgLight || it.imgDark);
+        const lightSrc = it.imgLight || it.img;
+        const darkSrc  = it.imgDark  || it.img;
+
+        const MediaBlock = (
+          <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
+            <div class="feature-media-inner dynamic-ratio">
+              {
+                hasThemeVariants
+                ? <>
+                    {lightSrc && <img src={lightSrc} alt={it.alt} loading="lazy" decoding="async" class="feature-contain theme-light" />}
+                    {darkSrc  && <img src={darkSrc}  alt={it.alt} loading="lazy" decoding="async" class="feature-contain theme-dark"  />}
+                  </>
+                : (it.img
+                    ? <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
+                    : null
+                  )
+              }
+            </div>
+          </div>
+        );
+
+        const ContentBlock = (
+          <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger={mediaFirst ? "1" : "0"} style={mediaFirst ? "--stagger-delay:.14s;" : "--stagger-delay:0s;"}>
+            <h3>{it.title}</h3><p>{it.text}</p>
+          </div>
+        );
+
         return (
           <article class={`feature-row feature-${side} ${it.altBg?'feature-alt':''}`}>
             <div class="feature-row-inner">
-              {mediaFirst ? (
-                <>
-                  <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger="0" style="--stagger-delay:0s;">
-                    <div class="feature-media-inner dynamic-ratio">
-                      <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
-                    </div>
-                  </div>
-                  <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger="1" style="--stagger-delay:.14s;">
-                    <h3>{it.title}</h3><p>{it.text}</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger="0" style="--stagger-delay:0s;">
-                    <h3>{it.title}</h3><p>{it.text}</p>
-                  </div>
-                  <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger="1" style="--stagger-delay:.14s;">
-                    <div class="feature-media-inner dynamic-ratio">
-                      <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
-                    </div>
-                  </div>
-                </>
-              )}
+              {mediaFirst ? (<>{MediaBlock}{ContentBlock}</>) : (<>{ContentBlock}{MediaBlock}</>)}
             </div>
           </article>
         );
@@ -58,23 +67,44 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
 <script is:inline>
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const els = document.querySelectorAll('[data-reveal]');
-  const conts = document.querySelectorAll('.feature-media-inner.dynamic-ratio img');
+  const reveals = document.querySelectorAll('[data-reveal]');
+  const containers = document.querySelectorAll('.feature-media-inner.dynamic-ratio');
 
-  conts.forEach(img => {
-    if (img.complete) applyRatio(img);
-    else img.addEventListener('load', () => applyRatio(img));
-  });
-
-  function applyRatio(img){
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    if (w && h) {
-      img.closest('.feature-media-inner').style.aspectRatio = `${w}/${h}`;
-    }
+  function visibleImageIn(container){
+    const imgs = Array.from(container.querySelectorAll('img'));
+    return imgs.find(img => getComputedStyle(img).display !== 'none') || imgs[0] || null;
   }
 
-  if (reduce) { els.forEach(e=>e.classList.add('is-visible')); return; }
+  function applyRatio(container){
+    const img = visibleImageIn(container);
+    if (!img) return;
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    if (w && h) container.style.aspectRatio = `${w}/${h}`;
+  }
+
+  function applyRatioAll(){
+    containers.forEach(c => applyRatio(c));
+  }
+
+  // Cuando cargue cualquier imagen, ajustar el ratio del contenedor
+  containers.forEach(c => {
+    const imgs = c.querySelectorAll('img');
+    imgs.forEach(img => {
+      if (img.complete) applyRatio(c);
+      else img.addEventListener('load', () => applyRatio(c), { once:true });
+    });
+  });
+
+  // Recalcular cuando cambia el tema (clase dark-theme en html/body)
+  const mo = new MutationObserver(applyRatioAll);
+  mo.observe(document.documentElement, { attributes:true, attributeFilter:['class'] });
+  if (document.body) mo.observe(document.body, { attributes:true, attributeFilter:['class'] });
+
+  if (reduce) {
+    reveals.forEach(e=>e.classList.add('is-visible'));
+    return;
+  }
 
   const io = new IntersectionObserver((entries)=>{
     for(const e of entries){
@@ -82,6 +112,6 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
       else e.target.classList.remove('is-visible');
     }
   }, {threshold:.25});
-  els.forEach(e=>io.observe(e));
+  reveals.forEach(e=>io.observe(e));
 })();
 </script>

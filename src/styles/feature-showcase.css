@@ -119,6 +119,11 @@
   transition: filter .9s ease, opacity .9s ease;
 }
 
+/* Mostrar/ocultar según tema cuando hay variantes */
+.feature-media-inner img.theme-dark { display: none; }
+.dark-theme .feature-media-inner img.theme-dark { display: block; }
+.dark-theme .feature-media-inner img.theme-light { display: none; }
+
 /* Contain vs Cover */
 .feature-media-inner img.feature-contain { object-fit: contain; }
 .feature-media-inner img.feature-cover   { object-fit: cover; }
