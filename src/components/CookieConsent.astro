@@ -21,72 +21,74 @@ import "../styles/cookie-consent.css";
 </div>
 
 <script is:inline>
-  (() => {
-    const wrap = document.getElementById('cookie-consent');
+(() => {
+  const KEY = 'cookie_consent';
+  const EXP_MS = 7 * 24 * 60 * 60 * 1000;
+
+  function gtag(){ (window.dataLayer = window.dataLayer || []).push(arguments); }
+  function now(){ return Date.now(); }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || !obj.value || !obj.ts) return null;
+      if (now() - obj.ts > EXP_MS) return null;
+      return obj;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function save(value) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ value: value, ts: now() }));
+    } catch (e) {}
+  }
+
+  function apply(value) {
+    var consent = value === 'accepted'
+      ? { analytics_storage: 'granted', ad_user_data: 'denied', ad_personalization: 'denied', ad_storage: 'denied' }
+      : { analytics_storage: 'denied',  ad_user_data: 'denied', ad_personalization: 'denied', ad_storage: 'denied' };
+    gtag('consent', 'update', consent);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var wrap = document.getElementById('cookie-consent');
     if (!wrap) return;
-    const KEY = 'cookie_consent';
-    const EXP_MS = 7 * 24 * 60 * 60 * 1000;
 
-    const gtag = window.gtag || function(){ (window.dataLayer = window.dataLayer || []).push(arguments); };
-    const now = () => Date.now();
+    var manageBtn = wrap.querySelector('.cc-manage');
 
-    function load() {
-      try {
-        const raw = localStorage.getItem(KEY);
-        if (!raw) return null;
-        const obj = JSON.parse(raw);
-        if (!obj || !obj.value || !obj.ts) return null;
-        if (now() - obj.ts > EXP_MS) return null;
-        return obj;
-      } catch { return null; }
-    }
-    function save(value) {
-      try { localStorage.setItem(KEY, JSON.stringify({ value, ts: now() })); } catch {}
-    }
-    function apply(value) {
-      if (value === 'accepted') {
-        gtag('consent', 'update', {
-          analytics_storage: 'granted',
-          ad_user_data: 'denied',
-          ad_personalization: 'denied',
-          ad_storage: 'denied'
-        });
-      } else {
-        gtag('consent', 'update', {
-          analytics_storage: 'denied',
-          ad_user_data: 'denied',
-          ad_personalization: 'denied',
-          ad_storage: 'denied'
-        });
-      }
-    }
-
-    const stored = load();
+    var stored = load();
     if (stored) {
-      wrap.dataset.state = 'done';
-      wrap.querySelector('.cc-manage')?.classList.remove('hp');
+      wrap.setAttribute('data-state', 'done');
+      if (manageBtn) manageBtn.classList.remove('hp');
       apply(stored.value);
     } else {
-      wrap.dataset.state = 'ask';
-      wrap.querySelector('.cc-manage')?.classList.add('hp');
+      wrap.setAttribute('data-state', 'ask');
+      if (manageBtn) manageBtn.classList.add('hp');
     }
 
-    wrap.addEventListener('click', (ev) => {
-      const target = ev.target.closest('[data-action]');
-      if (!target) return;
-      const action = target.getAttribute('data-action');
+    wrap.addEventListener('click', function(ev) {
+      var target = ev.target;
+      var btn = target.closest ? target.closest('[data-action]') : null;
+      if (!btn) return;
+
+      var action = btn.getAttribute('data-action');
       if (action === 'accept') {
         save('accepted'); apply('accepted');
-        wrap.dataset.state = 'done';
-        wrap.querySelector('.cc-manage')?.classList.remove('hp');
+        wrap.setAttribute('data-state', 'done');
+        if (manageBtn) manageBtn.classList.remove('hp');
       } else if (action === 'reject') {
         save('rejected'); apply('rejected');
-        wrap.dataset.state = 'done';
-        wrap.querySelector('.cc-manage')?.classList.remove('hp');
+        wrap.setAttribute('data-state', 'done');
+        if (manageBtn) manageBtn.classList.remove('hp');
       } else if (action === 'manage') {
-        wrap.dataset.state = 'ask';
-        wrap.querySelector('.cc-manage')?.classList.add('hp');
+        wrap.setAttribute('data-state', 'ask');
+        if (manageBtn) manageBtn.classList.add('hp');
       }
     });
-  })();
+  });
+})();
 </script>

@@ -55,7 +55,6 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
       {
         title:"Escoge entre Modo Claro / Modo Oscuro",
         text:"Opta por el modo que mejor se adapte a ti.",
-        // Sin variantes -> usa una sola imagen
         img:"/assets/features/claro_oscuro.png",
         alt:"Pantalla de venta rápida",
         mediaAnim:"zoom-in",
@@ -65,7 +64,6 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
       {
         title:"Arqueo de Caja",
         text:"Realizalo de forma rápida e intuitiva y no dejes que nada se te escape.",
-        // VARIANTES por tema (2)
         imgLight:"/assets/features/arqueo_caja.png",
         imgDark:"/assets/features/arqueo_caja_oscuro.png",
         alt:"Gestión de inventario",
@@ -76,18 +74,17 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
       {
         title:"Gestiona y Personaliza Empleados",
         text:"Siéntete libre de personalizar a cada empleado a través de una lista predefinida de avatares o con FOTOS REALES.",
-        // VARIANTES por tema (3)
         imgLight:"/assets/features/empleados.png",
         imgDark:"/assets/features/empleados_oscuro.png",
         alt:"Emisión de documentos",
         mediaAnim:"rotate-in",
         contentAnim:"lift-in",
-        altBg:false
+        altBg:false,
+        mediaWide: true // MÁS ANCHA: imagen 3 más grande
       },
       {
         title:"Informes claros",
         text:"Ventas por día, producto y empleado.",
-        // VARIANTES por tema (4)
         imgLight:"/assets/features/welcome_page_claro.png",
         imgDark:"/assets/features/welcome_page.png",
         alt:"Informes y analítica",

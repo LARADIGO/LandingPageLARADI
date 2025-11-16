@@ -11,6 +11,7 @@ interface Item {
   imgLight?:string;
   imgDark?:string;
   side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
+  mediaWide?: boolean; // NUEVO: ancho extra para la columna de la imagen
 }
 
 const { items = [] as Item[] } = Astro.props;
@@ -27,6 +28,12 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
         const hasThemeVariants = Boolean(it.imgLight || it.imgDark);
         const lightSrc = it.imgLight || it.img;
         const darkSrc  = it.imgDark  || it.img;
+
+        const rowClasses = [
+          `feature-${side}`,
+          it.altBg ? 'feature-alt' : '',
+          it.mediaWide ? 'feature-media-lg' : '' // clase condicional
+        ].filter(Boolean).join(' ');
 
         const MediaBlock = (
           <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
@@ -53,7 +60,7 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
         );
 
         return (
-          <article class={`feature-row feature-${side} ${it.altBg?'feature-alt':''}`}>
+          <article class={`feature-row ${rowClasses}`}>
             <div class="feature-row-inner">
               {mediaFirst ? (<>{MediaBlock}{ContentBlock}</>) : (<>{ContentBlock}{MediaBlock}</>)}
             </div>

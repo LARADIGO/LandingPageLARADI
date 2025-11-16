@@ -10,6 +10,11 @@
   margin-left: -50vw;
   margin-right: -50vw;
   width: 100vw;
+  /* Evita desbordes horizontales por redondeos del 50vw */
+  overflow-x: clip;
+}
+@supports not (overflow: clip) {
+  .full-bleed { overflow-x: hidden; }
 }
 
 .features-section {
@@ -127,6 +132,13 @@
 /* Contain vs Cover */
 .feature-media-inner img.feature-contain { object-fit: contain; }
 .feature-media-inner img.feature-cover   { object-fit: cover; }
+
+/* Imagen MÁS GRANDE en filas marcadas con mediaWide */
+@media (min-width: 901px){
+  .feature-row.feature-media-lg .feature-row-inner {
+    grid-template-columns: 0.7fr 1.3fr; /* da más ancho a la columna de la imagen */
+  }
+}
 
 /* Texto */
 .feature-content h3 {
