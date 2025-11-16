@@ -13,7 +13,6 @@ const {
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <!-- Viewport ajustado: bloquea zoom-out y se adapta a notch -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -30,7 +29,7 @@ const {
       rel="stylesheet"
     />
 
-    <!-- Consent Mode v2: estado inicial denied -->
+    <!-- Consent Mode v2 -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){ dataLayer.push(arguments); }
@@ -60,16 +59,16 @@ const {
     </script>
   </head>
   <body>
-    <header class="site-header">
+    <header class="site-header" role="banner">
       <div class="container header-inner">
         <a href="/" class="brand">TePeuVe</a>
 
         <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
-        <label for="nav-toggle" class="nav-toggle-btn" aria-hidden="true">
+        <label for="nav-toggle" class="nav-toggle-btn">
           <span></span><span></span><span></span>
         </label>
 
-        <nav class="nav">
+        <nav class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
           <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
@@ -85,6 +84,54 @@ const {
     </main>
 
     <SiteFooter />
+
+    <script is:inline>
+    (() => {
+      // Header scrolled class
+      const header = document.querySelector('.site-header');
+      const onScroll = () => {
+        if (window.scrollY > 8) header.classList.add('is-scrolled');
+        else header.classList.remove('is-scrolled');
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive:true });
+
+      // Auto efecto en cards (solo móviles)
+      const hasHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      if (!hasHover) {
+        const cards = document.querySelectorAll('.card');
+        const cardObserver = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) e.target.classList.add('card-auto-hover');
+            else e.target.classList.remove('card-auto-hover');
+          });
+        }, { threshold: 0.35 });
+        cards.forEach(c => cardObserver.observe(c));
+
+        // Pricing interacción táctil
+        const pricingGrid = document.querySelector('.pricing-grid');
+        if (pricingGrid) {
+          pricingGrid.addEventListener('click', (ev) => {
+            const card = ev.target.closest('.pricing-card');
+            if (!card) {
+              pricingGrid.classList.remove('touch-active');
+              pricingGrid.querySelectorAll('.pricing-card.is-active').forEach(c => c.classList.remove('is-active'));
+              return;
+            }
+            pricingGrid.classList.add('touch-active');
+            pricingGrid.querySelectorAll('.pricing-card.is-active').forEach(c => c.classList.remove('is-active'));
+            card.classList.add('is-active');
+          });
+          document.addEventListener('click', (ev) => {
+            if (!pricingGrid) return;
+            if (ev.target.closest('.pricing-grid')) return;
+            pricingGrid.classList.remove('touch-active');
+            pricingGrid.querySelectorAll('.pricing-card.is-active').forEach(c => c.classList.remove('is-active'));
+          });
+        }
+      }
+    })();
+    </script>
 
     <script type="module" is:inline>
       import '/src/scripts/ga4.events.client.ts';

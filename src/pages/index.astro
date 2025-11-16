@@ -59,7 +59,8 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
         alt:"Pantalla de venta rápida",
         mediaAnim:"zoom-in",
         contentAnim:"slide-left",
-        altBg:false
+        altBg:false,
+        mediaWide: true
       },
       {
         title:"Arqueo de Caja",
@@ -69,7 +70,8 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
         alt:"Gestión de inventario",
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
-        altBg:true
+        altBg:true,
+        mediaWide: true
       },
       {
         title:"Gestiona y Personaliza Empleados",
@@ -80,7 +82,7 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
         mediaAnim:"rotate-in",
         contentAnim:"lift-in",
         altBg:false,
-        mediaWide: true // MÁS ANCHA: imagen 3 más grande
+        mediaWide: true
       },
       {
         title:"Informes claros",
@@ -90,22 +92,12 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
         alt:"Informes y analítica",
         mediaAnim:"blur-in",
         contentAnim:"fade-in",
-        altBg:true
+        altBg:true,
+        mediaWide: true
       }
     ]}
   />
 
-  <!-- DEMO -->
-  <section id="demo" class="section">
-    <div class="container">
-      <h2 class="h2 center">Demo rápida</h2>
-      <p class="lead center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
-      <div class="media-grid">
-        <img class="rounded" src="/assets/screen-2.svg" alt="Flujo de caja" width="960" height="640" />
-        <img class="rounded" src="/assets/screen-3.svg" alt="Cierre de caja" width="960" height="640" />
-      </div>
-    </div>
-  </section>
 
   <!-- PRECIOS -->
   <section id="precios" class="section alt">
@@ -151,22 +143,10 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
     <div class="container">
       <h2 class="h2 center">VeriFactu</h2>
       <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
-      <div class="verifactu-features">
-        <article class="card">
-          <div class="card-ico">🛡️</div>
-          <h3>¿Qué es VeriFactu?</h3>
-          <p>Sistema de la Agencia Tributaria que exige facturación/tickets íntegros, trazables y verificables para luchar contra el fraude y asegurar la conservación de registros.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">📅</div>
-          <h3>Entrada obligatoria 2026</h3>
-          <p>Su adopción será exigida progresivamente a partir de 2026. Adaptarte antes reduce riesgos, costes de última hora y posibles sanciones administrativas.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">⚙️</div>
-          <h3>Impacto técnico</h3>
-          <p>Implica secuencialidad, firma o hash de comprobantes, almacenamiento seguro y posible envío telemático. Tu TPV debe generar formatos compatibles y conservar datos varios años.</p>
-        </article>
+      <div class="verifactu-cards">
+        <article class="card"><div class="card-ico">🛡️</div><h3>¿Qué es?</h3><p>Sistema que garantiza integridad y trazabilidad de los registros de facturación.</p></article>
+        <article class="card"><div class="card-ico">📅</div><h3>Entrada 2026</h3><p>Su obligatoriedad comienza en 2026; anticiparte reduce riesgos y costes.</p></article>
+        <article class="card"><div class="card-ico">⚙️</div><h3>Impacto técnico</h3><p>Secuencialidad, firma/hash, almacenamiento seguro y posible envío telemático.</p></article>
       </div>
       <p class="center" style="margin-top:26px;">
         <span class="vf-cta">
@@ -174,6 +154,19 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
           <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria" class="vf-cta__logo" width="28" height="28" loading="lazy" decoding="async" />
         </span>
       </p>
+    </div>
+  </section>
+
+  <section id="sobre" class="section alt">
+    <div class="container">
+      <h2 class="h2 center">Quiénes somos</h2>
+      <p class="lead center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
+      <div class="cards">
+        <article class="card"><div class="card-ico">🤝</div><h3>Soporte cercano</h3><p>Tiempo de respuesta rápido (normalmente &lt;24h).</p></article>
+        <article class="card"><div class="card-ico">🛍️</div><h3>Experiencia retail</h3><p>Conocimiento real de caja, inventario y periféricos.</p></article>
+        <article class="card"><div class="card-ico">🔐</div><h3>Seguridad</h3><p>Buenas prácticas y alineados con requisitos fiscales.</p></article>
+        <article class="card"><div class="card-ico">🚀</div><h3>Evolución continua</h3><p>Mejoras frecuentes centradas en valor de tienda.</p></article>
+      </div>
     </div>
   </section>
 

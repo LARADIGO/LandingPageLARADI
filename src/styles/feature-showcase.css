@@ -133,11 +133,56 @@
 .feature-media-inner img.feature-contain { object-fit: contain; }
 .feature-media-inner img.feature-cover   { object-fit: cover; }
 
-/* Imagen MÁS GRANDE en filas marcadas con mediaWide */
+/* Imagen MÁS GRANDE en filas marcadas con mediaWide (feature-media-lg)
+   - Sensible a la posición: si la imagen va a la izquierda o a la derecha
+   - Ajustada al viewport para no desbordar ni en alto ni en ancho */
 @media (min-width: 901px){
-  .feature-row.feature-media-lg .feature-row-inner {
-    grid-template-columns: 0.7fr 1.3fr; /* da más ancho a la columna de la imagen */
+  .feature-row.feature-media-lg.feature-left  .feature-row-inner { grid-template-columns: 1.5fr 0.5fr; }
+  .feature-row.feature-media-lg.feature-right .feature-row-inner { grid-template-columns: 0.5fr 1.5fr; }
+
+  /* Limitar altura al viewport */
+  .feature-row.feature-media-lg .feature-media-inner {
+    max-height: min(78vh, 820px);
   }
+}
+
+/* En móviles y tablets pequeñas, limitar también la altura para evitar scroll extra */
+@media (max-width: 900px){
+  .feature-media-inner { max-height: 68vh; }
+}
+
+/* Overlay de zoom (solo se activa por JS en móvil) */
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.55);
+  padding: clamp(8px, 4vw, 24px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.fs-overlay.is-open { display: flex; animation: fs-fade .25s ease; }
+@keyframes fs-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.fs-overlay img {
+  max-width: 92vw;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 24px 80px rgba(0,0,0,.35),
+    0 10px 28px rgba(0,0,0,.25);
+}
+
+body.fs-zoom-active {
+  overflow: hidden;
+  touch-action: none;
 }
 
 /* Texto */

@@ -11,7 +11,7 @@ interface Item {
   imgLight?:string;
   imgDark?:string;
   side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
-  mediaWide?: boolean; // NUEVO: ancho extra para la columna de la imagen
+  mediaWide?: boolean; // ancho extra para la columna de la imagen
 }
 
 const { items = [] as Item[] } = Astro.props;
@@ -37,7 +37,7 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
 
         const MediaBlock = (
           <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
-            <div class="feature-media-inner dynamic-ratio">
+            <div class="feature-media-inner dynamic-ratio" data-zoomable>
               {
                 hasThemeVariants
                 ? <>
@@ -110,15 +110,58 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
 
   if (reduce) {
     reveals.forEach(e=>e.classList.add('is-visible'));
-    return;
+  } else {
+    const io = new IntersectionObserver((entries)=>{
+      for(const e of entries){
+        if(e.isIntersecting) e.target.classList.add('is-visible');
+        else e.target.classList.remove('is-visible');
+      }
+    }, {threshold:.25});
+    reveals.forEach(e=>io.observe(e));
   }
 
-  const io = new IntersectionObserver((entries)=>{
-    for(const e of entries){
-      if(e.isIntersecting) e.target.classList.add('is-visible');
-      else e.target.classList.remove('is-visible');
-    }
-  }, {threshold:.25});
-  reveals.forEach(e=>io.observe(e));
+  // Zoom en móvil: solo en dispositivos sin hover / puntero grueso
+  const mqMobile = window.matchMedia('(hover: none), (pointer: coarse)');
+  let overlay = document.querySelector('.fs-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'fs-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  function openZoom(src, alt) {
+    if (!src) return;
+    overlay.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = src; img.alt = alt || '';
+    overlay.appendChild(img);
+    overlay.classList.add('is-open');
+    document.body.classList.add('fs-zoom-active');
+
+    const close = () => {
+      overlay.classList.remove('is-open');
+      document.body.classList.remove('fs-zoom-active');
+      overlay.removeEventListener('click', close);
+      document.removeEventListener('keydown', onEsc);
+    };
+    const onEsc = (ev) => { if (ev.key === 'Escape') close(); };
+
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', onEsc);
+  }
+
+  if (mqMobile.matches) {
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      const container = target && target.closest ? target.closest('.feature-media-inner[data-zoomable]') : null;
+      if (!container) return;
+      const img = visibleImageIn(container);
+      if (!img) return;
+      // Evita que el click active otros handlers
+      ev.preventDefault();
+      ev.stopPropagation();
+      openZoom(img.currentSrc || img.src, img.alt || '');
+    }, { passive: false });
+  }
 })();
 </script>
