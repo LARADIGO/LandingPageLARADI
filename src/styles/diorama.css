@@ -25,10 +25,8 @@
   background: linear-gradient(135deg, var(--dio-bg-1), var(--dio-bg-2));
   color: var(--dio-ink);
   font-family: var(--font-sans);
-
-  /* Variables para la ola (tema claro) */
-  --wave-fill-base: #ECF2EC;       /* color base actual de la ola */
-  --wave-glow-color: var(--primary); /* marroncito del tema claro */
+  --wave-fill-base: #ECF2EC;
+  --wave-glow-color: var(--primary);
 }
 
 .wrap { max-width:1200px; margin-inline:auto; padding: clamp(16px,3vw,28px); }
@@ -50,10 +48,7 @@
   backdrop-filter: blur(8px); color:#5B6B72; font-weight:600; z-index:2;
   font-family: var(--font-sans);
 }
-.card-nav .mini {
-  width:28px; height:28px; border-radius:10px; border:1px solid var(--dio-edge);
-  background:#fff; display:grid; place-items:center;
-}
+.card-nav .mini { width:28px; height:28px; border-radius:10px; border:1px solid var(--dio-edge); background:#fff; display:grid; place-items:center; }
 
 .hero-grid {
   position: relative; z-index: 1;
@@ -80,7 +75,6 @@
   font-weight:700;
   letter-spacing:-0.6px;
 }
-
 .diorama-page .lead {
   font-size: clamp(16px,2.3vw,20px);
   color: var(--dio-muted);
@@ -103,109 +97,117 @@
   box-shadow:0 1px 0 rgba(255,255,255,.6) inset;
   font-family: var(--font-sans);
 }
-.diorama-page .btn.primary {
-  background: var(--dio-primary-pastel);
-  border-color: var(--dio-primary-pastel);
-  color: var(--dio-ink);
-}
-.diorama-page .btn.primary:hover {
-  background: var(--dio-primary-pastel-hover);
-  border-color: var(--dio-primary-pastel-hover);
-}
+.diorama-page .btn.primary { background: var(--dio-primary-pastel); border-color: var(--dio-primary-pastel); color: var(--dio-ink); }
+.diorama-page .btn.primary:hover { background: var(--dio-primary-pastel-hover); border-color: var(--dio-primary-pastel-hover); }
 
+/* Escena */
 .stage {
-  position:relative; min-height: 520px; border-radius: 36px; border:1px solid var(--dio-edge);
+  position: relative;
+  min-height: 520px;
+  border-radius: 36px;
+  border: 1px solid var(--dio-edge);
   background:
-   radial-gradient(600px 320px at 85% 20%, rgba(106,133,241,.30), transparent 60%),
-   radial-gradient(600px 320px at 10% 80%, rgba(105,234,203,.30), transparent 60%),
-   #FFFFFFCC;
-  overflow:hidden; box-shadow: var(--dio-shadow-soft);
-  display:grid; place-items:center; padding:4%;
-}
-.stage .media { width:100%; height:100%; display:grid; place-items:center; }
-
-.stage img, .stage iframe, .stage canvas {
-  position:relative; width:100%; height:100%; object-fit:contain;
-  border-radius:24px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
-  mix-blend-mode:normal; opacity:1;
+    radial-gradient(600px 320px at 85% 20%, color-mix(in srgb, var(--primary) 34%, transparent), transparent 60%),
+    radial-gradient(600px 320px at 10% 80%, color-mix(in srgb, var(--primary-2) 26%, transparent), transparent 60%),
+    #FFFFFFCC;
+  overflow: hidden;
+  box-shadow: var(--dio-shadow-soft);
+  display: grid;
+  place-items: center;
+  padding: 4%;
+  transition: background-color .35s ease;
 }
 
+.dark-theme .stage {
+  background:
+    radial-gradient(600px 320px at 85% 20%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 60%),
+    radial-gradient(600px 320px at 10% 80%, color-mix(in srgb, var(--primary-2) 22%, transparent), transparent 60%),
+    rgba(255,255,255,.03);
+  border-color: var(--border);
+}
+
+.stage .media {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.stage img {
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(64vh,560px);
+  object-fit: contain;
+  border-radius: 24px;
+  box-shadow: 0 12px 36px rgba(2,6,23,.18);
+  transform-origin: center;
+  transition: box-shadow .45s ease;
+  cursor: zoom-in;
+  z-index: 2;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .stage img:hover { box-shadow: 0 18px 48px rgba(2,6,23,.24); }
+  .stage img:focus-visible {
+    outline:2px solid var(--primary);
+    outline-offset:4px;
+  }
+}
+
+@media (hover:none), (pointer:coarse) {
+  .stage img { cursor: default; }
+}
+
+@media (max-width:600px){
+  .stage img { max-height:48vh; }
+}
+
+/* Ola */
 .waves {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 0; right: 0; bottom: 0;
   height: 140px;
   pointer-events: none;
   z-index: 0;
 }
-
 .wave-path {
   fill: var(--wave-fill-base);
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  /* Sin animación por defecto; se activa con .is-animating */
   animation: none;
   will-change: transform, filter, opacity, fill;
 }
-
 .wave-path.is-animating {
   animation:
     wave-float 10s ease-in-out infinite,
     wave-glow 4.8s ease-in-out infinite;
 }
-
-/* Flotación vertical */
 @keyframes wave-float {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(12px); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
   100% { transform: translateY(0); }
 }
-
-/* Parpadeo de luz (ahora hacia el color de tema) */
 @keyframes wave-glow {
-  0%   { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
-  50%  { fill: var(--wave-glow-color); opacity: 0.97; filter: saturate(1.04) brightness(1.05); }
-  100% { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
+  0%   { fill: var(--wave-fill-base); opacity:1; filter:saturate(1) brightness(1); }
+  50%  { fill: var(--wave-glow-color); opacity:.97; filter:saturate(1.04) brightness(1.05); }
+  100% { fill: var(--wave-fill-base); opacity:1; filter:saturate(1) brightness(1); }
 }
-
-/* Respeto a usuarios con reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  .wave-path { animation: none !important; transform: none !important; filter: none !important; }
+  .wave-path { animation: none !important; transform:none !important; filter:none !important; }
 }
 
-.shelf {
-  position:relative; height:112px; background:#fff; border-top:1px solid var(--dio-edge);
-  box-shadow:0 -1px 0 rgba(255,255,255,.8) inset, 0 18px 40px rgba(0,0,0,.08);
-}
-.shelf::before { content:""; position:absolute; inset:0 0 auto 0; height:12px; background: var(--dio-bevel-top); }
-.shelf::after { content:""; position:absolute; inset:auto 0 0 0; height:12px; background: var(--dio-bevel-bottom); }
-
-.shelf-inner {
-  max-width:880px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;
-  height:100%; padding:0 24px;
-  color:#64737A; font-weight:700;
-  font-family: var(--font-sans);
-}
-
-.controls { display:flex; gap:10px; align-items:center; }
-.dot {
-  width:32px; height:32px; border-radius:50%; background:#F6FAF7; border:1px solid var(--dio-edge);
-  box-shadow:0 1px 0 rgba(255,255,255,.6) inset; display:grid; place-items:center;
-  font-size:14px; color:#6A7C83; font-family:var(--font-sans);
-}
-
-/* Dark theme */
-.dark-theme .diorama-page { 
-  background:linear-gradient(135deg,#0c1219,#101a24); 
+/* Dark Theme overrides */
+.dark-theme .diorama-page {
+  background:linear-gradient(135deg,#0c1219,#101a24);
   color:var(--text);
-
-  /* Variables para la ola (tema oscuro) */
   --wave-fill-base: rgba(255,255,255,.06);
-  --wave-glow-color: var(--primary); /* azul del tema oscuro */
+  --wave-glow-color: var(--primary);
 }
-
 .dark-theme .hero-card { background:linear-gradient(180deg,rgba(255,255,255,.06), rgba(255,255,255,.03)); border-color:var(--border); }
 .dark-theme .card-nav { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--text); }
 .dark-theme .eyebrow { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--text); }
@@ -214,17 +216,3 @@
 .dark-theme .diorama-page .bullets { color:var(--muted); }
 .dark-theme .diorama-page .btn { background:transparent; color:var(--text); border-color:var(--border); }
 .dark-theme .diorama-page .btn.primary { background:var(--dio-primary-pastel); color:#0F172A; border-color:var(--dio-primary-pastel); }
-.dark-theme .stage {
-  background:
-    radial-gradient(600px 320px at 85% 20%, rgba(106,133,241,.18), transparent 60%),
-    radial-gradient(600px 320px at 10% 80%, rgba(105,234,203,.18), transparent 60%),
-    rgba(255,255,255,.03);
-  border-color:var(--border);
-}
-
-/* Quitamos la antigua regla de fill fija para wave-path en dark y usamos variables */
-// .dark-theme .wave-path { fill:rgba(255,255,255,.06); }
-
-.dark-theme .shelf { background:var(--surface); border-top:1px solid var(--border); }
-.dark-theme .shelf-inner { color:var(--muted); }
-.dark-theme .dot { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--muted); }

@@ -2,10 +2,10 @@
 import "@styles/diorama.css";
 
 interface Props{
-  title?: string; subtitle?: string; string;
+  title?: string; subtitle?: string;
   ctaText?: string; ctaHref?: string; cta2Text?: string; cta2Href?: string;
-  imageSrc?: string;  // /public/images/...
-  splineUrl?: string; // opcional
+  imageSrc?: string;
+  splineUrl?: string;
 }
 const {
   title = 'El TPV para tu tienda, simple y en regla',
@@ -19,17 +19,14 @@ const {
 <section class="diorama-page" aria-label="Hero estilo diorama">
   <div class="wrap">
     <div class="hero-card">
-      <!-- Barra decorativa eliminada para no “pisar” tu cabecera real -->
-
       <div class="hero-grid">
         <div>
           <h1>{title}</h1>
           <p class="lead">{subtitle}</p>
-            <div class="ctas">
-            <!-- Añadimos la clase center-cta al botón que queremos ocultar -->
+          <div class="ctas">
             <a class="btn primary1 center-cta" href={ctaHref}>{ctaText}</a>
             <a class="btn primary2 center-cta" href={cta2Href}>{cta2Text}</a>
-            </div>
+          </div>
           <div class="bullets">
             <div>• Cobro rápido: efectivo y tarjeta</div>
             <div>• Facturas al instante por email</div>
@@ -41,7 +38,7 @@ const {
           <div class="media">
             {splineUrl
               ? <iframe src={splineUrl} title="Diorama 3D" frameborder="0" allow="autoplay; fullscreen" loading="lazy"></iframe>
-              : <img src={imageSrc} alt="TPV en mostrador" />
+              : <img src={imageSrc} alt="TPV en mostrador" tabindex="0" />
             }
           </div>
         </div>
@@ -54,26 +51,91 @@ const {
   </div>
 
   <script is:inline>
-    // Activa/pausa la animación cuando el hero entra/sale de viewport
     (() => {
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) return;
-
       const hero = document.querySelector('.diorama-page');
       const path = document.querySelector('.waves .wave-path');
-      if (!hero || !path) return;
+      const img = hero?.querySelector('.stage img');
+      if (!img) return;
 
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            path.classList.add('is-animating');
-          } else {
-            path.classList.remove('is-animating');
-          }
+      // Animación ola
+      if (!reduce && path && hero) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) path.classList.add('is-animating');
+            else path.classList.remove('is-animating');
+          });
+        }, { threshold: 0.15 });
+        io.observe(hero);
+      }
+
+      if (reduce) return;
+
+      const mqHover = window.matchMedia('(hover:hover) and (pointer:fine)');
+      let overlay: HTMLElement | null = null;
+
+      function ensureOverlay() {
+        overlay = document.querySelector('.zoom-overlay') as HTMLElement;
+        if (!overlay) {
+          overlay = document.createElement('div');
+            overlay.className = 'zoom-overlay';
+          document.body.appendChild(overlay);
         }
-      }, { threshold: 0.15 });
+      }
 
-      io.observe(hero);
+      function openZoom() {
+        if (document.body.classList.contains('zoom-global-active')) return;
+        ensureOverlay();
+        const clone = img.cloneNode(true) as HTMLImageElement;
+        clone.classList.add('zoomed-focus');
+        clone.removeAttribute('tabindex'); // evitar doble foco
+        overlay!.innerHTML = '';
+        overlay!.appendChild(clone);
+        document.body.classList.add('zoom-global-active');
+
+        const close = () => closeZoom();
+        overlay!.addEventListener('click', close, { once:true });
+        clone.addEventListener('click', close, { once:true });
+        document.addEventListener('keydown', escHandler);
+      }
+
+      function closeZoom() {
+        if (!document.body.classList.contains('zoom-global-active')) return;
+        document.body.classList.remove('zoom-global-active');
+        if (overlay) overlay.innerHTML = '';
+        document.removeEventListener('keydown', escHandler);
+      }
+
+      function escHandler(ev: KeyboardEvent) {
+        if (ev.key === 'Escape') closeZoom();
+      }
+
+      // Click para abrir/cerrar
+      if (mqHover.matches) {
+        img.addEventListener('click', () => {
+          if (document.body.classList.contains('zoom-global-active')) {
+            closeZoom();
+          } else {
+            openZoom();
+          }
+        });
+      }
+
+      // Teclado: Enter/Espacio
+      img.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          if (document.body.classList.contains('zoom-global-active')) closeZoom();
+          else openZoom();
+        } else if (ev.key === 'Escape') {
+          closeZoom();
+        }
+      });
+
+      // Si pierde foco y está abierto (poco común), cerramos
+      img.addEventListener('blur', () => {
+        if (document.body.classList.contains('zoom-global-active')) closeZoom();
+      });
     })();
   </script>
 </section>
