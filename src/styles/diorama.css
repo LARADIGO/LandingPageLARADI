@@ -25,6 +25,10 @@
   background: linear-gradient(135deg, var(--dio-bg-1), var(--dio-bg-2));
   color: var(--dio-ink);
   font-family: var(--font-sans);
+
+  /* Variables para la ola (tema claro) */
+  --wave-fill-base: #ECF2EC;       /* color base actual de la ola */
+  --wave-glow-color: var(--primary); /* marroncito del tema claro */
 }
 
 .wrap { max-width:1200px; margin-inline:auto; padding: clamp(16px,3vw,28px); }
@@ -127,8 +131,49 @@
   mix-blend-mode:normal; opacity:1;
 }
 
-.waves { position:absolute; inset:auto 0 112px 0; height:140px; pointer-events:none; z-index:0; }
-.wave-path { fill:#ECF2EC; }
+.waves {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wave-path {
+  fill: var(--wave-fill-base);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  /* Sin animación por defecto; se activa con .is-animating */
+  animation: none;
+  will-change: transform, filter, opacity, fill;
+}
+
+.wave-path.is-animating {
+  animation:
+    wave-float 10s ease-in-out infinite,
+    wave-glow 4.8s ease-in-out infinite;
+}
+
+/* Flotación vertical */
+@keyframes wave-float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(12px); }
+  100% { transform: translateY(0); }
+}
+
+/* Parpadeo de luz (ahora hacia el color de tema) */
+@keyframes wave-glow {
+  0%   { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
+  50%  { fill: var(--wave-glow-color); opacity: 0.97; filter: saturate(1.04) brightness(1.05); }
+  100% { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
+}
+
+/* Respeto a usuarios con reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .wave-path { animation: none !important; transform: none !important; filter: none !important; }
+}
 
 .shelf {
   position:relative; height:112px; background:#fff; border-top:1px solid var(--dio-edge);
@@ -152,7 +197,15 @@
 }
 
 /* Dark theme */
-.dark-theme .diorama-page { background:linear-gradient(135deg,#0c1219,#101a24); color:var(--text); }
+.dark-theme .diorama-page { 
+  background:linear-gradient(135deg,#0c1219,#101a24); 
+  color:var(--text);
+
+  /* Variables para la ola (tema oscuro) */
+  --wave-fill-base: rgba(255,255,255,.06);
+  --wave-glow-color: var(--primary); /* azul del tema oscuro */
+}
+
 .dark-theme .hero-card { background:linear-gradient(180deg,rgba(255,255,255,.06), rgba(255,255,255,.03)); border-color:var(--border); }
 .dark-theme .card-nav { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--text); }
 .dark-theme .eyebrow { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--text); }
@@ -168,7 +221,10 @@
     rgba(255,255,255,.03);
   border-color:var(--border);
 }
-.dark-theme .wave-path { fill:rgba(255,255,255,.06); }
+
+/* Quitamos la antigua regla de fill fija para wave-path en dark y usamos variables */
+// .dark-theme .wave-path { fill:rgba(255,255,255,.06); }
+
 .dark-theme .shelf { background:var(--surface); border-top:1px solid var(--border); }
 .dark-theme .shelf-inner { color:var(--muted); }
 .dark-theme .dot { background:rgba(255,255,255,.06); border-color:var(--border); color:var(--muted); }

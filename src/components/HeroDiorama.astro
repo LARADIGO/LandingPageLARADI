@@ -50,9 +50,30 @@ const {
       <svg class="waves" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
         <path class="wave-path" d="M0,80 C160,20 320,20 480,80 C640,140 800,140 960,80 C1120,20 1280,20 1440,80 L1440,160 L0,160 Z"></path>
       </svg>
-
-    
-      </div>
     </div>
   </div>
+
+  <script is:inline>
+    // Activa/pausa la animación cuando el hero entra/sale de viewport
+    (() => {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      const hero = document.querySelector('.diorama-page');
+      const path = document.querySelector('.waves .wave-path');
+      if (!hero || !path) return;
+
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            path.classList.add('is-animating');
+          } else {
+            path.classList.remove('is-animating');
+          }
+        }
+      }, { threshold: 0.15 });
+
+      io.observe(hero);
+    })();
+  </script>
 </section>
