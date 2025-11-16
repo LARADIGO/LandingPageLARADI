@@ -29,7 +29,6 @@ const {
       rel="stylesheet"
     />
 
-    <!-- Consent Mode v2 -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){ dataLayer.push(arguments); }
@@ -42,19 +41,13 @@ const {
         security_storage: 'granted'
       });
     </script>
-
-    <!-- GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6QB73LYVYN"></script>
     <script is:inline>
       function gtag(){ dataLayer.push(arguments); }
       gtag('js', new Date());
-      gtag('config', 'G-6QB73LYVYN', {
-        anonymize_ip: true,
-        send_page_view: true,
-        transport_type: 'beacon'
-      });
+      gtag('config', 'G-6QB73LYVYN', { anonymize_ip:true, send_page_view:true, transport_type:'beacon' });
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-        gtag('config', 'G-6QB73LYVYN', { debug_mode: true });
+        gtag('config', 'G-6QB73LYVYN', { debug_mode:true });
       }
     </script>
   </head>
@@ -87,7 +80,6 @@ const {
 
     <script is:inline>
     (() => {
-      // Header scrolled class
       const header = document.querySelector('.site-header');
       const onScroll = () => {
         if (window.scrollY > 8) header.classList.add('is-scrolled');
@@ -96,7 +88,6 @@ const {
       onScroll();
       window.addEventListener('scroll', onScroll, { passive:true });
 
-      // Auto efecto en cards (solo móviles)
       const hasHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
       if (!hasHover) {
         const cards = document.querySelectorAll('.card');
@@ -108,7 +99,6 @@ const {
         }, { threshold: 0.35 });
         cards.forEach(c => cardObserver.observe(c));
 
-        // Pricing interacción táctil
         const pricingGrid = document.querySelector('.pricing-grid');
         if (pricingGrid) {
           pricingGrid.addEventListener('click', (ev) => {

@@ -70,8 +70,7 @@ body {
   font-family: var(--font-sans);
   font-feature-settings: "kern","liga","clig","calt";
   -webkit-font-smoothing: antialiased;
-  /* Compensa el header fijo */
-  padding-top:64px;
+  padding-top:64px; /* compensación header fijo */
 }
 
 .container { width:100%; max-width:1120px; margin:0 auto; padding:0 20px; }
@@ -289,49 +288,7 @@ h2:not(.h2) { font-weight:600; letter-spacing:-0.3px; }
 }
 
 /* =========================
-   VeriFactu (cuadrados como “Quiénes somos”)
-   ========================= */
-.verifactu-cards {
-  display:grid;
-  gap:16px;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  margin-top:36px;
-}
-.verifactu-cards .card {
-  aspect-ratio:1/1;
-  padding:18px 16px 16px;
-  justify-content:flex-start;
-  gap:8px;
-}
-.verifactu-cards .card h3 {
-  font-size:16px;
-  margin:0 0 6px;
-}
-.verifactu-cards .card p {
-  font-size:13px;
-  line-height:1.4;
-}
-
-/* Hover consistente */
-@media (hover:hover) and (pointer:fine) {
-  .verifactu-cards .card:hover {
-    transform: translateY(var(--card-hover-translate));
-    box-shadow: var(--card-hover-shadow);
-    border-color: var(--primary);
-    background: var(--card-hover-gradient-light), linear-gradient(180deg,rgba(255,255,255,.045), rgba(255,255,255,.03));
-  }
-  .dark-theme .verifactu-cards .card:hover {
-    border-color: var(--primary-2);
-    background: var(--card-hover-gradient-dark), linear-gradient(180deg,rgba(255,255,255,.10), rgba(255,255,255,.05));
-  }
-  .verifactu-cards .card:hover .card-ico {
-    transform: rotate(-5deg) scale(1.08);
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
-  }
-}
-
-/* =========================
-   Pricing (blur restaurado) + touch
+   Pricing (blur + touch)
    ========================= */
 .pricing-grid {
   --pricing-max: 1080px;
