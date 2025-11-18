@@ -1,4 +1,5 @@
-// Controlador de contacto con spinner, redirección a /gracias y manejo de errores.
+// Controlador de contacto con spinner, validación de email en cliente,
+// redirección a /gracias y manejo de errores.
 (function(){
   const ENDPOINT = window.CONTACT_ENDPOINT || '';
   function $(sel){ return document.querySelector(sel); }
@@ -9,6 +10,9 @@
     statusEl.textContent = msg || '';
     statusEl.className = 'muted';
     if(type) statusEl.classList.add('status-'+type);
+    // Asegura que el usuario vea el mensaje
+    const sec = document.getElementById('contacto');
+    try { sec && sec.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
   }
 
   const messages = {
@@ -23,6 +27,8 @@
     METHOD_NOT_ALLOWED: 'Método no permitido.',
     SENT: 'Mensaje enviado correctamente.'
   };
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function setLoading(btn, loading){
     if(!btn) return;
@@ -46,6 +52,7 @@
     if(!form) return;
 
     const btn = form.querySelector('button[type="submit"]');
+    const emailInput = form.querySelector('input[name="email"]');
 
     try {
       const fd = new FormData(form);
@@ -66,6 +73,11 @@
 
       if(!payload.name || !payload.email || !payload.message){
         setStatus(messages.MISSING_FIELDS, 'error');
+        return;
+      }
+      if(!emailRegex.test(payload.email)){
+        setStatus(messages.INVALID_EMAIL, 'error');
+        emailInput && emailInput.focus();
         return;
       }
 

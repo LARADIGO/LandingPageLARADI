@@ -1,12 +1,29 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import "@styles/gracias.css";
 ---
-<BaseLayout title="Gracias" description="Gracias por contactarnos">
-  <section class="section">
+<BaseLayout title="¡Mensaje enviado!" description="Gracias por contactarnos">
+  <section class="section thankyou">
     <div class="container center">
+      <div class="badge-wrap" aria-hidden="true">
+        <svg class="badge" viewBox="0 0 120 120" role="img">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7fb3ff" />
+              <stop offset="100%" stop-color="#5b9cff" />
+            </linearGradient>
+          </defs>
+          <circle class="ring" cx="60" cy="60" r="46" />
+          <circle class="pulse" cx="60" cy="60" r="46" />
+          <path class="check" d="M42 62 L56 74 L80 46" />
+        </svg>
+        <div class="confetti" />
+      </div>
+
       <h1 class="h2">¡Gracias por tu mensaje!</h1>
-      <p class="muted max-680">Hemos recibido tu consulta y te responderemos en menos de 24 horas.</p>
-      <p style="margin-top:16px;">
+      <p class="lead max-680">Lo hemos recibido correctamente. Te responderemos en menos de 24 horas.</p>
+
+      <p style="margin-top:18px;">
         <a href="/" class="btn btn-sm">Volver al inicio</a>
       </p>
     </div>
