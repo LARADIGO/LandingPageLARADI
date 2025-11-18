@@ -395,6 +395,28 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
   .hero-img { height:clamp(200px,50vw,360px); object-position:center top; }
 }
 
+/* Spinner y estados de envío (añadido) */
+.btn.is-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: .85;
+}
+.spinner {
+  display:inline-block;
+  width:1em; height:1em;
+  margin-right:.6em;
+  border:.16em solid rgba(0,0,0,.15);
+  border-top-color: rgba(0,0,0,.55);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  vertical-align:-.125em;
+}
+.dark-theme .spinner {
+  border-color: rgba(255,255,255,.18);
+  border-top-color: rgba(255,255,255,.85);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 #contact-status { transition: color .15s ease; }
 #contact-status.status-loading { color:#555; }
 #contact-status.status-error { color:#c0392b; font-weight:600; }

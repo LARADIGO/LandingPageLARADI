@@ -1,4 +1,4 @@
-// Controlador de contacto con manejo de códigos de error y accesibilidad.
+// Controlador de contacto con spinner, redirección a /gracias y manejo de errores.
 (function(){
   const ENDPOINT = window.CONTACT_ENDPOINT || '';
   function $(sel){ return document.querySelector(sel); }
@@ -6,7 +6,7 @@
 
   function setStatus(msg, type){
     if(!statusEl) return;
-    statusEl.textContent = msg;
+    statusEl.textContent = msg || '';
     statusEl.className = 'muted';
     if(type) statusEl.classList.add('status-'+type);
   }
@@ -24,13 +24,28 @@
     SENT: 'Mensaje enviado correctamente.'
   };
 
+  function setLoading(btn, loading){
+    if(!btn) return;
+    if(loading){
+      if(!btn.dataset.original) btn.dataset.original = btn.innerHTML;
+      btn.classList.add('is-loading');
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Enviando...';
+      btn.setAttribute('aria-busy', 'true');
+      btn.setAttribute('disabled','true');
+    } else {
+      btn.classList.remove('is-loading');
+      btn.innerHTML = btn.dataset.original || 'Enviar';
+      btn.removeAttribute('aria-busy');
+      btn.removeAttribute('disabled');
+    }
+  }
+
   async function handleSubmit(ev){
     ev.preventDefault();
     const form = ev.target;
     if(!form) return;
 
     const btn = form.querySelector('button[type="submit"]');
-    btn && btn.setAttribute('disabled','true');
 
     try {
       const fd = new FormData(form);
@@ -55,14 +70,13 @@
       }
 
       if(!ENDPOINT){
-        console.warn('[contact] Sin ENDPOINT. Fallback nativo.');
-        form.method = 'POST';
-        form.action = '/';
-        form.submit();
+        console.error('[contact] Falta CONTACT_ENDPOINT');
+        setStatus('Error de configuración. Inténtalo más tarde.', 'error');
         return;
       }
 
       setStatus('Enviando...', 'loading');
+      setLoading(btn, true);
 
       const res = await fetch(ENDPOINT, {
         method:'POST',
@@ -83,7 +97,7 @@
 
       if(data && data.ok){
         setStatus('Enviado. Redirigiendo...', 'success');
-        setTimeout(()=> { location.href='/gracias'; }, 400);
+        setTimeout(()=> { location.href='/gracias'; }, 350);
         form.reset();
       } else {
         const code = data?.code || 'INTERNAL_ERROR';
@@ -93,7 +107,7 @@
       console.error('[contact] Error:', err);
       setStatus('Fallo de red o servidor. Inténtalo más tarde.', 'error');
     } finally {
-      btn && btn.removeAttribute('disabled');
+      setLoading(btn, false);
     }
   }
 
