@@ -395,4 +395,7 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
   .hero-img { height:clamp(200px,50vw,360px); object-position:center top; }
 }
 
-#contact-status.error { color:#c0392b; font-weight:600; }
+#contact-status { transition: color .15s ease; }
+#contact-status.status-loading { color:#555; }
+#contact-status.status-error { color:#c0392b; font-weight:600; }
+#contact-status.status-success { color:#2d7c36; font-weight:600; }
