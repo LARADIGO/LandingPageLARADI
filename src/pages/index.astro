@@ -243,17 +243,13 @@ const initialStatusClass = errCode ? 'status-error' : '';
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
       <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
-      <form
-        id="contact-form"
-        class="form"
-        method="POST"
-        action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}  <!-- fallback solo si NO carga JS -->
-        <!-- IMPORTANTE: sin novalidate, así el navegador bloquea emails inválidos incluso sin JS -->
-      >
+      <form id="contact-form"
+            class="form"
+            method="POST"
+            action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}>
         <p class="hp" aria-hidden="true">
           <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
         </p>
-
         <div class="form-grid">
           <div>
             <label>Nombre</label>
@@ -261,28 +257,29 @@ const initialStatusClass = errCode ? 'status-error' : '';
           </div>
           <div>
             <label>Email</label>
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="tu@ejemplo.com"
-              autocomplete="email"
-              inputmode="email"
-              pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
-              title="Introduce un email válido (formato usuario@dominio.ext)"
-            />
+            <input name="email"
+                   type="email"
+                   required
+                   placeholder="tu@ejemplo.com"
+                   autocomplete="email"
+                   inputmode="email"
+                   pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
+                   title="Introduce un email válido (usuario@dominio.ext)" />
           </div>
           <div class="full">
             <label>Mensaje</label>
-            <textarea name="message" rows="4" required placeholder="¿Qué necesitas?" autocomplete="off"></textarea>
+            <textarea name="message" rows="4" required placeholder="¿Qué necesitas?"></textarea>
           </div>
         </div>
-
-        <div id="contact-status" class={"muted " + initialStatusClass} role="status" aria-live="polite" style="min-height:1.2em;">
+        <div id="contact-status"
+             class={"muted " + initialStatusClass}
+             role="status"
+             aria-live="polite"
+             style="min-height:1.2em;">
           {initialStatus}
         </div>
         <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
-        <noscript><p class="muted">JavaScript desactivado: el envío se hará directo al servidor.</p></noscript>
+        <noscript><p class="muted">JavaScript desactivado: se usará envío directo.</p></noscript>
       </form>
     </div>
   </section>
@@ -290,11 +287,11 @@ const initialStatusClass = errCode ? 'status-error' : '';
   {errCode && (
     <script is:inline>
       const sec = document.getElementById('contacto');
-      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      sec && sec.scrollIntoView({ behavior:'smooth', block:'center' });
       try {
-        const url = new URL(location.href);
-        url.searchParams.delete('contact_error');
-        history.replaceState({}, '', url.toString());
+        const u=new URL(location.href);
+        u.searchParams.delete('contact_error');
+        history.replaceState({},'',u.toString());
       } catch {}
     </script>
   )}
