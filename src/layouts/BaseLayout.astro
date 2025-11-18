@@ -78,6 +78,7 @@ const {
 
     <SiteFooter />
 
+    <!-- Efectos UI móviles e interacciones pricing (inline) -->
     <script is:inline>
     (() => {
       const header = document.querySelector('.site-header');
@@ -123,11 +124,9 @@ const {
     })();
     </script>
 
-    <!-- Carga el controlador del formulario en todas las páginas (no rompe si no hay formulario) -->
-    <script type="module" is:inline>
-      import '/src/scripts/ga4.events.client.ts';
-      import '/src/scripts/contact.client.ts';
-    </script>
+    <!-- IMPORTANTE: usar src para que Astro/Vite bundlee los scripts -->
+    <script type="module" src={Astro.resolve('../scripts/ga4.events.client.ts')}></script>
+    <script type="module" src={Astro.resolve('../scripts/contact.client.ts')}></script>
 
     <CookieConsent />
   </body>

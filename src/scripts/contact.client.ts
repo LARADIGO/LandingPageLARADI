@@ -1,11 +1,10 @@
-// Envío del formulario a AWS API Gateway + Lambda (POST JSON)
-// Requiere PUBLIC_CONTACT_ENDPOINT configurada en Amplify Hosting
+// Controlador del formulario de contacto: envía POST JSON a API Gateway.
+// Requiere PUBLIC_CONTACT_ENDPOINT definido en Amplify Hosting.
 const ENDPOINT = import.meta.env.PUBLIC_CONTACT_ENDPOINT;
 
 function $(sel: string, root: Document | HTMLElement = document) {
   return root.querySelector(sel) as HTMLElement | null;
 }
-
 function setStatus(msg: string, isError = false) {
   const el = $('#contact-status');
   if (!el) return;
@@ -28,7 +27,8 @@ async function handleSubmit(ev: Event) {
 
   try {
     const fd = new FormData(form);
-    const hp = (fd.get('hp_field') || '').toString().trim(); // honeypot
+    // Honeypot
+    const hp = (fd.get('hp_field') || '').toString().trim();
     if (hp) {
       setStatus('Gracias, enviado.', false);
       form.reset();
