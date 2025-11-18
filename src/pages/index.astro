@@ -97,6 +97,8 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
       }
     ]}
   />
+  
+
 
   <!-- PRECIOS -->
   <section id="precios" class="section alt">
@@ -226,18 +228,12 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
       <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
-      <form
-        name="contact"
-        method="POST"
-        action="/gracias"
-        data-netlify="true"
-        netlify-honeypot="bot-field"
-        class="form"
-      >
+      <form id="contact-form" class="form" novalidate>
+        <!-- Honeypot simple -->
         <p class="hp" aria-hidden="true">
-          <label>No rellenar: <input name="bot-field" /></label>
+          <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
         </p>
-        <input type="hidden" name="form-name" value="contact" />
+
         <div class="form-grid">
           <div>
             <label>Nombre</label>
@@ -252,6 +248,8 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
             <textarea name="message" rows="4" required placeholder="¿Qué necesitas?"></textarea>
           </div>
         </div>
+
+        <div id="contact-status" class="muted" role="status" aria-live="polite" style="min-height:1.2em;"></div>
         <button type="submit" class="btn btn-lg">Enviar</button>
       </form>
     </div>

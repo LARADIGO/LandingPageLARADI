@@ -123,8 +123,10 @@ const {
     })();
     </script>
 
+    <!-- Carga el controlador del formulario en todas las páginas (no rompe si no hay formulario) -->
     <script type="module" is:inline>
       import '/src/scripts/ga4.events.client.ts';
+      import '/src/scripts/contact.client.ts';
     </script>
 
     <CookieConsent />
