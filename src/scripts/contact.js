@@ -1,18 +1,23 @@
-// Controlador de contacto con spinner, validación nativa del navegador,
-// redirección a /gracias y manejo de errores.
+// Versión reforzada: evita POST nativo con email inválido,
+// quita action + novalidate si JS carga, valida con pattern y regex,
+// y loguea el flujo. Si JS falla -> fallback nativo (redirección).
 (function(){
   const ENDPOINT = window.CONTACT_ENDPOINT || '';
-  function $(sel){ return document.querySelector(sel); }
-  const statusEl = $('#contact-status');
-
-  function setStatus(msg, type){
-    if(!statusEl) return;
-    statusEl.textContent = msg || '';
-    statusEl.className = 'muted';
-    if(type) statusEl.classList.add('status-'+type);
-    const sec = document.getElementById('contacto');
-    try { sec && sec.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
+  const form = document.getElementById('contact-form');
+  if(!form){
+    console.warn('[contact] Formulario no encontrado');
+    return;
   }
+
+  // Quita atributos para impedir fallback mientras JS está activo
+  // (si quieres mantener fallback elimina estas dos líneas)
+  form.removeAttribute('action');
+  form.removeAttribute('novalidate');
+
+  const statusEl = document.getElementById('contact-status');
+  const submitBtn = form.querySelector('[data-contact-submit]');
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const messages = {
     MISSING_FIELDS: 'Rellena todos los campos.',
@@ -27,63 +32,77 @@
     SENT: 'Mensaje enviado correctamente.'
   };
 
-  function setLoading(btn, loading){
-    if(!btn) return;
+  function setStatus(msg, type){
+    if(!statusEl) return;
+    statusEl.textContent = msg || '';
+    statusEl.className = 'muted';
+    if(type) statusEl.classList.add('status-'+type);
+  }
+
+  function setLoading(loading){
+    if(!submitBtn) return;
     if(loading){
-      if(!btn.dataset.original) btn.dataset.original = btn.innerHTML;
-      btn.classList.add('is-loading');
-      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Enviando...';
-      btn.setAttribute('aria-busy', 'true');
-      btn.setAttribute('disabled','true');
+      if(!submitBtn.dataset.original) submitBtn.dataset.original = submitBtn.innerHTML;
+      submitBtn.classList.add('is-loading');
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Enviando...';
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.setAttribute('disabled','true');
     } else {
-      btn.classList.remove('is-loading');
-      btn.innerHTML = btn.dataset.original || 'Enviar';
-      btn.removeAttribute('aria-busy');
-      btn.removeAttribute('disabled');
+      submitBtn.classList.remove('is-loading');
+      submitBtn.innerHTML = submitBtn.dataset.original || 'Enviar';
+      submitBtn.removeAttribute('aria-busy');
+      submitBtn.removeAttribute('disabled');
     }
+  }
+
+  function scrollToForm(){
+    const sec = document.getElementById('contacto');
+    try { sec && sec.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
   }
 
   async function handleSubmit(ev){
     ev.preventDefault();
-    const form = ev.target;
-    if(!form) return;
+    setStatus('', '');
 
-    // Fuerza la validación nativa del navegador aunque el <form> tenga novalidate
-    try { form.noValidate = false; } catch {}
-    if (!form.checkValidity()) {
-      // Muestra UI nativa de validación (tooltip del navegador) y no envía
-      form.reportValidity();
-      setStatus('Revisa los campos resaltados.', 'error');
+    const fd = new FormData(form);
+    const name = (fd.get('name')||'').toString().trim();
+    const email = (fd.get('email')||'').toString().trim();
+    const message = (fd.get('message')||'').toString().trim();
+    const hp = (fd.get('hp_field')||'').toString().trim();
+
+    // Validación básica previa
+    if(hp){
+      setStatus('Enviado.', 'success');
+      form.reset();
+      return;
+    }
+    if(!name || !email || !message){
+      setStatus(messages.MISSING_FIELDS, 'error');
+      scrollToForm();
+      return;
+    }
+    if(!EMAIL_REGEX.test(email)){
+      setStatus(messages.INVALID_EMAIL, 'error');
+      const emailInput = form.querySelector('input[name="email"]');
+      emailInput && emailInput.focus();
+      scrollToForm();
       return;
     }
 
-    const btn = form.querySelector('button[type="submit"]');
-    const fd = new FormData(form);
+    if(!ENDPOINT){
+      setStatus('Error de configuración. Inténtalo más tarde.', 'error');
+      return;
+    }
+
+    setStatus('Enviando...', 'loading');
+    setLoading(true);
 
     try {
-      const hp = (fd.get('hp_field')||'').toString().trim();
-      if(hp){
-        setStatus('Enviado.', 'success');
-        form.reset();
-        return;
-      }
-
       const payload = {
-        name: (fd.get('name')||'').toString().trim(),
-        email: (fd.get('email')||'').toString().trim(),
-        message: (fd.get('message')||'').toString().trim(),
+        name, email, message,
         url: location.href,
         ua: navigator.userAgent
       };
-
-      setStatus('Enviando...', 'loading');
-      setLoading(btn, true);
-
-      if(!ENDPOINT){
-        console.error('[contact] Falta CONTACT_ENDPOINT');
-        setStatus('Error de configuración. Inténtalo más tarde.', 'error');
-        return;
-      }
 
       const res = await fetch(ENDPOINT, {
         method:'POST',
@@ -94,45 +113,36 @@
       });
 
       let data = null;
-      try { data = await res.json(); } catch { data = null; }
+      try { data = await res.json(); } catch {}
 
       if(!res.ok){
         const code = data?.code || 'INTERNAL_ERROR';
         setStatus(messages[code] || `Error ${res.status}`, 'error');
+        scrollToForm();
         return;
       }
 
-      if(data && data.ok){
+      if(data?.ok){
         setStatus('Enviado. Redirigiendo...', 'success');
         setTimeout(()=> { location.href='/gracias'; }, 350);
         form.reset();
       } else {
         const code = data?.code || 'INTERNAL_ERROR';
         setStatus(messages[code] || 'Error al enviar.', 'error');
+        scrollToForm();
       }
     } catch(err){
-      console.error('[contact] Error:', err);
+      console.error('[contact] Error de red:', err);
       setStatus('Fallo de red o servidor. Inténtalo más tarde.', 'error');
+      scrollToForm();
     } finally {
-      setLoading(btn, false);
+      setLoading(false);
     }
   }
 
-  const form = document.getElementById('contact-form');
-  if(!form){
-    console.warn('[contact] Formulario no encontrado');
-    return;
-  }
+  // Listener en capture para interceptar antes que cualquier otro
+  form.addEventListener('submit', handleSubmit, { capture: true });
 
-  // Sugerencia: añade sugerencias de teclado/autocompletado
-  try {
-    const email = form.querySelector('input[name="email"]');
-    if (email) { email.setAttribute('inputmode','email'); email.setAttribute('autocomplete','email'); }
-    const name = form.querySelector('input[name="name"]');
-    if (name) name.setAttribute('autocomplete','name');
-  } catch {}
-
-  form.addEventListener('submit', handleSubmit);
   setStatus('', '');
   console.log('[contact] Inicializado. ENDPOINT:', ENDPOINT || '(no definido)');
 })();
