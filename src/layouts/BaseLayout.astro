@@ -55,7 +55,8 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
     <!-- Variable global para el script de contacto -->
     <script is:inline>
-      window.CONTACT_ENDPOINT = "{contactEndpoint}";
+      window.CONTACT_ENDPOINT = {JSON.stringify(contactEndpoint)};
+      console.log('[contact][BOOT] CONTACT_ENDPOINT:', window.CONTACT_ENDPOINT || '(vacío)');
     </script>
   </head>
   <body>

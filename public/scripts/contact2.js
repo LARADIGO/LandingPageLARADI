@@ -1,5 +1,5 @@
-// Versión estable: valida en cliente, usa fetch si hay endpoint,
-// y mantiene fallback nativo. NO elimina el action del <form>.
+// Estable: valida en cliente; usa fetch si hay endpoint; si no, deja envío nativo.
+// No elimina action del <form> y solo cancela el submit cuando procede.
 (function(){
   const form = document.getElementById('contact-form');
   if(!form){ console.warn('[contact] Form no encontrado'); return; }
@@ -43,7 +43,7 @@
   }
 
   form.addEventListener('submit', async (ev) => {
-    // Deja que el navegador bloquee si algo no es válido (required/pattern/type=email)
+    // 1) Deja que el navegador bloquee si hay campos inválidos (required/pattern/type=email)
     if (!form.checkValidity()) {
       ev.preventDefault();
       form.reportValidity();
@@ -52,47 +52,49 @@
       return;
     }
 
-    ev.preventDefault(); // Vamos a decidir fetch vs nativo
-
+    // 2) Leemos datos y decidimos si usamos fetch o dejamos nativo
     const fd = new FormData(form);
     const name = (fd.get('name')||'').toString().trim();
     const email = (fd.get('email')||'').toString().trim();
     const message = (fd.get('message')||'').toString().trim();
     const hp = (fd.get('hp_field')||'').toString().trim();
 
+    // Mensaje limpio
     setStatus('', '');
 
-    // Honeypot
+    // Honeypot: no enviamos nada realmente
     if(hp){
+      ev.preventDefault();
       setStatus('Enviado.', 'success');
       form.reset();
       return;
     }
 
-    // Validación adicional
+    // Validación extra
     if(!name || !email || !message){
+      ev.preventDefault();
       setStatus('Rellena todos los campos.', 'error');
       scrollToForm();
       return;
     }
     if(!EMAIL_REGEX.test(email)){
+      ev.preventDefault();
       setStatus('El email no parece válido.', 'error');
       form.querySelector('input[name="email"]')?.focus();
       scrollToForm();
       return;
     }
 
+    // 3) Usar fetch si tenemos endpoint; si no, dejar envío nativo (no cancelar)
     const ENDPOINT = getEndpoint();
-
-    // Si NO tenemos endpoint, dejamos que el submit nativo se encargue (fallback)
     if(!ENDPOINT){
       console.warn('[contact] Sin endpoint: envío nativo (action).');
-      form.removeEventListener('submit', arguments.callee); // no reinterceptar
-      form.submit();
+      // No llamamos preventDefault: el navegador hará POST al action.
       return;
     }
 
-    // Envío por fetch (JSON)
+    // 4) Envío por fetch: ahora sí cancelamos el nativo
+    ev.preventDefault();
     setStatus('Enviando...','loading');
     setLoading(true);
 
