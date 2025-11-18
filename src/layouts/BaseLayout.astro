@@ -4,15 +4,13 @@ import ThemeToggle from '@components/ThemeToggle.astro';
 import CookieConsent from '@components/CookieConsent.astro';
 import SiteFooter from '@components/SiteFooter.astro';
 
-// Importa las URLs finales de los scripts (Vite ?url)
-import ga4Url from '../scripts/ga4.events.client.ts?url';
-import contactUrl from '../scripts/contact.client.ts?url';
-
 const {
   title = "Tu Producto",
   description = "Solución moderna, rápida y sencilla para tu negocio.",
   image = "/assets/og-image.svg",
 } = Astro.props;
+
+const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 ---
 <html lang="es">
   <head>
@@ -54,6 +52,11 @@ const {
         gtag('config', 'G-6QB73LYVYN', { debug_mode:true });
       }
     </script>
+
+    <!-- Variable global para el script de contacto -->
+    <script is:inline>
+      window.CONTACT_ENDPOINT = "{contactEndpoint}";
+    </script>
   </head>
   <body>
     <header class="site-header" role="banner">
@@ -67,7 +70,7 @@ const {
 
         <nav class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
-          <a href="#verifactu">VeriFactu</a>
+            <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
@@ -82,7 +85,6 @@ const {
 
     <SiteFooter />
 
-    <!-- Efectos UI móviles e interacciones pricing (inline) -->
     <script is:inline>
     (() => {
       const header = document.querySelector('.site-header');
@@ -128,9 +130,9 @@ const {
     })();
     </script>
 
-    <!-- IMPORTANTE: usar src con ?url para que Vite/Astro emitan /assets/*.js -->
-    <script type="module" src={ga4Url}></script>
-    <script type="module" src={contactUrl}></script>
+    <!-- Scripts JS planos servidos desde /public/scripts -->
+    <script type="module" src="/scripts/ga4.js"></script>
+    <script type="module" src="/scripts/contact.js"></script>
 
     <CookieConsent />
   </body>

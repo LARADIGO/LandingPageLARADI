@@ -1,5 +1,5 @@
-// Controlador del formulario de contacto: envía POST JSON a API Gateway.
-// Requiere PUBLIC_CONTACT_ENDPOINT definido en Amplify Hosting.
+// Controlador del formulario de contacto: POST JSON a API Gateway.
+// Requiere PUBLIC_CONTACT_ENDPOINT definida en el build (Amplify Hosting).
 const ENDPOINT = import.meta.env.PUBLIC_CONTACT_ENDPOINT;
 
 function $(sel: string, root: Document | HTMLElement = document) {
@@ -17,8 +17,10 @@ async function handleSubmit(ev: Event) {
   const form = ev.target as HTMLFormElement;
   if (!form) return;
 
+  // Si no hay ENDPOINT (no configurado), dejamos que el form haga POST normal (fallback) si action está puesto.
   if (!ENDPOINT) {
-    setStatus('Error de configuración: falta PUBLIC_CONTACT_ENDPOINT.', true);
+    console.warn('[contact] Falta PUBLIC_CONTACT_ENDPOINT; usando fallback form action.');
+    form.submit(); // continúa envío nativo (x-www-form-urlencoded)
     return;
   }
 
@@ -27,7 +29,6 @@ async function handleSubmit(ev: Event) {
 
   try {
     const fd = new FormData(form);
-    // Honeypot
     const hp = (fd.get('hp_field') || '').toString().trim();
     if (hp) {
       setStatus('Gracias, enviado.', false);
@@ -58,11 +59,11 @@ async function handleSubmit(ev: Event) {
     });
 
     if (!res.ok) {
-      const txt = await res.text().catch(()=>'');
+      const txt = await res.text().catch(()=> '');
       throw new Error(`Error ${res.status}: ${txt || res.statusText}`);
     }
 
-    const data = await res.json().catch(()=>({ ok:true }));
+    const data = await res.json().catch(()=> ({ ok: true }));
     if (data.ok) {
       setStatus('Enviado correctamente. Redirigiendo...', false);
       setTimeout(() => { window.location.href = '/gracias'; }, 400);
@@ -71,8 +72,8 @@ async function handleSubmit(ev: Event) {
       throw new Error('No se pudo enviar el mensaje.');
     }
   } catch (err:any) {
-    console.error(err);
-    setStatus('No se pudo enviar el mensaje. Inténtalo de nuevo más tarde.', true);
+    console.error('[contact] Error envío:', err);
+    setStatus('No se pudo enviar el mensaje. Inténtalo más tarde.', true);
   } finally {
     submitBtn?.removeAttribute('disabled');
   }
@@ -80,6 +81,10 @@ async function handleSubmit(ev: Event) {
 
 (function init() {
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
-  if (!form) return;
+  if (!form) {
+    console.warn('[contact] Formulario no encontrado');
+    return;
+  }
   form.addEventListener('submit', handleSubmit);
+  console.log('[contact] Inicializado. ENDPOINT:', ENDPOINT || '(no definido)');
 })();

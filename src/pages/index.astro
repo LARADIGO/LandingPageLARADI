@@ -98,7 +98,17 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
     ]}
   />
   
-
+  <!-- DEMO -->
+  <section id="demo" class="section">
+    <div class="container">
+      <h2 class="h2 center">Demo rápida</h2>
+      <p class="lead center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
+      <div class="media-grid">
+        <img class="rounded" src="/assets/screen-2.svg" alt="Flujo de caja" width="960" height="640" />
+        <img class="rounded" src="/assets/screen-3.svg" alt="Cierre de caja" width="960" height="640" />
+      </div>
+    </div>
+  </section>
 
   <!-- PRECIOS -->
   <section id="precios" class="section alt">
@@ -211,12 +221,18 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
   />
 
   <!-- CONTACTO -->
+  <!-- CONTACTO -->
   <section id="contacto" class="section alt">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
       <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
-      <form id="contact-form" class="form" novalidate>
-        <!-- Honeypot simple -->
+      <form
+        id="contact-form"
+        class="form"
+        method="POST"
+        action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}
+        novalidate
+      >
         <p class="hp" aria-hidden="true">
           <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
         </p>
@@ -226,7 +242,7 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
             <label>Nombre</label>
             <input name="name" type="text" required placeholder="Tu nombre" />
           </div>
-          <div>
+            <div>
             <label>Email</label>
             <input name="email" type="email" required placeholder="tú@ejemplo.com" />
           </div>
@@ -238,6 +254,7 @@ import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio
 
         <div id="contact-status" class="muted" role="status" aria-live="polite" style="min-height:1.2em;"></div>
         <button type="submit" class="btn btn-lg">Enviar</button>
+        <noscript><p class="muted">JavaScript desactivado: el envío se hará directo al servidor.</p></noscript>
       </form>
     </div>
   </section>

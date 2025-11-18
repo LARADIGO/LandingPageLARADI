@@ -394,3 +394,5 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
 @media (max-width:600px){
   .hero-img { height:clamp(200px,50vw,360px); object-position:center top; }
 }
+
+#contact-status.error { color:#c0392b; font-weight:600; }
