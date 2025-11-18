@@ -1,6 +1,5 @@
-// Versión reforzada: evita POST nativo con email inválido,
-// quita action + novalidate si JS carga, valida con pattern y regex,
-// y loguea el flujo. Si JS falla -> fallback nativo (redirección).
+// Reforzado: elimina action para evitar POST nativo si el JS está activo.
+// Valida con pattern/regex y usa fetch; muestra errores en la misma página.
 (function(){
   const ENDPOINT = window.CONTACT_ENDPOINT || '';
   const form = document.getElementById('contact-form');
@@ -9,14 +8,12 @@
     return;
   }
 
-  // Quita atributos para impedir fallback mientras JS está activo
-  // (si quieres mantener fallback elimina estas dos líneas)
+  // Desactiva envío nativo mientras JS está activo (evita redirecciones 303)
+  form.setAttribute('data-js-active','1');
   form.removeAttribute('action');
-  form.removeAttribute('novalidate');
 
   const statusEl = document.getElementById('contact-status');
   const submitBtn = form.querySelector('[data-contact-submit]');
-
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const messages = {
@@ -37,6 +34,8 @@
     statusEl.textContent = msg || '';
     statusEl.className = 'muted';
     if(type) statusEl.classList.add('status-'+type);
+    const sec = document.getElementById('contacto');
+    try { sec && sec.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
   }
 
   function setLoading(loading){
@@ -55,22 +54,25 @@
     }
   }
 
-  function scrollToForm(){
-    const sec = document.getElementById('contacto');
-    try { sec && sec.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
+  function preventNative(ev){
+    // Capa extra de seguridad: bloquear envío nativo pase lo que pase
+    ev.preventDefault();
+    ev.stopPropagation();
   }
+  // Captura para asegurarnos de interceptar siempre
+  form.addEventListener('submit', preventNative, { capture: true });
+
+  // Limpia el estado al teclear
+  form.addEventListener('input', () => setStatus('', ''));
 
   async function handleSubmit(ev){
-    ev.preventDefault();
-    setStatus('', '');
-
+    // preventDefault ya aplicado arriba
     const fd = new FormData(form);
     const name = (fd.get('name')||'').toString().trim();
     const email = (fd.get('email')||'').toString().trim();
     const message = (fd.get('message')||'').toString().trim();
     const hp = (fd.get('hp_field')||'').toString().trim();
 
-    // Validación básica previa
     if(hp){
       setStatus('Enviado.', 'success');
       form.reset();
@@ -78,17 +80,14 @@
     }
     if(!name || !email || !message){
       setStatus(messages.MISSING_FIELDS, 'error');
-      scrollToForm();
+      form.querySelector('input[name="name"]')?.focus();
       return;
     }
     if(!EMAIL_REGEX.test(email)){
       setStatus(messages.INVALID_EMAIL, 'error');
-      const emailInput = form.querySelector('input[name="email"]');
-      emailInput && emailInput.focus();
-      scrollToForm();
+      form.querySelector('input[name="email"]')?.focus();
       return;
     }
-
     if(!ENDPOINT){
       setStatus('Error de configuración. Inténtalo más tarde.', 'error');
       return;
@@ -98,12 +97,7 @@
     setLoading(true);
 
     try {
-      const payload = {
-        name, email, message,
-        url: location.href,
-        ua: navigator.userAgent
-      };
-
+      const payload = { name, email, message, url: location.href, ua: navigator.userAgent };
       const res = await fetch(ENDPOINT, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -118,7 +112,6 @@
       if(!res.ok){
         const code = data?.code || 'INTERNAL_ERROR';
         setStatus(messages[code] || `Error ${res.status}`, 'error');
-        scrollToForm();
         return;
       }
 
@@ -129,20 +122,18 @@
       } else {
         const code = data?.code || 'INTERNAL_ERROR';
         setStatus(messages[code] || 'Error al enviar.', 'error');
-        scrollToForm();
       }
     } catch(err){
       console.error('[contact] Error de red:', err);
       setStatus('Fallo de red o servidor. Inténtalo más tarde.', 'error');
-      scrollToForm();
     } finally {
       setLoading(false);
     }
   }
 
-  // Listener en capture para interceptar antes que cualquier otro
-  form.addEventListener('submit', handleSubmit, { capture: true });
+  // Listener principal en burbuja (prevención ya está en capture)
+  form.addEventListener('submit', handleSubmit, { capture: false });
 
   setStatus('', '');
-  console.log('[contact] Inicializado. ENDPOINT:', ENDPOINT || '(no definido)');
+  console.log('[contact] Inicializado. JS activo, action eliminado. ENDPOINT:', ENDPOINT || '(no definido)');
 })();

@@ -4,10 +4,9 @@ import HeroDiorama from "@components/HeroDiorama.astro";
 import FaqSection from "@components/FaqSection.astro";
 import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio.astro";
 
-// Lee el código de error que pueda venir por query (?contact_error=CODE)
-const errCode = Astro.url.searchParams.get('contact_error') || '';
 
-// Mensajes que mapean los códigos devueltos por la Lambda
+// Código de error por redirección (solo si no cargó el JS y hubo POST nativo)
+const errCode = Astro.url.searchParams.get('contact_error') || '';
 const messages: Record<string, string> = {
   MISSING_FIELDS: 'Rellena todos los campos.',
   INVALID_EMAIL: 'El email no parece válido.',
@@ -248,8 +247,8 @@ const initialStatusClass = errCode ? 'status-error' : '';
         id="contact-form"
         class="form"
         method="POST"
-        action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}
-        novalidate
+        action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}  <!-- fallback solo si NO carga JS -->
+        <!-- IMPORTANTE: sin novalidate, así el navegador bloquea emails inválidos incluso sin JS -->
       >
         <p class="hp" aria-hidden="true">
           <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
