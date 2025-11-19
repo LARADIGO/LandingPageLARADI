@@ -5,8 +5,8 @@ import "../styles/faq.css";
  * FaqSection.astro
  * - Acordeón con <details>.
  * - Marcado FAQPage (JSON-LD) para SEO.
- * - Prop disableSchema para desactivar el script JSON-LD.
- * - Iconos simplificados (texto dentro del DOM, no pseudo-elements).
+ * - Icono en DOM + script robusto.
+ * - Script JSON-LD volcado con set:html para evitar plantillas sin evaluar.
  */
 const {
   title = "Preguntas frecuentes",
@@ -40,7 +40,6 @@ const prepared = items.map((it, i) => ({
 }));
 
 const shouldRenderSchema = !disableSchema && prepared.length > 0;
-
 const faqSchema = shouldRenderSchema ? {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -53,6 +52,9 @@ const faqSchema = shouldRenderSchema ? {
     }
   }))
 } : null;
+
+// Serialización a texto para inyectar sin plantillas
+const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
 ---
 
 <section id="faq" class={`section faq-section ${defer ? 'defer' : ''}`}>
@@ -95,9 +97,7 @@ const faqSchema = shouldRenderSchema ? {
   </div>
 
   {shouldRenderSchema && (
-    <script type="application/ld+json" is:inline>
-      {JSON.stringify(faqSchema)}
-    </script>
+    <script type="application/ld+json" is:inline set:html={faqJson}></script>
   )}
 </section>
 
@@ -114,7 +114,6 @@ const faqSchema = shouldRenderSchema ? {
   }
   if(!items.length) return;
 
-  // Dataset config
   const accordion      = root.dataset.accordion === 'true';
   const persist        = !accordion && root.dataset.persist === 'true';
   const autoscroll     = root.dataset.autoscroll === 'true';
@@ -163,22 +162,21 @@ const faqSchema = shouldRenderSchema ? {
     }
   }
 
-  // Inicializar visual sin animación
+  // Inicializar sin animación
   items.forEach(d => {
     const panel = d.querySelector('.faq-panel');
     if(!panel) return;
+    const glyph = d.querySelector('.faq-glyph');
     if(toOpen.has(d.id)){
       d.setAttribute('open','');
       panel.style.height='auto';
       panel.style.opacity='1';
-      const glyph = d.querySelector('.faq-glyph');
       if(glyph) glyph.textContent='▴';
     } else {
       d.removeAttribute('open');
       panel.style.height='0px';
       panel.style.opacity='0';
       panel.style.overflow='hidden';
-      const glyph = d.querySelector('.faq-glyph');
       if(glyph) glyph.textContent='▾';
     }
   });
@@ -193,7 +191,6 @@ const faqSchema = shouldRenderSchema ? {
   }
   updateCounter();
 
-  // Animaciones
   function animate(details, opening){
     const panel = details.querySelector('.faq-panel');
     const glyph = details.querySelector('.faq-glyph');
@@ -203,11 +200,7 @@ const faqSchema = shouldRenderSchema ? {
 
     if(opening){
       if(glyph) glyph.textContent='▴';
-      if(reduce){
-        panel.style.height='auto';
-        panel.style.opacity='1';
-        return;
-      }
+      if(reduce){ panel.style.height='auto'; panel.style.opacity='1'; return; }
       panel.style.height='0px';
       panel.style.opacity='0';
       requestAnimationFrame(()=>{
@@ -224,11 +217,7 @@ const faqSchema = shouldRenderSchema ? {
       });
     } else {
       if(glyph) glyph.textContent='▾';
-      if(reduce){
-        panel.style.height='0px';
-        panel.style.opacity='0';
-        return;
-      }
+      if(reduce){ panel.style.height='0px'; panel.style.opacity='0'; return; }
       panel.style.height=panel.scrollHeight+'px';
       panel.style.opacity='1';
       requestAnimationFrame(()=>{
@@ -252,21 +241,15 @@ const faqSchema = shouldRenderSchema ? {
     }
     details.setAttribute('open','');
     animate(details,true);
-    if(updateHash){
-      history.replaceState(null,'','#'+details.id);
-    }
-    if(scroll && autoscroll){
-      details.scrollIntoView({behavior:'smooth', block:scrollBlock});
-    }
+    if(updateHash){ history.replaceState(null,'','#'+details.id); }
+    if(scroll && autoscroll){ details.scrollIntoView({behavior:'smooth', block:scrollBlock}); }
   }
 
   function closeItem(details,{updateHash=true}={}){
     if(!details.open) return;
     details.removeAttribute('open');
     animate(details,false);
-    if(updateHash && location.hash==='#'+details.id){
-      history.replaceState(null,'','#');
-    }
+    if(updateHash && location.hash==='#'+details.id){ history.replaceState(null,'','#'); }
   }
 
   function persistState(){
@@ -275,7 +258,7 @@ const faqSchema = shouldRenderSchema ? {
     savePersisted(openIds);
   }
 
-  // Eventos en summary
+  // Eventos
   items.forEach(d=>{
     const summary = d.querySelector('summary');
     summary?.addEventListener('click', e=>{
@@ -294,29 +277,26 @@ const faqSchema = shouldRenderSchema ? {
     });
   });
 
-  // Expand / Collapse global
+  // Expandir / Colapsar
+  const controlsWrap = section.querySelector('.faq-controls');
   if(controlsWrap && expandCollapse){
-    const btnExpand = controlsWrap.querySelector('.faq-expand-all');
-    const btnCollapse = controlsWrap.querySelector('.faq-collapse-all');
-    btnExpand?.addEventListener('click', ()=>{
+    controlsWrap.querySelector('.faq-expand-all')?.addEventListener('click', ()=>{
       items.forEach(d=>openItem(d,{scroll:false, updateHash:false}));
-      persistState();
-      updateCounter();
+      persistState(); updateCounter();
     });
-    btnCollapse?.addEventListener('click', ()=>{
+    controlsWrap.querySelector('.faq-collapse-all')?.addEventListener('click', ()=>{
       items.forEach(d=>closeItem(d,{updateHash:false}));
-      persistState();
-      updateCounter();
+      persistState(); updateCounter();
     });
+  } else if(controlsWrap && !expandCollapse){
+    controlsWrap.style.display = 'none';
   }
 
-  // Scroll inicial si hash directo
+  // Scroll inicial si llega con hash
   if(currentHash){
     const target = items.find(d=>d.id===currentHash);
     if(target && autoscroll){
-      requestAnimationFrame(()=>{
-        target.scrollIntoView({behavior:'smooth', block:scrollBlock});
-      });
+      requestAnimationFrame(()=>{ target.scrollIntoView({behavior:'smooth', block:scrollBlock}); });
     }
   }
 })();
