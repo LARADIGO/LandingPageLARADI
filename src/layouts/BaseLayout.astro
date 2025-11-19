@@ -19,6 +19,41 @@ const canonicalUrl = origin + Astro.url.pathname;
 const ogImageUrl = new URL(image, origin).href;
 const logoUrl = new URL('/logo.png', origin).href;
 const siteName = 'TePeuVe';
+
+// JSON-LD (serializado previamente y volcado con set:html)
+const jsonLdHead = JSON.stringify([
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name": siteName,
+    "url": origin,
+    "logo": logoUrl,
+    "contactPoint": [{
+      "@type":"ContactPoint",
+      "contactType":"sales",
+      "url": origin + "/#contacto",
+      "availableLanguage": ["es"]
+    }]
+  },
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name": siteName,
+    "url": origin
+  },
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"TePeuVe TPV",
+    "applicationCategory":"BusinessApplication",
+    "operatingSystem":"Web",
+    "offers": {
+      "@type":"Offer",
+      "price":"9.90",
+      "priceCurrency":"EUR"
+    }
+  }
+]);
 ---
 <html lang="es">
   <head>
@@ -74,42 +109,8 @@ const siteName = 'TePeuVe';
       rel="stylesheet"
     />
 
-    <!-- JSON-LD -->
-    <script type="application/ld+json" is:inline>
-      {JSON.stringify([
-        {
-          "@context":"https://schema.org",
-          "@type":"Organization",
-          "name": siteName,
-          "url": origin,
-          "logo": logoUrl,
-          "contactPoint": [{
-            "@type":"ContactPoint",
-            "contactType":"sales",
-            "url": origin + "/#contacto",
-            "availableLanguage": ["es"]
-          }]
-        },
-        {
-          "@context":"https://schema.org",
-          "@type":"WebSite",
-          "name": siteName,
-          "url": origin
-        },
-        {
-          "@context":"https://schema.org",
-          "@type":"SoftwareApplication",
-          "name":"TePeuVe TPV",
-          "applicationCategory":"BusinessApplication",
-          "operatingSystem":"Web",
-          "offers": {
-            "@type":"Offer",
-            "price":"9.90",
-            "priceCurrency":"EUR"
-          }
-        }
-      ])}
-    </script>
+    <!-- JSON-LD inyectado como texto plano -->
+    <script type="application/ld+json" is:inline set:html={jsonLdHead}></script>
 
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
@@ -183,16 +184,21 @@ const siteName = 'TePeuVe';
         const cards = document.querySelectorAll('.card');
         const HOVER_DURATION = 900;
         const OBS_THRESHOLD = 0.35;
+
         const cardObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             const card = entry.target;
             if (!entry.isIntersecting) {
               card.classList.remove('card-auto-hover');
               card.dataset.animating = '0';
-              if (card._hoverTimer) { clearTimeout(card._hoverTimer); card._hoverTimer = null; }
+              if (card._hoverTimer) {
+                clearTimeout(card._hoverTimer);
+                card._hoverTimer = null;
+              }
               return;
             }
             if (entry.isIntersecting && card.dataset.animating !== '1') {
+              card.dataset.animinating = '1';
               card.dataset.animating = '1';
               card.classList.add('card-auto-hover');
               if (card._hoverTimer) { clearTimeout(card._hoverTimer); }
@@ -203,7 +209,11 @@ const siteName = 'TePeuVe';
               }, HOVER_DURATION);
             }
           });
-        }, { threshold: OBS_THRESHOLD, rootMargin: '0px 0px -10% 0px' });
+        }, {
+          threshold: OBS_THRESHOLD,
+          rootMargin: '0px 0px -10% 0px'
+        });
+
         cards.forEach((c) => cardObserver.observe(c));
       }
 
@@ -237,26 +247,29 @@ const siteName = 'TePeuVe';
           const btn = e.target && e.target.closest ? e.target.closest('.btn') : null;
           if (!btn || btn.hasAttribute('disabled')) return;
           const rect = btn.getBoundingClientRect();
-          const x = (e.clientX ?? rect.left + rect.width/2) - rect.left;
-          const y = (e.clientY ?? rect.top + rect.height/2) - rect.top;
+          const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
+          const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
           const size = Math.max(rect.width, rect.height) * 1.65;
+
           const span = document.createElement('span');
           span.className = 'ripple';
           span.style.setProperty('--ripple-x', x + 'px');
           span.style.setProperty('--ripple-y', y + 'px');
           span.style.setProperty('--ripple-size', size + 'px');
-          if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+
+          if (getComputedStyle(btn).position === 'static') {
+            btn.style.position = 'relative';
+          }
           btn.appendChild(span);
           span.addEventListener('animationend', () => span.remove(), { once:true });
         }, { passive: true });
       }
 
-      // Carga diferida formulario (contact.js)
       const loadContactScript = () => {
         if (!document.getElementById('contact-form')) return;
         const s = document.createElement('script');
-        s.src = '/scripts/contact.js';
         s.type = 'module';
+        s.src = '/scripts/contact.js';
         s.defer = true;
         document.body.appendChild(s);
       };
