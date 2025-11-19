@@ -71,7 +71,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
         <nav class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
-            <a href="#verifactu">VeriFactu</a>
+          <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
@@ -88,6 +88,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
     <script is:inline>
     (() => {
+      // Sombra al hacer scroll
       const header = document.querySelector('.site-header');
       const onScroll = () => {
         if (window.scrollY > 8) header.classList.add('is-scrolled');
@@ -96,17 +97,54 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
       onScroll();
       window.addEventListener('scroll', onScroll, { passive:true });
 
+      // Auto-hover móvil: anima al entrar y vuelve al estado original (no se queda pegado)
       const hasHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-      if (!hasHover) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!hasHover && !reduceMotion) {
         const cards = document.querySelectorAll('.card');
-        const cardObserver = new IntersectionObserver((entries) => {
-          entries.forEach(e => {
-            if (e.isIntersecting) e.target.classList.add('card-auto-hover');
-            else e.target.classList.remove('card-auto-hover');
-          });
-        }, { threshold: 0.35 });
-        cards.forEach(c => cardObserver.observe(c));
+        const HOVER_DURATION = 900; // ms que dura el estado "hover" antes de volver
+        const OBS_THRESHOLD = 0.35; // % visible para considerar "entrada"
 
+        const cardObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            const card = entry.target;
+            // Limpia si sale de viewport
+            if (!entry.isIntersecting) {
+              card.classList.remove('card-auto-hover');
+              card.dataset.animating = '0';
+              if (card._hoverTimer) {
+                clearTimeout(card._hoverTimer);
+                card._hoverTimer = null;
+              }
+              return;
+            }
+
+            // Si entra y no está animando ahora, dispara animación temporal
+            if (entry.isIntersecting && card.dataset.animating !== '1') {
+              card.dataset.animinating = '1'; // typo safeguard (old)
+              card.dataset.animating = '1';
+              card.classList.add('card-auto-hover');
+
+              // Quita la clase tras un tiempo para volver al estado base
+              if (card._hoverTimer) { clearTimeout(card._hoverTimer); }
+              card._hoverTimer = setTimeout(() => {
+                card.classList.remove('card-auto-hover');
+                card.dataset.animating = '0';
+                card._hoverTimer = null;
+              }, HOVER_DURATION);
+            }
+          });
+        }, {
+          threshold: OBS_THRESHOLD,
+          rootMargin: '0px 0px -10% 0px' // dispara un poco antes de salir
+        });
+
+        cards.forEach((c) => cardObserver.observe(c));
+      }
+
+      // Interacción táctil en pricing (igual que tenías)
+      const hasHoverFine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      if (!hasHoverFine) {
         const pricingGrid = document.querySelector('.pricing-grid');
         if (pricingGrid) {
           pricingGrid.addEventListener('click', (ev) => {
