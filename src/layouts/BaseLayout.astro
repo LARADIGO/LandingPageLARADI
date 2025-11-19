@@ -15,7 +15,8 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
@@ -24,8 +25,17 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/logo.png" type="image/png" />
 
+    <!-- DNS + Preconnect a fuentes y API -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {contactEndpoint && <link rel="preconnect" href={new URL(contactEndpoint).origin} />}
+
+    <!-- Preload hero LCP (imagen clara por defecto) -->
+    <link rel="preload" as="image" href="/assets/features/welcome_page.png" fetchpriority="high" />
+
+    <!-- Fuentes (display=swap) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -71,7 +81,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
         <nav class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
-            <a href="#verifactu">VeriFactu</a>
+          <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
@@ -88,7 +98,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
     <script is:inline>
     (() => {
-      // Sombra al hacer scroll
+      // Sombra al hacer scroll (mantiene funcionalidad original)
       const header = document.querySelector('.site-header');
       const onScroll = () => {
         if (window.scrollY > 8) header.classList.add('is-scrolled');
@@ -102,7 +112,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!hasHover && !reduceMotion) {
         const cards = document.querySelectorAll('.card');
-        const HOVER_DURATION = 900; // ms
+        const HOVER_DURATION = 900;
         const OBS_THRESHOLD = 0.35;
 
         const cardObserver = new IntersectionObserver((entries) => {
@@ -118,7 +128,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
               return;
             }
             if (entry.isIntersecting && card.dataset.animating !== '1') {
-              card.dataset.animinating = '1'; // legacy typo safeguard
+              card.dataset.animinating = '1';
               card.dataset.animating = '1';
               card.classList.add('card-auto-hover');
               if (card._hoverTimer) { clearTimeout(card._hoverTimer); }
@@ -162,7 +172,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
         }
       }
 
-      // Ripple en botones (microinteracción, más marcado)
+      // Ripple en botones (microinteracción)
       const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!prefersReduce) {
         document.addEventListener('click', (e) => {
@@ -171,7 +181,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
           const rect = btn.getBoundingClientRect();
           const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
           const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
-          const size = Math.max(rect.width, rect.height) * 1.65; // antes 1.35
+          const size = Math.max(rect.width, rect.height) * 1.65;
 
           const span = document.createElement('span');
           span.className = 'ripple';
@@ -186,12 +196,28 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
           span.addEventListener('animationend', () => span.remove(), { once:true });
         }, { passive: true });
       }
+
+      // ============== Rendimiento: carga diferida de contact.js ==============
+      // Sólo se carga si existe el formulario (páginas con contacto), usando idle.
+      const loadContactScript = () => {
+        if (!document.getElementById('contact-form')) return;
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.src = '/scripts/contact.js';
+        s.defer = true;
+        document.body.appendChild(s);
+      };
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadContactScript, { timeout: 3000 });
+      } else {
+        setTimeout(loadContactScript, 900);
+      }
+      // =======================================================================
     })();
     </script>
 
-    <!-- Scripts JS planos servidos desde /public/scripts -->
+    <!-- GA4 adicional (si tuvieras eventos, puedes añadirlos después; mantenemos ga4.js si existe) -->
     <script type="module" src="/scripts/ga4.js"></script>
-    <script type="module" src="/scripts/contact.js"></script>
 
     <CookieConsent />
   </body>

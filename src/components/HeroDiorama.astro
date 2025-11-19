@@ -6,15 +6,31 @@ interface Props{
   ctaText?: string; ctaHref?: string; cta2Text?: string; cta2Href?: string;
   imageSrc?: string;
   splineUrl?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 const {
   title = 'El TPV para tu tienda, simple y en regla',
   subtitle = 'Cobra, emite tickets y facturas, controla inventario y cumple con VeriFactu.',
   ctaText = 'Probar gratis', ctaHref = '#contacto',
   cta2Text = 'Ver precios', cta2Href = '#precios',
-  imageSrc = '/images/tpv-diorama.jpg',
-  splineUrl = ''
+  imageSrc = '/assets/features/welcome_page.png',
+  splineUrl = '',
+  imageWidth = 1200,
+  imageHeight = 720
 } = Astro.props as Props;
+
+/**
+ * Rendimiento:
+ * - fetchpriority="high" para LCP
+ * - width/height para evitar CLS
+ * - <picture> con WebP (requiere crear el .webp)
+ */
+const webpCandidate = imageSrc.endsWith('.png')
+  ? imageSrc.replace(/\.png$/i, '.webp')
+  : imageSrc.endsWith('.jpg') || imageSrc.endsWith('.jpeg')
+    ? imageSrc.replace(/\.(jpg|jpeg)$/i, '.webp')
+    : '';
 ---
 <section class="diorama-page" aria-label="Hero estilo diorama">
   <div class="wrap">
@@ -38,7 +54,16 @@ const {
           <div class="media">
             {splineUrl
               ? <iframe src={splineUrl} title="Diorama 3D" frameborder="0" allow="autoplay; fullscreen" loading="lazy"></iframe>
-              : <img src={imageSrc} alt="TPV en mostrador" />
+              : <picture>
+                  {webpCandidate && <source srcset={`${webpCandidate}`} type="image/webp" />}
+                  <img src={imageSrc}
+                       alt="TPV en mostrador"
+                       width={imageWidth}
+                       height={imageHeight}
+                       fetchpriority="high"
+                       decoding="async"
+                       style="aspect-ratio: {imageWidth}/{imageHeight};" />
+                </picture>
             }
           </div>
         </div>

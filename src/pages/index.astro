@@ -4,8 +4,6 @@ import HeroDiorama from "@components/HeroDiorama.astro";
 import FaqSection from "@components/FaqSection.astro";
 import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio.astro";
 
-
-// Código de error por redirección (solo si no cargó el JS y hubo POST nativo)
 const errCode = Astro.url.searchParams.get('contact_error') || '';
 const messages: Record<string, string> = {
   MISSING_FIELDS: 'Rellena todos los campos.',
@@ -19,11 +17,9 @@ const messages: Record<string, string> = {
   METHOD_NOT_ALLOWED: 'Método no permitido.'
 };
 
-// Texto inicial y clase si llegamos con error (redirección 303 desde la Lambda)
 const initialStatus = errCode ? (messages[errCode] || 'No se pudo enviar el mensaje.') : '';
 const initialStatusClass = errCode ? 'status-error' : '';
 ---
-
 <BaseLayout
   title="TePeuVe"
   description="Interfaz clara, cobros en segundos y control total de inventario. Funciona en PC y tablet."
@@ -34,9 +30,10 @@ const initialStatusClass = errCode ? 'status-error' : '';
     ctaHref="#contacto"
     cta2Href="#precios"
     imageSrc="/assets/features/welcome_page.png"
+    imageWidth={1200}
+    imageHeight={720}
   />
 
-  <!-- CARACTERÍSTICAS -->
   <section id="caracteristicas" class="section">
     <div class="container">
       <h2 class="h2 center">Características clave</h2>
@@ -67,7 +64,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-  <!-- FUNCIONALIDADES FULL-BLEED con imágenes por tema en 2, 3 y 4 -->
   <FeatureShowcaseDynamicRatio
     items={[
       {
@@ -78,7 +74,9 @@ const initialStatusClass = errCode ? 'status-error' : '';
         mediaAnim:"zoom-in",
         contentAnim:"slide-left",
         altBg:false,
-        mediaWide: true
+        mediaWide: true,
+        width: 1240,
+        height: 760
       },
       {
         title:"Arqueo de Caja",
@@ -89,18 +87,22 @@ const initialStatusClass = errCode ? 'status-error' : '';
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
         altBg:true,
-        mediaWide: true
+        mediaWide: true,
+        width: 1240,
+        height: 760
       },
       {
         title:"Gestiona y Personaliza Empleados",
-        text:"Siéntete libre de personalizar a cada empleado a través de una lista predefinida de avatares o con FOTOS REALES.",
+        text:"Personaliza cada empleado con avatares o fotos reales.",
         imgLight:"/assets/features/empleados.png",
         imgDark:"/assets/features/empleados_oscuro.png",
-        alt:"Emisión de documentos",
+        alt:"Gestión de empleados",
         mediaAnim:"rotate-in",
         contentAnim:"lift-in",
         altBg:false,
-        mediaWide: true
+        mediaWide: true,
+        width: 1240,
+        height: 760
       },
       {
         title:"Informes claros",
@@ -111,24 +113,13 @@ const initialStatusClass = errCode ? 'status-error' : '';
         mediaAnim:"blur-in",
         contentAnim:"fade-in",
         altBg:true,
-        mediaWide: true
+        mediaWide: true,
+        width: 1240,
+        height: 760
       }
     ]}
   />
-  
-  <!-- DEMO -->
-  <!--<section id="demo" class="section">
-    <div class="container">
-      <h2 class="h2 center">Demo rápida</h2>
-      <p class="lead center max-680">Sube tu propio video a /public/media/demo.mp4 o deja imágenes.</p>
-      <div class="media-grid">
-        <img class="rounded" src="/assets/screen-2.svg" alt="Flujo de caja" width="960" height="640" />
-        <img class="rounded" src="/assets/screen-3.svg" alt="Cierre de caja" width="960" height="640" />
-      </div>
-    </div>
-  </section>-->
 
-  <!-- PRECIOS -->
   <section id="precios" class="section alt">
     <div class="container">
       <h2 class="h2 center">Escoge tu plan</h2>
@@ -167,7 +158,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-  <!-- VeriFactu -->
   <section id="verifactu" class="section alt verifactu-section">
     <div class="container">
       <h2 class="h2 center">VeriFactu</h2>
@@ -180,13 +170,16 @@ const initialStatusClass = errCode ? 'status-error' : '';
       <p class="center" style="margin-top:26px;">
         <span class="vf-cta">
           <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
-          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria" class="vf-cta__logo" width="28" height="28" loading="lazy" decoding="async" />
+          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria"
+               width="28" height="28"
+               loading="lazy"
+               decoding="async"
+               class="vf-cta__logo" />
         </span>
       </p>
     </div>
   </section>
 
-  <!-- QUIÉNES SOMOS -->
   <section id="sobre" class="section alt">
     <div class="container">
       <h2 class="h2 center">Quiénes somos</h2>
@@ -200,32 +193,31 @@ const initialStatusClass = errCode ? 'status-error' : '';
         <article class="card">
           <div class="card-ico">🛍️</div>
           <h3>Experiencia en retail</h3>
-          <p>Conocimiento práctico de caja, inventario y periféricos (impresoras, cajón, lector, etc.).</p>
+          <p>Conocimiento práctico de caja, inventario y periféricos.</p>
         </article>
         <article class="card">
           <div class="card-ico">🔐</div>
           <h3>Seguridad y cumplimiento</h3>
-          <p>Buenas prácticas de seguridad y alineados con los requisitos de VeriFactu.</p>
+          <p>Buenas prácticas y alineados con requisitos VeriFactu.</p>
         </article>
         <article class="card">
           <div class="card-ico">🚀</div>
           <h3>Evolución continua</h3>
-          <p>Mejoras frecuentes y hoja de ruta enfocada en lo que aporta valor en tienda.</p>
+          <p>Mejoras frecuentes enfocadas en valor real.</p>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
   <FaqSection
     title="Preguntas frecuentes"
-    description="Resolvemos las dudas más comunes sobre el TPV y VeriFactu."
+    description="Resolvemos dudas sobre el TPV y VeriFactu."
     items={[
       { question: "¿Necesito hardware especial?", answer: "Funciona con periféricos estándar: lector de códigos, cajón y ticketera." },
-      { question: "¿Puedo importar productos?", answer: "Sí, mediante plantillas CSV; podemos ayudarte en la migración inicial." },
+      { question: "¿Puedo importar productos?", answer: "Sí, mediante plantillas CSV con ayuda inicial si la necesitas." },
       { question: "¿Hay contrato de permanencia?", answer: "No. Puedes cancelar cuando quieras sin penalizaciones." },
       { question: "¿Ofrecéis soporte prioritario?", answer: "Sí, en planes avanzados y Pro, con SLA reducido." },
-      { question: "¿Cumple con VeriFactu?", answer: "Se prepara para los requisitos de integridad, secuencialidad y trazabilidad exigidos." }
+      { question: "¿Cumple con VeriFactu?", answer: "Se prepara para requisitos de integridad, secuencialidad y trazabilidad exigidos." }
     ]}
     data-accordion="false"
     data-persist="true"
@@ -238,7 +230,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
     data-hash-prefix="faq-"
   />
 
-  <!-- CONTACTO -->
   <section id="contacto" class="section alt">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>

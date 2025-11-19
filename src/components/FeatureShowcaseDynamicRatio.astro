@@ -12,6 +12,8 @@ interface Item {
   imgDark?:string;
   side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
   mediaWide?: boolean; // ancho extra para la columna de la imagen
+  width?: number;
+  height?: number;
 }
 
 const { items = [] as Item[] } = Astro.props;
@@ -28,6 +30,14 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
         const hasThemeVariants = Boolean(it.imgLight || it.imgDark);
         const lightSrc = it.imgLight || it.img;
         const darkSrc  = it.imgDark  || it.img;
+        const width = it.width || 980;
+        const height = it.height || 600;
+
+        // Candidatos WebP (si existen esos archivos)
+        const lightWebp = lightSrc && lightSrc.match(/\.(png|jpg|jpeg)$/i)
+          ? lightSrc.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
+        const darkWebp = darkSrc && darkSrc.match(/\.(png|jpg|jpeg)$/i)
+          ? darkSrc.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
 
         const rowClasses = [
           `feature-${side}`,
@@ -35,17 +45,57 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
           it.mediaWide ? 'feature-media-lg' : '' // clase condicional
         ].filter(Boolean).join(' ');
 
+        const sizeAttr = it.mediaWide
+          ? '(min-width:1200px) 60vw, (min-width:900px) 50vw, 92vw'
+          : '(min-width:900px) 42vw, 94vw';
+
         const MediaBlock = (
           <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
-            <div class="feature-media-inner dynamic-ratio" data-zoomable>
+            <div class="feature-media-inner dynamic-ratio" data-zoomable style={`aspect-ratio:${width}/${height};`}>
               {
                 hasThemeVariants
                 ? <>
-                    {lightSrc && <img src={lightSrc} alt={it.alt} loading="lazy" decoding="async" class="feature-contain theme-light" />}
-                    {darkSrc  && <img src={darkSrc}  alt={it.alt} loading="lazy" decoding="async" class="feature-contain theme-dark"  />}
+                    <picture class="theme-light">
+                      {lightWebp && <source srcset={lightWebp} type="image/webp" />}
+                      {lightSrc && <img
+                        src={lightSrc}
+                        alt={it.alt}
+                        loading="lazy"
+                        decoding="async"
+                        width={width}
+                        height={height}
+                        sizes={sizeAttr}
+                        class="feature-contain theme-light"
+                      />}
+                    </picture>
+                    <picture class="theme-dark">
+                      {darkWebp && <source srcset={darkWebp} type="image/webp" />}
+                      {darkSrc && <img
+                        src={darkSrc}
+                        alt={it.alt}
+                        loading="lazy"
+                        decoding="async"
+                        width={width}
+                        height={height}
+                        sizes={sizeAttr}
+                        class="feature-contain theme-dark"
+                      />}
+                    </picture>
                   </>
-                : (it.img
-                    ? <img src={it.img} alt={it.alt} loading="lazy" decoding="async" class="feature-contain"/>
+                : (lightSrc
+                    ? <picture>
+                        {lightWebp && <source srcset={lightWebp} type="image/webp" />}
+                        <img
+                          src={lightSrc}
+                          alt={it.alt}
+                          loading="lazy"
+                          decoding="async"
+                          width={width}
+                          height={height}
+                          sizes={sizeAttr}
+                          class="feature-contain"
+                        />
+                      </picture>
                     : null
                   )
               }
@@ -120,7 +170,7 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
     reveals.forEach(e=>io.observe(e));
   }
 
-  // Zoom en móvil: solo en dispositivos sin hover / puntero grueso
+  // Zoom en móvil
   const mqMobile = window.matchMedia('(hover: none), (pointer: coarse)');
   let overlay = document.querySelector('.fs-overlay');
   if (!overlay) {
@@ -157,7 +207,6 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
       if (!container) return;
       const img = visibleImageIn(container);
       if (!img) return;
-      // Evita que el click active otros handlers
       ev.preventDefault();
       ev.stopPropagation();
       openZoom(img.currentSrc || img.src, img.alt || '');
