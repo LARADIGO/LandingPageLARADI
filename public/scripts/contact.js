@@ -1,5 +1,5 @@
-// Estable: valida en cliente; usa fetch si hay endpoint; si no, deja envío nativo.
-// No elimina action del <form> y solo cancela el submit cuando procede.
+// Versión estable + microinteracción: valida en cliente; usa fetch si hay endpoint;
+// si no, deja envío nativo. Añade animación 'status-pop' al actualizar el estado.
 (function(){
   const form = document.getElementById('contact-form');
   if(!form){ console.warn('[contact] Form no encontrado'); return; }
@@ -21,6 +21,11 @@
     statusEl.textContent = msg || '';
     statusEl.className = 'muted';
     if(type) statusEl.classList.add('status-'+type);
+    // micro: animación corta al actualizar mensaje
+    statusEl.classList.add('status-pop');
+    statusEl.addEventListener('animationend', () => {
+      statusEl.classList.remove('status-pop');
+    }, { once:true });
   }
   function scrollToForm(){
     const sec = document.getElementById('contacto');
@@ -43,7 +48,7 @@
   }
 
   form.addEventListener('submit', async (ev) => {
-    // 1) Deja que el navegador bloquee si hay campos inválidos (required/pattern/type=email)
+    // 1) Validación nativa (required/pattern/type=email)
     if (!form.checkValidity()) {
       ev.preventDefault();
       form.reportValidity();
@@ -59,18 +64,14 @@
     const message = (fd.get('message')||'').toString().trim();
     const hp = (fd.get('hp_field')||'').toString().trim();
 
-    // Mensaje limpio
     setStatus('', '');
 
-    // Honeypot: no enviamos nada realmente
     if(hp){
       ev.preventDefault();
       setStatus('Enviado.', 'success');
       form.reset();
       return;
     }
-
-    // Validación extra
     if(!name || !email || !message){
       ev.preventDefault();
       setStatus('Rellena todos los campos.', 'error');
@@ -85,15 +86,13 @@
       return;
     }
 
-    // 3) Usar fetch si tenemos endpoint; si no, dejar envío nativo (no cancelar)
     const ENDPOINT = getEndpoint();
     if(!ENDPOINT){
       console.warn('[contact] Sin endpoint: envío nativo (action).');
-      // No llamamos preventDefault: el navegador hará POST al action.
-      return;
+      return; // no cancelamos: el navegador hará POST al action
     }
 
-    // 4) Envío por fetch: ahora sí cancelamos el nativo
+    // 3) Envío por fetch
     ev.preventDefault();
     setStatus('Enviando...','loading');
     setLoading(true);
@@ -127,7 +126,7 @@
       }
     } catch (err){
       console.error('[contact] Error fetch', err);
-      setStatus('Fallo de red o servidor. Inténtalo más tarde.', 'error');
+      setStatus('Fallo de red o servidor. Inténtalo más tarde.','error');
       scrollToForm();
     } finally {
       setLoading(false);

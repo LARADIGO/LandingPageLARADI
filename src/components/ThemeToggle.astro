@@ -20,14 +20,20 @@
   const updateUI = () => {
     const isDark = root.classList.contains('dark-theme');
     btn.setAttribute('aria-pressed', String(isDark));
-    // mostramos/ocultamos iconos
     btn.querySelector('.icon-sun').style.display = isDark ? 'none' : '';
     btn.querySelector('.icon-moon').style.display = isDark ? '' : 'none';
   };
 
   updateUI();
 
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   btn.addEventListener('click', () => {
+    if (!reduce) {
+      root.classList.add('theme-anim');
+      // más suave: dejamos la clase algo más de tiempo para cubrir la transición CSS
+      setTimeout(() => root.classList.remove('theme-anim'), 520); // antes ~350ms
+    }
     const isNowDark = root.classList.toggle('dark-theme');
     localStorage.setItem('theme', isNowDark ? 'dark' : 'light');
     updateUI();

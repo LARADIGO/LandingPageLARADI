@@ -71,7 +71,7 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
         <nav class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
-          <a href="#verifactu">VeriFactu</a>
+            <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
@@ -102,13 +102,12 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!hasHover && !reduceMotion) {
         const cards = document.querySelectorAll('.card');
-        const HOVER_DURATION = 900; // ms que dura el estado "hover" antes de volver
-        const OBS_THRESHOLD = 0.35; // % visible para considerar "entrada"
+        const HOVER_DURATION = 900; // ms
+        const OBS_THRESHOLD = 0.35;
 
         const cardObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             const card = entry.target;
-            // Limpia si sale de viewport
             if (!entry.isIntersecting) {
               card.classList.remove('card-auto-hover');
               card.dataset.animating = '0';
@@ -118,14 +117,10 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
               }
               return;
             }
-
-            // Si entra y no está animando ahora, dispara animación temporal
             if (entry.isIntersecting && card.dataset.animating !== '1') {
-              card.dataset.animinating = '1'; // typo safeguard (old)
+              card.dataset.animinating = '1'; // legacy typo safeguard
               card.dataset.animating = '1';
               card.classList.add('card-auto-hover');
-
-              // Quita la clase tras un tiempo para volver al estado base
               if (card._hoverTimer) { clearTimeout(card._hoverTimer); }
               card._hoverTimer = setTimeout(() => {
                 card.classList.remove('card-auto-hover');
@@ -136,13 +131,13 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
           });
         }, {
           threshold: OBS_THRESHOLD,
-          rootMargin: '0px 0px -10% 0px' // dispara un poco antes de salir
+          rootMargin: '0px 0px -10% 0px'
         });
 
         cards.forEach((c) => cardObserver.observe(c));
       }
 
-      // Interacción táctil en pricing (igual que tenías)
+      // Interacción táctil en pricing
       const hasHoverFine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
       if (!hasHoverFine) {
         const pricingGrid = document.querySelector('.pricing-grid');
@@ -165,6 +160,31 @@ const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
             pricingGrid.querySelectorAll('.pricing-card.is-active').forEach(c => c.classList.remove('is-active'));
           });
         }
+      }
+
+      // Ripple en botones (microinteracción, más marcado)
+      const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReduce) {
+        document.addEventListener('click', (e) => {
+          const btn = e.target && e.target.closest ? e.target.closest('.btn') : null;
+          if (!btn || btn.hasAttribute('disabled')) return;
+          const rect = btn.getBoundingClientRect();
+          const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
+          const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
+          const size = Math.max(rect.width, rect.height) * 1.65; // antes 1.35
+
+          const span = document.createElement('span');
+          span.className = 'ripple';
+          span.style.setProperty('--ripple-x', x + 'px');
+          span.style.setProperty('--ripple-y', y + 'px');
+          span.style.setProperty('--ripple-size', size + 'px');
+
+          if (getComputedStyle(btn).position === 'static') {
+            btn.style.position = 'relative';
+          }
+          btn.appendChild(span);
+          span.addEventListener('animationend', () => span.remove(), { once:true });
+        }, { passive: true });
       }
     })();
     </script>
