@@ -5,8 +5,8 @@ import "../styles/faq.css";
  * FaqSection.astro
  * - Acordeón con <details>.
  * - Marcado FAQPage (JSON-LD) para SEO.
- * - Icono en DOM + script robusto.
- * - Script JSON-LD volcado con set:html para evitar plantillas sin evaluar.
+ * - Controles (expandir / colapsar) siempre visibles salvo data-expand-collapse="false".
+ * - JSON-LD inyectado con set:html para evitar plantillas sin evaluar.
  */
 const {
   title = "Preguntas frecuentes",
@@ -53,7 +53,6 @@ const faqSchema = shouldRenderSchema ? {
   }))
 } : null;
 
-// Serialización a texto para inyectar sin plantillas
 const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
 ---
 
@@ -67,8 +66,8 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
     </div>
 
     <div class="faq-controls center">
-      <button type="button" class="btn btn-sm faq-expand-all">Expandir todo</button>
-      <button type="button" class="btn btn-sm btn-ghost faq-collapse-all">Colapsar todo</button>
+      <button type="button" class="btn btn-sm faq-expand-all" data-analytics="faq_expand_all">Expandir todo</button>
+      <button type="button" class="btn btn-sm btn-ghost faq-collapse-all" data-analytics="faq_collapse_all">Colapsar todo</button>
     </div>
 
     <div
@@ -103,201 +102,225 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
 
 <script is:inline>
 (function(){
-  const root = document.querySelector('[data-component="faq"]');
-  if(!root) return;
-
-  let items;
   try {
-    items = Array.from(root.querySelectorAll('.faq-item'));
-  } catch {
-    return;
-  }
-  if(!items.length) return;
+    const root = document.querySelector('[data-component="faq"]');
+    if(!root) return;
 
-  const accordion      = root.dataset.accordion === 'true';
-  const persist        = !accordion && root.dataset.persist === 'true';
-  const autoscroll     = root.dataset.autoscroll === 'true';
-  const hashPrefix     = root.dataset.hashPrefix || 'faq-';
-  const counterSel     = root.dataset.counterTarget || '#faq-count';
-  const scrollBlock    = root.dataset.scrollBlock || 'center';
-  const expandCollapse = root.dataset.expandCollapse === 'true';
-  const defaultOpenRaw = root.dataset.defaultOpen || '';
-  const defaultOpenIdx = defaultOpenRaw.split(',')
-    .map(s=>s.trim()).filter(Boolean).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
+    const items = Array.from(root.querySelectorAll('.faq-item'));
+    if(!items.length) return;
 
-  const section = root.closest('.faq-section') || document;
-  const counterTarget = section.querySelector(counterSel);
-  const controlsWrap  = section.querySelector('.faq-controls');
+    // Config
+    const accordion   = root.dataset.accordion === 'true';
+    const persist     = !accordion && root.dataset.persist === 'true';
+    const autoscroll  = root.dataset.autoscroll === 'true';
+    const hashPrefix  = root.dataset.hashPrefix || 'faq-';
+    const counterSel  = root.dataset.counterTarget || '#faq-count';
+    const scrollBlock = root.dataset.scrollBlock || 'center';
+    // Mostrar controles salvo que sea explícitamente "false"
+    const expandCollapseAttr = root.dataset.expandCollapse;
+    const expandCollapse = expandCollapseAttr !== 'false';
 
-  if(controlsWrap && !expandCollapse){
-    controlsWrap.style.display='none';
-  }
+    const section      = root.closest('.faq-section') || document;
+    const counterTarget= section.querySelector(counterSel);
+    const controlsWrap = section.querySelector('.faq-controls');
 
-  // Persistencia
-  const LS_KEY = 'faqOpenIds';
-  function loadPersisted(){
-    if(!persist) return [];
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
-  }
-  function savePersisted(ids){
-    if(!persist) return;
-    try { localStorage.setItem(LS_KEY, JSON.stringify(ids)); } catch {}
-  }
-
-  // Estado inicial (hash > persistencia > default)
-  const currentHash = decodeURIComponent(location.hash.replace('#',''));
-  const toOpen = new Set();
-  if(currentHash && currentHash.startsWith(hashPrefix)){
-    const match = items.find(d=>d.id===currentHash);
-    if(match) toOpen.add(match.id);
-  } else {
-    const persisted = loadPersisted();
-    if(persisted.length){
-      persisted.forEach(id=>toOpen.add(id));
-    } else {
-      defaultOpenIdx.forEach(i => {
-        const det = items[i];
-        if(det) toOpen.add(det.id);
-      });
+    if(controlsWrap && !expandCollapse){
+      controlsWrap.style.display='none';
+    } else if (controlsWrap) {
+      controlsWrap.style.display='';
     }
-  }
 
-  // Inicializar sin animación
-  items.forEach(d => {
-    const panel = d.querySelector('.faq-panel');
-    if(!panel) return;
-    const glyph = d.querySelector('.faq-glyph');
-    if(toOpen.has(d.id)){
-      d.setAttribute('open','');
-      panel.style.height='auto';
-      panel.style.opacity='1';
-      if(glyph) glyph.textContent='▴';
+    // Persistencia
+    const LS_KEY = 'faqOpenIds';
+    const loadPersisted = () => {
+      if(!persist) return [];
+      try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+    };
+    const savePersisted = (ids) => {
+      if(!persist) return;
+      try { localStorage.setItem(LS_KEY, JSON.stringify(ids)); } catch {}
+    };
+
+    // Estado inicial
+    const currentHash = decodeURIComponent(location.hash.replace('#',''));
+    const toOpen = new Set();
+    if(currentHash && currentHash.startsWith(hashPrefix)){
+      const match = items.find(d=>d.id===currentHash);
+      if(match) toOpen.add(match.id);
     } else {
-      d.removeAttribute('open');
-      panel.style.height='0px';
-      panel.style.opacity='0';
-      panel.style.overflow='hidden';
-      if(glyph) glyph.textContent='▾';
+      const persisted = loadPersisted();
+      if(persisted.length){
+        persisted.forEach(id=>toOpen.add(id));
+      } else {
+        const defaultOpenRaw = root.dataset.defaultOpen || '';
+        const defaultIdx = defaultOpenRaw.split(',')
+          .map(s=>s.trim()).filter(Boolean)
+          .map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
+        defaultIdx.forEach(i => {
+          const det = items[i];
+          if(det) toOpen.add(det.id);
+        });
+      }
     }
-  });
 
-  function updateCounter(){
-    if(!counterTarget) return;
-    const openCount = items.filter(d=>d.open).length;
-    const total = items.length;
-    counterTarget.textContent = openCount
-      ? `Abiertas: ${openCount}/${total}`
-      : `Sin preguntas abiertas (${total})`;
-  }
-  updateCounter();
-
-  function animate(details, opening){
-    const panel = details.querySelector('.faq-panel');
-    const glyph = details.querySelector('.faq-glyph');
-    if(!panel) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    panel.style.overflow='hidden';
-
-    if(opening){
-      if(glyph) glyph.textContent='▴';
-      if(reduce){ panel.style.height='auto'; panel.style.opacity='1'; return; }
-      panel.style.height='0px';
-      panel.style.opacity='0';
-      requestAnimationFrame(()=>{
-        panel.style.transition='height .34s cubic-bezier(.25,.9,.25,1), opacity .30s ease';
-        panel.style.height=panel.scrollHeight+'px';
+    // Inicializar sin animación
+    items.forEach(d => {
+      const panel = d.querySelector('.faq-panel');
+      const glyph = d.querySelector('.faq-glyph');
+      if(!panel) return;
+      if(toOpen.has(d.id)){
+        d.setAttribute('open','');
+        panel.style.height='auto';
         panel.style.opacity='1';
-      });
-      panel.addEventListener('transitionend', function end(e){
-        if(e.propertyName==='height'){
-          panel.style.height='auto';
-          panel.style.overflow='';
-          panel.removeEventListener('transitionend', end);
-        }
-      });
-    } else {
-      if(glyph) glyph.textContent='▾';
-      if(reduce){ panel.style.height='0px'; panel.style.opacity='0'; return; }
-      panel.style.height=panel.scrollHeight+'px';
-      panel.style.opacity='1';
-      requestAnimationFrame(()=>{
-        panel.style.transition='height .28s ease, opacity .26s ease';
+        if(glyph) glyph.textContent='▴';
+      } else {
+        d.removeAttribute('open');
         panel.style.height='0px';
         panel.style.opacity='0';
-      });
-      panel.addEventListener('transitionend', function end(e){
-        if(e.propertyName==='height'){
-          panel.style.overflow='';
-          panel.removeEventListener('transitionend', end);
-        }
-      });
-    }
-  }
-
-  function openItem(details,{scroll=true, updateHash=true}={}){
-    if(details.open) return;
-    if(accordion){
-      items.forEach(d=>{ if(d!==details && d.open) closeItem(d,{updateHash:false}); });
-    }
-    details.setAttribute('open','');
-    animate(details,true);
-    if(updateHash){ history.replaceState(null,'','#'+details.id); }
-    if(scroll && autoscroll){ details.scrollIntoView({behavior:'smooth', block:scrollBlock}); }
-  }
-
-  function closeItem(details,{updateHash=true}={}){
-    if(!details.open) return;
-    details.removeAttribute('open');
-    animate(details,false);
-    if(updateHash && location.hash==='#'+details.id){ history.replaceState(null,'','#'); }
-  }
-
-  function persistState(){
-    if(!persist) return;
-    const openIds = items.filter(d=>d.open).map(d=>d.id);
-    savePersisted(openIds);
-  }
-
-  // Eventos
-  items.forEach(d=>{
-    const summary = d.querySelector('summary');
-    summary?.addEventListener('click', e=>{
-      e.preventDefault();
-      d.open ? closeItem(d) : openItem(d);
-      persistState();
-      updateCounter();
-    });
-    summary?.addEventListener('keydown', e=>{
-      if(e.key==='Enter' || e.key===' '){
-        e.preventDefault();
-        d.open ? closeItem(d) : openItem(d);
-        persistState();
-        updateCounter();
+        panel.style.overflow='hidden';
+        if(glyph) glyph.textContent='▾';
       }
     });
-  });
 
-  // Expandir / Colapsar
-  const controlsWrap = section.querySelector('.faq-controls');
-  if(controlsWrap && expandCollapse){
-    controlsWrap.querySelector('.faq-expand-all')?.addEventListener('click', ()=>{
-      items.forEach(d=>openItem(d,{scroll:false, updateHash:false}));
-      persistState(); updateCounter();
-    });
-    controlsWrap.querySelector('.faq-collapse-all')?.addEventListener('click', ()=>{
-      items.forEach(d=>closeItem(d,{updateHash:false}));
-      persistState(); updateCounter();
-    });
-  } else if(controlsWrap && !expandCollapse){
-    controlsWrap.style.display = 'none';
-  }
-
-  // Scroll inicial si llega con hash
-  if(currentHash){
-    const target = items.find(d=>d.id===currentHash);
-    if(target && autoscroll){
-      requestAnimationFrame(()=>{ target.scrollIntoView({behavior:'smooth', block:scrollBlock}); });
+    function updateCounter(){
+      if(!counterTarget) return;
+      const openCount = items.filter(d=>d.open).length;
+      const total = items.length;
+      counterTarget.textContent = openCount
+        ? `Abiertas: ${openCount}/${total}`
+        : `Sin preguntas abiertas (${total})`;
     }
+    updateCounter();
+
+    function animate(details, opening){
+      const panel = details.querySelector('.faq-panel');
+      const glyph = details.querySelector('.faq-glyph');
+      if(!panel) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      panel.style.overflow='hidden';
+      if(opening){
+        if(glyph) glyph.textContent='▴';
+        if(reduce){
+          panel.style.height='auto'; panel.style.opacity='1'; return;
+        }
+        panel.style.height='0px'; panel.style.opacity='0';
+        requestAnimationFrame(()=>{
+          panel.style.transition='height .34s cubic-bezier(.25,.9,.25,1), opacity .30s ease';
+          panel.style.height=panel.scrollHeight+'px';
+          panel.style.opacity='1';
+        });
+        panel.addEventListener('transitionend', function end(e){
+          if(e.propertyName==='height'){
+            panel.style.height='auto';
+            panel.style.overflow='';
+            panel.removeEventListener('transitionend', end);
+          }
+        });
+      } else {
+        if(glyph) glyph.textContent='▾';
+        if(reduce){
+          panel.style.height='0px'; panel.style.opacity='0'; return;
+        }
+        panel.style.height=panel.scrollHeight+'px'; panel.style.opacity='1';
+        requestAnimationFrame(()=>{
+          panel.style.transition='height .28s ease, opacity .26s ease';
+          panel.style.height='0px';
+          panel.style.opacity='0';
+        });
+        panel.addEventListener('transitionend', function end(e){
+          if(e.propertyName==='height'){
+            panel.style.overflow='';
+            panel.removeEventListener('transitionend', end);
+          }
+        });
+      }
+    }
+
+    function openItem(details,{scroll=true, updateHash=true, fireEvt=true}={}){
+      if(details.open) return;
+      if(accordion){
+        items.forEach(d=>{ if(d!==details && d.open) closeItem(d,{updateHash:false, fireEvt:false}); });
+      }
+      details.setAttribute('open','');
+      animate(details,true);
+      if(updateHash) history.replaceState(null,'','#'+details.id);
+      if(scroll && autoscroll) details.scrollIntoView({behavior:'smooth', block:scrollBlock});
+      if(fireEvt) sendGA('faq_open', details);
+    }
+
+    function closeItem(details,{updateHash=true, fireEvt=true}={}){
+      if(!details.open) return;
+      details.removeAttribute('open');
+      animate(details,false);
+      if(updateHash && location.hash==='#'+details.id) history.replaceState(null,'','#');
+      if(fireEvt) sendGA('faq_close', details);
+    }
+
+    function persistState(){
+      if(!persist) return;
+      const openIds = items.filter(d=>d.open).map(d=>d.id);
+      savePersisted(openIds);
+    }
+
+    function sendGA(eventName, details){
+      const gtag = window.gtag || function(){};
+      try {
+        const question = (details.querySelector('.faq-question')?.textContent || '').trim().slice(0,120);
+        const index = parseInt(details.dataset.index || '-1',10);
+        gtag('event', eventName, {
+          question,
+          faq_id: details.id||'',
+          index,
+          page_path: location.pathname,
+          transport_type:'beacon'
+        });
+      } catch {}
+    }
+
+    // Eventos sobre cada summary
+    items.forEach(d=>{
+      const summary = d.querySelector('summary');
+      summary?.addEventListener('click', e=>{
+        e.preventDefault();
+        d.open ? closeItem(d) : openItem(d);
+        persistState(); updateCounter();
+      });
+      summary?.addEventListener('keydown', e=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          d.open ? closeItem(d) : openItem(d);
+          persistState(); updateCounter();
+        }
+      });
+    });
+
+    // Expandir / Colapsar global
+    if(controlsWrap && expandCollapse){
+      const btnExpand = controlsWrap.querySelector('.faq-expand-all');
+      const btnCollapse = controlsWrap.querySelector('.faq-collapse-all');
+      btnExpand?.addEventListener('click', ()=>{
+        items.forEach(d=>openItem(d,{scroll:false, updateHash:false}));
+        persistState(); updateCounter();
+        const gtag = window.gtag || function(){};
+        gtag('event','faq_expand_all',{page_path:location.pathname, transport_type:'beacon'});
+      });
+      btnCollapse?.addEventListener('click', ()=>{
+        items.forEach(d=>closeItem(d,{updateHash:false}));
+        persistState(); updateCounter();
+        const gtag = window.gtag || function(){};
+        gtag('event','faq_collapse_all',{page_path:location.pathname, transport_type:'beacon'});
+      });
+    }
+
+    // Scroll inicial si llegó con hash
+    if(currentHash){
+      const target = items.find(d=>d.id===currentHash);
+      if(target && autoscroll){
+        requestAnimationFrame(()=>{ target.scrollIntoView({behavior:'smooth', block:scrollBlock}); });
+      }
+    }
+  } catch(err){
+    console.error('[faq] init error', err);
   }
 })();
 </script>

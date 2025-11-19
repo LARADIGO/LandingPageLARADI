@@ -1,14 +1,20 @@
-// GA4 eventos personalizados (versión JS plano).
+// GA4 eventos personalizados (ampliado)
 (function(){
   const gtag = window.gtag || function(){};
   const DNT = navigator.doNotTrack === '1' || window.doNotTrack === '1';
   if(DNT) return;
 
   function send(name, props){
-    try { gtag('event', name, { ...props, page_path: location.pathname, transport_type:'beacon' }); } catch {}
+    try {
+      gtag('event', name, {
+        ...props,
+        page_path: location.pathname,
+        transport_type: 'beacon'
+      });
+    } catch {}
   }
 
-  // pricing_view
+  // pricing_view (una vez)
   (function(){
     const section = document.querySelector('#precios');
     if(!section) return;
@@ -18,7 +24,7 @@
       const io = new IntersectionObserver((entries)=>{
         entries.forEach(e=>{
           if(e.isIntersecting && (e.intersectionRatio||0)>=0.35){
-            send('pricing_view',{});
+            send('pricing_view', {});
             sessionStorage.setItem(key,'1');
             io.disconnect();
           }
@@ -26,16 +32,13 @@
       }, {threshold:[0.35]});
       io.observe(section);
     } else {
-      setTimeout(()=>{ send('pricing_view', {}); sessionStorage.setItem(key,'1'); },1000);
+      setTimeout(()=>{ send('pricing_view', {}); sessionStorage.setItem(key,'1'); },1200);
     }
   })();
 
-  // FAQ open/close
+  // FAQ open/close (ya disparados también desde componente; este fallback por si no carga el script del componente)
   (function(){
-    const faqRoot = document.querySelector('.faq-section') ||
-                    document.querySelector('[data-faq-root]') ||
-                    document.querySelector('#faq') ||
-                    document.querySelector('[id*="faq"]');
+    const faqRoot = document.querySelector('.faq-section');
     if(!faqRoot) return;
     document.addEventListener('click', (ev)=>{
       const summary = ev.target.closest && ev.target.closest('details summary');
@@ -44,12 +47,21 @@
       if(!details || !faqRoot.contains(details)) return;
       setTimeout(()=>{
         const open = details.hasAttribute('open');
-        const q = (details.querySelector('.faq-question')?.textContent ||
-                   summary.textContent || '').trim().slice(0,120);
+        const q = (details.querySelector('.faq-question')?.textContent || '').trim().slice(0,120);
         const all = Array.from(faqRoot.querySelectorAll('details'));
         const index = Math.max(0, all.indexOf(details));
-        send(open?'faq_open':'faq_close', { faq_id: details.id||'', question: q, index });
-      }, 20);
+        send(open?'faq_open':'faq_close',{ question: q, faq_id: details.id||'', index });
+      }, 30);
+    }, {capture:true});
+  })();
+
+  // Botones expandir / colapsar (analítica adicional si el componente fallara)
+  (function(){
+    document.addEventListener('click',(ev)=>{
+      const btnExpand = ev.target.closest('.faq-expand-all');
+      if(btnExpand) send('faq_expand_all',{});
+      const btnCollapse = ev.target.closest('.faq-collapse-all');
+      if(btnCollapse) send('faq_collapse_all',{});
     }, {capture:true});
   })();
 
@@ -59,8 +71,7 @@
       const a = ev.target.closest && ev.target.closest('a[href="#contacto"], a[href="/#contacto"]');
       if(!a) return;
       const section = a.closest('section[id]');
-      const from = section?.id ||
-        (a.closest('header, main, footer, section')?.tagName.toLowerCase()) || 'unknown';
+      const from = section?.id || (a.closest('header, main, footer, section')?.tagName.toLowerCase()) || 'unknown';
       const plan = a.closest('.pricing-card')?.querySelector('h3')?.textContent?.trim() || '';
       send('cta_probar_gratis_click',{
         from,
@@ -70,7 +81,7 @@
     }, {capture:true});
   })();
 
-  // data-analytics delegación
+  // Delegación genérica data-analytics
   (function(){
     document.addEventListener('click',(ev)=>{
       const el = ev.target.closest && ev.target.closest('[data-analytics]');

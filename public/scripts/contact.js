@@ -1,4 +1,4 @@
-// Contacto con accesibilidad, consentimiento, anti-spam y Turnstile.
+// Contacto con accesibilidad, consentimiento, anti-spam, Turnstile y eventos GA4.
 (function(){
   const form = document.getElementById('contact-form');
   if(!form){ return; }
@@ -74,21 +74,34 @@
     return '';
   }
 
+  function sendGA(status, extra={}){
+    const gtag = window.gtag || function(){};
+    try {
+      gtag('event','contact_submit',{
+        status,
+        ...extra,
+        page_path: location.pathname,
+        transport_type:'beacon'
+      });
+    } catch {}
+  }
+
   form.addEventListener('submit', async (ev) => {
     if(tooFast()){
       ev.preventDefault();
-      setStatus('Enviado. (Filtro rápido activado)', 'success');
+      setStatus('Enviado. (Filtro rápido activado)','success');
       form.reset();
+      sendGA('fast-filter');
       return;
     }
     if(rateLimited()){
       ev.preventDefault();
       setStatus('Espera unos segundos antes de reenviar.', 'error');
       scrollToForm();
+      sendGA('rate_limited');
       return;
     }
 
-    // Limpia estados previos
     ['name','email','message'].forEach(id => markInvalid(form[id], false));
 
     if(!form.checkValidity()){
@@ -96,6 +109,7 @@
       form.reportValidity();
       setStatus('Revisa los campos.', 'error');
       scrollToForm();
+      sendGA('invalid_native');
       return;
     }
 
@@ -111,33 +125,37 @@
 
     if(hp){
       ev.preventDefault();
-      setStatus('Enviado.', 'success');
+      setStatus('Enviado.','success');
       form.reset();
+      sendGA('honeypot');
       return;
     }
-    if(!name){ ev.preventDefault(); markInvalid(form.name,true); setStatus('El nombre es obligatorio.', 'error'); scrollToForm(); return; }
-    if(!EMAIL_REGEX.test(email)){ ev.preventDefault(); markInvalid(form.email,true); setStatus('El email no parece válido.', 'error'); form.email.focus(); scrollToForm(); return; }
-    if(!message){ ev.preventDefault(); markInvalid(form.message,true); setStatus('Escribe un mensaje.', 'error'); scrollToForm(); return; }
-    if(privacy && !privacy.checked){ ev.preventDefault(); setStatus('Debes aceptar la Política de privacidad.', 'error'); privacy.focus(); scrollToForm(); return; }
+    if(!name){ ev.preventDefault(); markInvalid(form.name,true); setStatus('El nombre es obligatorio.', 'error'); scrollToForm(); sendGA('invalid_field',{field:'name'}); return; }
+    if(!EMAIL_REGEX.test(email)){ ev.preventDefault(); markInvalid(form.email,true); setStatus('El email no parece válido.', 'error'); form.email.focus(); scrollToForm(); sendGA('invalid_field',{field:'email'}); return; }
+    if(!message){ ev.preventDefault(); markInvalid(form.message,true); setStatus('Escribe un mensaje.', 'error'); scrollToForm(); sendGA('invalid_field',{field:'message'}); return; }
+    if(privacy && !privacy.checked){ ev.preventDefault(); setStatus('Debes aceptar la Política de privacidad.', 'error'); privacy.focus(); scrollToForm(); sendGA('invalid_field',{field:'privacy'}); return; }
 
     const endpoint = getEndpoint();
     if(!endpoint){
-      // Fallback envío nativo
+      // Fallback nativo (no podemos instrumentar fetch)
+      sendGA('no_endpoint');
       return;
     }
 
-    // Validar CAPTCHA si sitekey presente
+    // Turnstile
     const sitekey = (import.meta && import.meta.env && import.meta.env.PUBLIC_TURNSTILE_SITEKEY) ? import.meta.env.PUBLIC_TURNSTILE_SITEKEY : '';
     if(sitekey && !captchaToken){
       ev.preventDefault();
       setStatus('Completa la verificación (CAPTCHA).', 'error');
       scrollToForm();
+      sendGA('captcha_missing');
       return;
     }
 
     ev.preventDefault();
     setStatus('Enviando...','loading');
     setLoading(true);
+    sendGA('sending');
 
     try {
       const payload = { name, email, message, url: location.href, ua: navigator.userAgent, captchaToken };
@@ -153,25 +171,31 @@
       try { data = await res.json(); } catch {}
 
       if(!res.ok){
+        const code = (data && data.code) || 'unknown';
         setStatus((data && data.message) || 'Error interno. Inténtalo más tarde.', 'error');
         scrollToForm();
+        sendGA('error_http',{ http_status: res.status, code });
         return;
       }
       if(data && data.ok){
         setStatus('Enviado. Redirigiendo...','success');
-        setTimeout(()=>{ location.href='/gracias'; }, 450);
+        sendGA('success');
+        setTimeout(()=>{ location.href='/gracias'; }, 480);
         form.reset();
         if(window.turnstile && window.turnstile.reset){
           try { window.turnstile.reset(); } catch {}
         }
       } else {
+        const code = (data && data.code) || 'unknown';
         setStatus((data && data.message) || 'Error al enviar.', 'error');
         scrollToForm();
+        sendGA('error_logic',{ code });
       }
     } catch(err){
       console.error('[contact] Error fetch', err);
       setStatus('Fallo de red o servidor.','error');
       scrollToForm();
+      sendGA('error_network');
     } finally {
       setLoading(false);
     }
