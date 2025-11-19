@@ -185,7 +185,7 @@ body {
 .muted { color:var(--muted); }
 .max-680 { max-width:680px; margin:0 auto; }
 
-h1:not(.display), h2:not(.h2) { font-family:var(--font-display); font-weight:700; letter-spacing:-0.5px; color:var(--text-strong); }
+h1:not(.display), h2:not(.h2) { font-family:var(--font-display); font-weight:700; letter-spacing:-0.5px; color: var(--text-strong); }
 h2:not(.h2) { font-weight:600; letter-spacing:-0.3px; }
 .dark-theme .display, .dark-theme .h2, .dark-theme h1:not(.display), .dark-theme h2:not(.h2) { color: var(--text); }
 
@@ -196,7 +196,7 @@ h2:not(.h2) { font-weight:600; letter-spacing:-0.3px; }
 .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; align-items:center; }
 @media (max-width:880px){ .grid-2 { grid-template-columns:1fr; } }
 .hero-img { width:100%; border-radius:16px; border:1px solid var(--border); box-shadow:0 10px 30px rgba(2,6,23,.06); height:clamp(260px,45vw,520px); object-fit:cover; object-position:center; }
-.hero .display { font-family:var(--font-display); font-weight:700; color:#f6ead7; letter-spacing:-0.5px; }
+.hero .display { font-family:var(--font-display); font-weight:700; color:#f6ead7; }
 .hero .lead { color:rgba(246,234,215,0.9); max-width:560px; }
 .dark-theme .hero .display { color:#ffffff; }
 
@@ -351,7 +351,7 @@ h2:not(.h2) { font-weight:600; letter-spacing:-0.3px; }
 .pricing-card.featured { outline:2px solid var(--primary); }
 .pricing-card h3 { font-family:var(--font-display); font-weight:600; margin:0 0 4px; color: var(--text-strong); }
 .dark-theme .pricing-card h3 { color: var(--text); }
-.price { font-size:34px; font-weight:700; margin:0 0 8px; color:var(--text-strong); font-family:var(--font-display); font-variant-numeric: tabular-nums; letter-spacing:-0.4px; line-height:1.1; }
+.price { font-size:34px; font-weight:700; margin:0 0 8px; color: var(--text-strong); font-family:var(--font-display); font-variant-numeric: tabular-nums; letter-spacing:-0.4px; line-height:1.1; }
 .dark-theme .price { color: var(--text); }
 .price span { color:var(--muted); font-weight:600; font-size:16px; }
 .pricing-card ul { list-style:disc inside; margin:0 0 14px; padding:0; }
@@ -460,4 +460,17 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
 @keyframes status-pop {
   from { transform: translateY(-2px); opacity:.85; }
   to { transform: translateY(0); opacity:1; }
+}
+
+/* =========================
+   Defer painting (content-visibility)
+   ========================= */
+@supports (content-visibility: auto) {
+  .defer {
+    content-visibility: auto;
+    contain-intrinsic-size: 720px; /* reserva aproximada para evitar CLS */
+  }
+  .features-section.defer {
+    contain-intrinsic-size: 820px; /* la de features suele ser más alta */
+  }
 }

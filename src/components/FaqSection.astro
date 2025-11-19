@@ -8,8 +8,9 @@ const {
   title = "Preguntas frecuentes",
   description = "",
   items = [],
+  defer = false,
   ...attrs
-} = Astro.props;
+} = Astro.props as { title?: string; description?: string; items?: any[]; defer?: boolean; [k:string]: any };
 
 function slugify(str: string) {
   return str
@@ -27,7 +28,7 @@ const prepared = items.map((it, i) => ({
 }));
 ---
 
-<section id="faq" class="section faq-section">
+<section id="faq" class={`section faq-section ${defer ? 'defer' : ''}`}>
   <div class="container">
     <h2 class="h2 center">{title}</h2>
     {description && <p class="lead center max-680">{description}</p>}

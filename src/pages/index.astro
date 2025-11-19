@@ -65,6 +65,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
   </section>
 
   <FeatureShowcaseDynamicRatio
+    defer={true}
     items={[
       {
         title:"Escoge entre Modo Claro / Modo Oscuro",
@@ -120,7 +121,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
     ]}
   />
 
-  <section id="precios" class="section alt">
+  <section id="precios" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Escoge tu plan</h2>
       <div class="pricing-grid">
@@ -158,7 +159,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-  <section id="verifactu" class="section alt verifactu-section">
+  <section id="verifactu" class="section alt verifactu-section defer">
     <div class="container">
       <h2 class="h2 center">VeriFactu</h2>
       <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
@@ -180,7 +181,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-  <section id="sobre" class="section alt">
+  <section id="sobre" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Quiénes somos</h2>
       <p class="lead center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
@@ -210,6 +211,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
   </section>
 
   <FaqSection
+    defer={true}
     title="Preguntas frecuentes"
     description="Resolvemos dudas sobre el TPV y VeriFactu."
     items={[
@@ -230,7 +232,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
     data-hash-prefix="faq-"
   />
 
-  <section id="contacto" class="section alt">
+  <section id="contacto" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
       <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>

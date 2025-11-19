@@ -16,10 +16,10 @@ interface Item {
   height?: number;
 }
 
-const { items = [] as Item[] } = Astro.props;
+const { items = [] as Item[], defer = false } = Astro.props as { items: Item[]; defer?: boolean; };
 const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in","scale-up"];
 ---
-<section id="funcionalidades" class="section features-section full-bleed">
+<section id="funcionalidades" class={`section features-section full-bleed ${defer ? 'defer' : ''}`}>
   <div class="features-list">
     {
       items.map((it,i) => {
