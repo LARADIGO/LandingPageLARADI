@@ -474,3 +474,34 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
     contain-intrinsic-size: 820px; /* la de features suele ser más alta */
   }
 }
+
+/* Añadir al final del archivo existente (o cerca de sección Form) */
+.consent-row { margin-top: 4px; }
+.consent {
+  display:flex;
+  gap:.6em;
+  align-items:flex-start;
+  font-size:14px;
+  line-height:1.4;
+  color:var(--muted);
+  user-select:none;
+}
+.consent a { color:var(--text-strong); text-decoration:underline; }
+.dark-theme .consent a { color:var(--text); }
+.consent input[type="checkbox"] {
+  margin-top:3px;
+  width:18px;
+  height:18px;
+  cursor:pointer;
+  accent-color: var(--primary);
+  flex-shrink:0;
+}
+
+.captcha-wrap {
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:68px; /* reserva espacio para evitar salto cuando carga */
+}
+.captcha-wrap .cf-turnstile { width:auto; }

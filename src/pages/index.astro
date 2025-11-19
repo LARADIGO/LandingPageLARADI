@@ -245,12 +245,13 @@ const initialStatusClass = errCode ? 'status-error' : '';
         </p>
         <div class="form-grid">
           <div>
-            <label>Nombre</label>
-            <input name="name" type="text" required placeholder="Tu nombre" autocomplete="name" />
+            <label for="name">Nombre</label>
+            <input id="name" name="name" type="text" required placeholder="Tu nombre" autocomplete="name" />
           </div>
           <div>
-            <label>Email</label>
-            <input name="email"
+            <label for="email">Email</label>
+            <input id="email"
+                   name="email"
                    type="email"
                    required
                    placeholder="tu@ejemplo.com"
@@ -260,8 +261,20 @@ const initialStatusClass = errCode ? 'status-error' : '';
                    title="Introduce un email válido (usuario@dominio.ext)" />
           </div>
           <div class="full">
-            <label>Mensaje</label>
-            <textarea name="message" rows="4" required placeholder="¿Qué necesitas?"></textarea>
+            <label for="message">Mensaje</label>
+            <textarea id="message" name="message" rows="4" required placeholder="¿Qué necesitas?" spellcheck="true"></textarea>
+          </div>
+          <div class="full consent-row">
+            <label class="consent" for="privacy">
+              <input id="privacy" name="privacy" type="checkbox" required />
+              <span>Acepto la <a href="/politica-privacidad" target="_blank" rel="noopener">Política de privacidad</a>.</span>
+            </label>
+          </div>
+          <div class="full captcha-wrap">
+            <div class="cf-turnstile"
+                 data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITEKEY || ''}
+                 data-theme="auto"
+                 data-size="normal"></div>
           </div>
         </div>
         <div id="contact-status"
@@ -272,8 +285,12 @@ const initialStatusClass = errCode ? 'status-error' : '';
           {initialStatus}
         </div>
         <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
-        <noscript><p class="muted">JavaScript desactivado: se usará envío directo.</p></noscript>
+        <noscript><p class="muted">JavaScript desactivado: el CAPTCHA no se aplicará.</p></noscript>
       </form>
+      <!-- Script Turnstile (solo si hay sitekey) -->
+      {import.meta.env.PUBLIC_TURNSTILE_SITEKEY && (
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+      )}
     </div>
   </section>
 

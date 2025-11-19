@@ -2,7 +2,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import "@styles/gracias.css";
 ---
-<BaseLayout title="¡Mensaje enviado!" description="Gracias por contactarnos">
+<BaseLayout title="¡Mensaje enviado!" description="Gracias por contactarnos" robots="noindex, nofollow">
   <section class="section thankyou">
     <div class="container center">
       <div class="badge-wrap" aria-hidden="true">
@@ -19,10 +19,8 @@ import "@styles/gracias.css";
         </svg>
         <div class="confetti" />
       </div>
-
       <h1 class="h2">¡Gracias por tu mensaje!</h1>
       <p class="lead max-680">Lo hemos recibido correctamente. Te responderemos en menos de 24 horas.</p>
-
       <p style="margin-top:18px;">
         <a href="/" class="btn btn-sm">Volver al inicio</a>
       </p>
