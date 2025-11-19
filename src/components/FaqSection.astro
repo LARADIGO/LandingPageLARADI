@@ -2,15 +2,27 @@
 import "../styles/faq.css";
 
 /**
- * FaqSection.astro (versión con estilos externos y script mejorado)
+ * FaqSection.astro
+ * - Acordeón con <details>.
+ * - Marcado FAQPage (JSON-LD) para SEO.
+ * - Prop disableSchema para desactivar el script JSON-LD.
+ * - Iconos simplificados (texto dentro del DOM, no pseudo-elements).
  */
 const {
   title = "Preguntas frecuentes",
   description = "",
   items = [],
   defer = false,
+  disableSchema = false,
   ...attrs
-} = Astro.props as { title?: string; description?: string; items?: any[]; defer?: boolean; [k:string]: any };
+} = Astro.props as {
+  title?: string;
+  description?: string;
+  items?: { question: string; answer: string }[];
+  defer?: boolean;
+  disableSchema?: boolean;
+  [k: string]: any
+};
 
 function slugify(str: string) {
   return str
@@ -26,6 +38,21 @@ const prepared = items.map((it, i) => ({
   ...it,
   id: hashPrefix + (slugify(it.question) || i)
 }));
+
+const shouldRenderSchema = !disableSchema && prepared.length > 0;
+
+const faqSchema = shouldRenderSchema ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": prepared.map(entry => ({
+    "@type": "Question",
+    "name": entry.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": entry.answer
+    }
+  }))
+} : null;
 ---
 
 <section id="faq" class={`section faq-section ${defer ? 'defer' : ''}`}>
@@ -52,7 +79,9 @@ const prepared = items.map((it, i) => ({
       {prepared.map((item, idx) => (
         <details class="faq-item" id={item.id} data-index={idx}>
           <summary>
-            <span class="faq-icon" aria-hidden="true"></span>
+            <span class="faq-icon" aria-hidden="true">
+              <span class="faq-glyph">▾</span>
+            </span>
             <span class="faq-question">{item.question}</span>
           </summary>
           <div class="faq-panel">
@@ -64,6 +93,12 @@ const prepared = items.map((it, i) => ({
       ))}
     </div>
   </div>
+
+  {shouldRenderSchema && (
+    <script type="application/ld+json" is:inline>
+      {JSON.stringify(faqSchema)}
+    </script>
+  )}
 </section>
 
 <script is:inline>
@@ -71,88 +106,83 @@ const prepared = items.map((it, i) => ({
   const root = document.querySelector('[data-component="faq"]');
   if(!root) return;
 
-  const section = root.closest('.faq-section') || document;
-  const items = Array.from(root.querySelectorAll('.faq-item'));
+  let items;
+  try {
+    items = Array.from(root.querySelectorAll('.faq-item'));
+  } catch {
+    return;
+  }
   if(!items.length) return;
 
-  const accordion     = root.dataset.accordion === 'true';
-  const persist       = !accordion && root.dataset.persist === 'true';
-  const iconType      = (root.dataset.icon || 'chevron').toLowerCase();
-  const autoscroll    = root.dataset.autoscroll === 'true';
-  const hashPrefix    = root.dataset.hashPrefix || 'faq-';
-  const counterSel    = root.dataset.counterTarget || '#faq-count';
-  const scrollBlock   = root.dataset.scrollBlock || 'center';
-  const expandCollapse= root.dataset.expandCollapse === 'true';
-  const defaultOpenRaw= root.dataset.defaultOpen || '';
-  const defaultOpenIndexes = defaultOpenRaw.split(',')
-    .map(s=>s.trim()).filter(Boolean)
-    .map(s=>parseInt(s,10))
-    .filter(n=>!isNaN(n));
+  // Dataset config
+  const accordion      = root.dataset.accordion === 'true';
+  const persist        = !accordion && root.dataset.persist === 'true';
+  const autoscroll     = root.dataset.autoscroll === 'true';
+  const hashPrefix     = root.dataset.hashPrefix || 'faq-';
+  const counterSel     = root.dataset.counterTarget || '#faq-count';
+  const scrollBlock    = root.dataset.scrollBlock || 'center';
+  const expandCollapse = root.dataset.expandCollapse === 'true';
+  const defaultOpenRaw = root.dataset.defaultOpen || '';
+  const defaultOpenIdx = defaultOpenRaw.split(',')
+    .map(s=>s.trim()).filter(Boolean).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
 
+  const section = root.closest('.faq-section') || document;
   const counterTarget = section.querySelector(counterSel);
   const controlsWrap  = section.querySelector('.faq-controls');
 
-  // Ocultar controles si no se pide
   if(controlsWrap && !expandCollapse){
-    controlsWrap.style.display = 'none';
+    controlsWrap.style.display='none';
   }
-
-  // Preparar iconos
-  items.forEach(d => {
-    const iconSpan = d.querySelector('.faq-icon');
-    if(iconSpan){
-      iconSpan.dataset.iconType = iconType;
-    }
-  });
 
   // Persistencia
   const LS_KEY = 'faqOpenIds';
   function loadPersisted(){
     if(!persist) return [];
-    try {
-      return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-    } catch(_) { return []; }
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
   }
-  function savePersisted(openIds){
+  function savePersisted(ids){
     if(!persist) return;
-    try { localStorage.setItem(LS_KEY, JSON.stringify(openIds)); } catch(_){}
+    try { localStorage.setItem(LS_KEY, JSON.stringify(ids)); } catch {}
   }
 
-  // Estado inicial: hash > persistencia > default
+  // Estado inicial (hash > persistencia > default)
   const currentHash = decodeURIComponent(location.hash.replace('#',''));
-  const toOpenSet = new Set();
+  const toOpen = new Set();
   if(currentHash && currentHash.startsWith(hashPrefix)){
-    const match = items.find(d => d.id === currentHash);
-    if(match) toOpenSet.add(match.id);
+    const match = items.find(d=>d.id===currentHash);
+    if(match) toOpen.add(match.id);
   } else {
     const persisted = loadPersisted();
     if(persisted.length){
-      persisted.forEach(id => toOpenSet.add(id));
+      persisted.forEach(id=>toOpen.add(id));
     } else {
-      defaultOpenIndexes.forEach(i => {
+      defaultOpenIdx.forEach(i => {
         const det = items[i];
-        if(det) toOpenSet.add(det.id);
+        if(det) toOpen.add(det.id);
       });
     }
   }
 
-  // Inicializar (sin animación)
+  // Inicializar visual sin animación
   items.forEach(d => {
     const panel = d.querySelector('.faq-panel');
     if(!panel) return;
-    if(toOpenSet.has(d.id)){
+    if(toOpen.has(d.id)){
       d.setAttribute('open','');
       panel.style.height='auto';
       panel.style.opacity='1';
+      const glyph = d.querySelector('.faq-glyph');
+      if(glyph) glyph.textContent='▴';
     } else {
       d.removeAttribute('open');
       panel.style.height='0px';
       panel.style.opacity='0';
       panel.style.overflow='hidden';
+      const glyph = d.querySelector('.faq-glyph');
+      if(glyph) glyph.textContent='▾';
     }
   });
 
-  // Contador
   function updateCounter(){
     if(!counterTarget) return;
     const openCount = items.filter(d=>d.open).length;
@@ -163,26 +193,25 @@ const prepared = items.map((it, i) => ({
   }
   updateCounter();
 
-  // Animación altura
+  // Animaciones
   function animate(details, opening){
     const panel = details.querySelector('.faq-panel');
+    const glyph = details.querySelector('.faq-glyph');
     if(!panel) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     panel.style.overflow='hidden';
-    if(reduce){
-      if(opening){
-        panel.style.height='auto'; panel.style.opacity='1';
-      } else {
-        panel.style.height='0px'; panel.style.opacity='0';
-      }
-      return;
-    }
+
     if(opening){
+      if(glyph) glyph.textContent='▴';
+      if(reduce){
+        panel.style.height='auto';
+        panel.style.opacity='1';
+        return;
+      }
       panel.style.height='0px';
       panel.style.opacity='0';
       requestAnimationFrame(()=>{
-        panel.style.transition='height .38s cubic-bezier(.25,.9,.25,1), opacity .32s ease';
+        panel.style.transition='height .34s cubic-bezier(.25,.9,.25,1), opacity .30s ease';
         panel.style.height=panel.scrollHeight+'px';
         panel.style.opacity='1';
       });
@@ -194,10 +223,16 @@ const prepared = items.map((it, i) => ({
         }
       });
     } else {
+      if(glyph) glyph.textContent='▾';
+      if(reduce){
+        panel.style.height='0px';
+        panel.style.opacity='0';
+        return;
+      }
       panel.style.height=panel.scrollHeight+'px';
       panel.style.opacity='1';
       requestAnimationFrame(()=>{
-        panel.style.transition='height .32s ease, opacity .28s ease';
+        panel.style.transition='height .28s ease, opacity .26s ease';
         panel.style.height='0px';
         panel.style.opacity='0';
       });
@@ -210,12 +245,10 @@ const prepared = items.map((it, i) => ({
     }
   }
 
-  function openItem(details, {scroll=true, updateHash=true}={}){
+  function openItem(details,{scroll=true, updateHash=true}={}){
     if(details.open) return;
     if(accordion){
-      items.forEach(d=>{
-        if(d!==details && d.open) closeItem(d,{updateHash:false});
-      });
+      items.forEach(d=>{ if(d!==details && d.open) closeItem(d,{updateHash:false}); });
     }
     details.setAttribute('open','');
     animate(details,true);
@@ -234,6 +267,12 @@ const prepared = items.map((it, i) => ({
     if(updateHash && location.hash==='#'+details.id){
       history.replaceState(null,'','#');
     }
+  }
+
+  function persistState(){
+    if(!persist) return;
+    const openIds = items.filter(d=>d.open).map(d=>d.id);
+    savePersisted(openIds);
   }
 
   // Eventos en summary
@@ -255,13 +294,7 @@ const prepared = items.map((it, i) => ({
     });
   });
 
-  function persistState(){
-    if(!persist) return;
-    const openIds = items.filter(d=>d.open).map(d=>d.id);
-    savePersisted(openIds);
-  }
-
-  // Controles expand / collapse
+  // Expand / Collapse global
   if(controlsWrap && expandCollapse){
     const btnExpand = controlsWrap.querySelector('.faq-expand-all');
     const btnCollapse = controlsWrap.querySelector('.faq-collapse-all');
@@ -277,7 +310,7 @@ const prepared = items.map((it, i) => ({
     });
   }
 
-  // Scroll inicial si hash
+  // Scroll inicial si hash directo
   if(currentHash){
     const target = items.find(d=>d.id===currentHash);
     if(target && autoscroll){
