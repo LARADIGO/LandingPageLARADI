@@ -58,7 +58,6 @@ const jsonLdHead = JSON.stringify([
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <!-- Cambiado: permitimos zoom (quitado user-scalable=no y máximo estricto) -->
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
     <title>{title}</title>
@@ -97,12 +96,15 @@ const jsonLdHead = JSON.stringify([
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    {contactEndpoint && <link rel="preconnect" href={new URL(contactEndpoint).origin} />}
 
-    <link rel="preload" as="image" href="/assets/features/welcome_page.png" fetchpriority="high" />
-
+    <!-- Fuentes globales existentes -->
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Nuevas fuentes SOLO para el splash (futurista/cyber) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Share+Tech+Mono&family=Saira+Stencil+One&family=Chakra+Petch:wght@500;700&display=swap"
       rel="stylesheet"
     />
 
@@ -147,6 +149,28 @@ const jsonLdHead = JSON.stringify([
       durationMultiplier={1}
       explodeDelay={620}
       explodeDuration={680}
+      fireworksDelayAfterSecond={500}
+      fireworksDuration={3200}
+      flashDuration={300}
+      fireworksBurstsTotal={12}
+      fireworksNearCenter={5}
+      fireworksSpreadBase={140}
+      fireworksSpreadVariance={240}
+      fireworksRandomScreen={true}
+      fireworksParticlesMin={24}
+      fireworksParticlesMax={42}
+      fireworksTimelineSpacing={220}
+      fireworksAllowOverlap={false}
+      fireworksParticleSizeMin={5}
+      fireworksParticleSizeMax={16}
+      fireworksTrailEnabled={true}
+      fireworksTrailThickness={3}
+      fireworksTrailLengthFactor={1.15}
+      fireworksTrailFadeExtra={450}
+      backgroundFadeDelay={1300}
+      backgroundFadeDuration={3300}
+      backgroundFinalOpacity={0.3}
+      splashFontPreset="stencil" 
     />
 
     <header class="site-header" role="banner">

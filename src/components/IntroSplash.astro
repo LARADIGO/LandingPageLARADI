@@ -1,19 +1,55 @@
 ---
 /**
- * IntroSplash.astro (versión con doble mensaje y efecto “explosión”)
- *
+ * IntroSplash.astro
+ * Doble mensaje con:
+ *  - Typewriter del primer mensaje
+ *  - Explosión (flash + partículas)
+ *  - Segundo mensaje (typewriter opcional)
+ *  - Degradado del fondo a transparente mientras se muestran fireworks
+ *  - Fireworks configurables (tamaño, posición, dispersión, cantidad)
+ *  - Trails (estelas) opcionales para cada partícula del firework
+ *  - Cierre final
+ * 
  * Props:
+ *  Config Principales:
  *  firstMessage: string          Mensaje inicial (typewriter)
  *  secondMessage: string         Mensaje posterior tras explosión
  *  secondTypewriter?: boolean    Si el segundo mensaje también se escribe carácter a carácter
- *  oncePerSession?: boolean
- *  theme?: 'light' | 'dark' | 'auto'
+ *  oncePerSession?: boolean      Si true solo sale una vez por usuario
+ *  theme?: 'light' | 'dark' | 'auto' Si queremos que mantenga siempre un tema o auto.
  *  durationMultiplier?: number   Escala la velocidad de typewriter (1 = base)
  *  explodeDelay?: number         Ms desde fin del primer typewriter hasta iniciar explosión
  *  explodeDuration?: number      Ms de la animación de explosión
- *
+ *  flashDuration: number
+ *  fireworksDelayAfterSecond?: number
+ *  fireworksDuration?: number
+ * 
+ *  Config fireworks:
+ *  fireworksBurstsTotal?: number;    Número total de bursts (explosiones). Default 8.
+ *  fireworksNearCenter?: number;     Cuántos bursts deben generarse cerca del segundo texto. Default 3.
+ *  fireworksSpreadBase?: number;     Distancia base (px) de las partículas del burst. Default 80.
+ *  fireworksSpreadVariance?: number; Rango adicional aleatorio máximo (px). Default 120.
+ *  fireworksRandomScreen?: boolean;  Si true, los bursts restantes se ubican en cualquier punto de la pantalla, no sólo en la mitad superior. Default true.
+ *  fireworksParticlesMin?: number;   Mínimo de partículas por burst. Default 18.
+ *  fireworksParticlesMax?: number;   Máximo de partículas por burst. Default 30.
+ *  fireworksTimelineSpacing?: number;  Separación en ms entre cada burst (ritmo de salida). Default 240.
+ *  fireworksAllowOverlap?: boolean;  Si true, no aplica separación para evitar solapamientos en el tiempo. Default false.
+ * 
+ *  Trails/fireworks "gordos":
+ *  fireworksParticleSizeMin      default 4
+ *  fireworksParticleSizeMax      default 9
+ *  fireworksTrailEnabled         default true
+ *  fireworksTrailThickness       default 2
+ *  fireworksTrailLengthFactor    default 1.05 (multiplica longitud)
+ *  fireworksTrailFadeExtra       default 300 (ms extra de desvanecido)
+ * 
+ *  Fade fondo
+ *  backgroundFadeDelay           ms de espera antes de empezar el fade del fondo
+ *  backgroundFadeDuration        ms de duración del fade
+ *  backgroundFinalOpacity        opacidad final (0..1)
+ * 
+ * splashFontPreset -> FUENTE
  */
-
 
 interface Props {
   firstMessage?: string;
@@ -24,6 +60,32 @@ interface Props {
   durationMultiplier?: number;
   explodeDelay?: number;
   explodeDuration?: number;
+  fireworksDelayAfterSecond?: number;
+  fireworksDuration?: number;
+  flashDuration?: number;
+
+  fireworksBurstsTotal?: number;
+  fireworksNearCenter?: number;
+  fireworksSpreadBase?: number;
+  fireworksSpreadVariance?: number;
+  fireworksRandomScreen?: boolean;
+  fireworksParticlesMin?: number;
+  fireworksParticlesMax?: number;
+  fireworksTimelineSpacing?: number;
+  fireworksAllowOverlap?: boolean;
+
+  fireworksParticleSizeMin?: number;
+  fireworksParticleSizeMax?: number;
+  fireworksTrailEnabled?: boolean;
+  fireworksTrailThickness?: number;
+  fireworksTrailLengthFactor?: number;
+  fireworksTrailFadeExtra?: number;
+
+  backgroundFadeDelay?: number;
+  backgroundFadeDuration?: number;
+  backgroundFinalOpacity?: number;
+
+  splashFontPreset?: 'tech' | 'mono' | 'stencil';
 }
 
 const {
@@ -34,18 +96,65 @@ const {
   theme = 'auto',
   durationMultiplier = 1,
   explodeDelay = 420,
-  explodeDuration = 680
+  explodeDuration = 680,
+  fireworksDelayAfterSecond = 2000,
+  fireworksDuration = 3000,
+  flashDuration = 260,
+
+  fireworksBurstsTotal = 8,
+  fireworksNearCenter = 3,
+  fireworksSpreadBase = 80,
+  fireworksSpreadVariance = 120,
+  fireworksRandomScreen = true,
+  fireworksParticlesMin = 18,
+  fireworksParticlesMax = 30,
+  fireworksTimelineSpacing = 240,
+  fireworksAllowOverlap = false,
+
+  fireworksParticleSizeMin = 4,
+  fireworksParticleSizeMax = 9,
+  fireworksTrailEnabled = true,
+  fireworksTrailThickness = 2,
+  fireworksTrailLengthFactor = 1.05,
+  fireworksTrailFadeExtra = 300,
+
+  backgroundFadeDelay = 1200,
+  backgroundFadeDuration = 3200,
+  backgroundFinalOpacity = 0.2,
+
+  splashFontPreset = 'tech'
 } = Astro.props as Props;
 ---
 
 <div
   id="intro-splash"
-  class={`intro-splash intro-theme-${theme}`}
+  class={`intro-splash intro-theme-${theme} intro-font-${splashFontPreset}`}
   data-once={String(oncePerSession)}
   data-speed={String(durationMultiplier)}
   data-explode-delay={String(explodeDelay)}
   data-explode-duration={String(explodeDuration)}
   data-second-typewriter={String(secondTypewriter)}
+  data-fireworks-delay={String(fireworksDelayAfterSecond)}
+  data-fireworks-duration={String(fireworksDuration)}
+  data-flash-duration={String(flashDuration)}
+  data-fw-bursts={String(fireworksBurstsTotal)}
+  data-fw-near={String(fireworksNearCenter)}
+  data-fw-spread-base={String(fireworksSpreadBase)}
+  data-fw-spread-var={String(fireworksSpreadVariance)}
+  data-fw-random-screen={String(fireworksRandomScreen)}
+  data-fw-pmin={String(fireworksParticlesMin)}
+  data-fw-pmax={String(fireworksParticlesMax)}
+  data-fw-spacing={String(fireworksTimelineSpacing)}
+  data-fw-overlap={String(fireworksAllowOverlap)}
+  data-fw-size-min={String(fireworksParticleSizeMin)}
+  data-fw-size-max={String(fireworksParticleSizeMax)}
+  data-fw-trail={String(fireworksTrailEnabled)}
+  data-fw-trail-thickness={String(fireworksTrailThickness)}
+  data-fw-trail-factor={String(fireworksTrailLengthFactor)}
+  data-fw-trail-fade-extra={String(fireworksTrailFadeExtra)}
+  data-bg-fade-delay={String(backgroundFadeDelay)}
+  data-bg-fade-duration={String(backgroundFadeDuration)}
+  data-bg-final-opacity={String(backgroundFinalOpacity)}
   aria-hidden="true"
 >
   <div class="intro-inner">
@@ -58,46 +167,89 @@ const {
 <script is:inline>
 (() => {
   const root = document.getElementById('intro-splash');
-  if(!root) return;
+  if (!root) return;
 
-  const once = root.getAttribute('data-once') === 'true';
-  const key = 'tpv_intro_seen_v2';
+  const getNum = (attr, def) => {
+    const v = root.getAttribute(attr);
+    const n = v === null ? NaN : parseFloat(v);
+    return Number.isFinite(n) ? n : def;
+  };
+  const getBool = (attr, def=false) => {
+    const v = root.getAttribute(attr);
+    if (v === null) return def;
+    return v === 'true';
+  };
+
+  const once = getBool('data-once', false);
+  const key = 'tpv_intro_seen_v6';
   if (once && localStorage.getItem(key)) {
     root.style.display = 'none';
     return;
   }
 
   const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const speedMult = parseFloat(root.getAttribute('data-speed') || '1') || 1;
-  const explodeDelay = parseInt(root.getAttribute('data-explode-delay') || '420', 10);
-  const explodeDuration = parseInt(root.getAttribute('data-explode-duration') || '680', 10);
-  const secondTypewriter = root.getAttribute('data-second-typewriter') === 'true';
+  const speedMult = getNum('data-speed', 1);
 
-  const phase1El = root.querySelector('.intro-type.intro-phase-1');
-  const phase2El = root.querySelector('.intro-type.intro-phase-2');
+  // Timings
+  const explodeDelay = getNum('data-explode-delay', 420);
+  const explodeDuration = getNum('data-explode-duration', 680);
+  const fireworksDelayAfterSecond = getNum('data-fireworks-delay', 2000);
+  const fireworksDuration = getNum('data-fireworks-duration', 3000);
+  const flashDuration = getNum('data-flash-duration', 260);
+  const secondTypewriter = getBool('data-second-typewriter', true);
+
+  // Fireworks config
+  const fwBurstsTotal = getNum('data-fw-bursts', 8);
+  const fwNearCenter = Math.min(getNum('data-fw-near', 3), fwBurstsTotal);
+  const fwSpreadBase = getNum('data-fw-spread-base', 80);
+  const fwSpreadVar = getNum('data-fw-spread-var', 120);
+  const fwRandomScreen = getBool('data-fw-random-screen', true);
+  const fwPMin = getNum('data-fw-pmin', 18);
+  const fwPMax = getNum('data-fw-pmax', 30);
+  const fwSpacing = getNum('data-fw-spacing', 240);
+  const fwOverlap = getBool('data-fw-overlap', false);
+  const fwSizeMin = getNum('data-fw-size-min', 4);
+  const fwSizeMax = getNum('data-fw-size-max', 9);
+  const fwTrailEnabled = getBool('data-fw-trail', true);
+  const fwTrailThickness = getNum('data-fw-trail-thickness', 2);
+  const fwTrailFactor = getNum('data-fw-trail-factor', 1.05);
+  const fwTrailFadeExtra = getNum('data-fw-trail-fade-extra', 300);
+
+  // Fondo: nuevos parámetros
+  const bgFadeDelay = getNum('data-bg-fade-delay', 1200);
+  const bgFadeDuration = getNum('data-bg-fade-duration', 3200);
+  const bgFinalOpacityRaw = parseFloat(root.getAttribute('data-bg-final-opacity') || '0');
+  const bgFinalOpacity = Number.isFinite(bgFinalOpacityRaw)
+    ? Math.max(0, Math.min(1, bgFinalOpacityRaw))
+    : 0;
+
+  const inner = root.querySelector('.intro-inner');
+  const phase1El = root.querySelector('.intro-phase-1');
+  const phase2El = root.querySelector('.intro-phase-2');
   const skipBtn = root.querySelector('[data-intro-skip]');
 
   const firstText = phase1El?.getAttribute('data-text') || '';
   const secondText = phase2El?.getAttribute('data-text2') || '';
 
-  // Timings
   const CHAR_INTERVAL = 42 / speedMult;
-  const END_DELAY_SECOND = 520 / speedMult;
+  const END_DELAY_SECOND = 560 / speedMult;
 
-  let i1 = 0;
-  let i2 = 0;
-  let t1 = null;
-  let t2 = null;
-  let finished = false;
+  let i1 = 0, i2 = 0;
+  let t1 = null, t2 = null;
+  let finished = false, explosionTriggered = false, fireworksTriggered = false;
 
   function finishIntro() {
     if (finished) return;
     finished = true;
-    if (once) {
-      try { localStorage.setItem(key, '1'); } catch {}
-    }
+    if (once) { try { localStorage.setItem(key, '1'); } catch {} }
     root.classList.add('intro-hide');
     setTimeout(() => root.remove(), 650);
+  }
+  function manualSkip() {
+    if (t1) clearTimeout(t1);
+    if (t2) clearTimeout(t2);
+    finished = true;
+    finishIntro();
   }
 
   function typeFirst() {
@@ -111,8 +263,59 @@ const {
     }
   }
 
+  function spawnExplosionParticles() {
+    if (prefersReduce || !inner || !phase1El) return;
+    let container = inner.querySelector('.intro-particles');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'intro-particles';
+      inner.appendChild(container);
+    } else container.innerHTML = '';
+
+    const innerRect = inner.getBoundingClientRect();
+    const rect = phase1El.getBoundingClientRect();
+    const ox = rect.left + rect.width / 2 - innerRect.left;
+    const oy = rect.top + rect.height / 2 - innerRect.top;
+
+    const COUNT = 120;
+    for (let i = 0; i < COUNT; i++) {
+      const p = document.createElement('span');
+      p.className = 'p';
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 100 + Math.random() * 220;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+      const size = 3 + Math.random() * 7;
+      const isSquare = Math.random() < 0.3;
+      const dur = 520 + Math.random() * 820;
+      const del = Math.random() * 150;
+      p.style.left = (ox - size / 2) + 'px';
+      p.style.top = (oy - size / 2) + 'px';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.borderRadius = isSquare ? '3px' : '50%';
+      const useAlt = Math.random() < 0.35;
+      p.style.background = useAlt ? 'var(--primary-2,#d4b088)' : 'var(--primary,#e8caa6)';
+      p.style.opacity = (0.8 + Math.random() * 0.15).toFixed(2);
+      p.style.setProperty('--dx', dx.toFixed(1) + 'px');
+      p.style.setProperty('--dy', dy.toFixed(1) + 'px');
+      p.style.setProperty('--p-dur', Math.round(dur) + 'ms');
+      p.style.setProperty('--p-del', Math.round(del) + 'ms');
+      p.style.setProperty('--p-blur', (Math.random() * 2).toFixed(1) + 'px');
+      container.appendChild(p);
+    }
+    setTimeout(() => container?.remove(), explodeDuration + 1600);
+  }
+
   function triggerExplosion() {
+    if (explosionTriggered || finished) return;
+    explosionTriggered = true;
     if (!phase1El) return showSecond();
+    if (!prefersReduce) {
+      spawnExplosionParticles();
+      root.classList.add('intro-flash');
+      setTimeout(() => root.classList.remove('intro-flash'), flashDuration);
+    }
     root.classList.add('intro-explode');
     setTimeout(() => {
       phase1El.hidden = true;
@@ -124,13 +327,10 @@ const {
     if (!phase2El) return finishIntro();
     phase2El.hidden = false;
     phase2El.classList.add('intro-second-visible');
-
     if (prefersReduce || !secondTypewriter) {
       phase2El.textContent = secondText;
-      setTimeout(finishIntro, END_DELAY_SECOND);
-    } else {
-      typeSecond();
-    }
+      scheduleFireworks();
+    } else typeSecond();
   }
 
   function typeSecond() {
@@ -139,30 +339,128 @@ const {
       phase2El.textContent = secondText.slice(0, i2 + 1);
       i2++;
       t2 = setTimeout(typeSecond, CHAR_INTERVAL);
-    } else {
-      setTimeout(finishIntro, END_DELAY_SECOND);
+    } else scheduleFireworks();
+  }
+
+  function scheduleFireworks() {
+    if (finished) return;
+    if (prefersReduce) {
+      setTimeout(finishIntro, 600);
+      return;
     }
+    setTimeout(() => launchFireworks(), fireworksDelayAfterSecond);
   }
 
-  function manualSkip() {
-    if (t1) clearTimeout(t1);
-    if (t2) clearTimeout(t2);
-    finishIntro();
+  function launchFireworks() {
+    if (fireworksTriggered || finished) return;
+    fireworksTriggered = true;
+
+    // Iniciar el fade del fondo con los nuevos parámetros
+    setTimeout(() => {
+      root.style.setProperty('--bg-fade-duration', bgFadeDuration + 'ms');
+      root.style.setProperty('--bg-final-opacity', String(bgFinalOpacity));
+      root.classList.add('intro-bg-fade');
+    }, Math.max(0, bgFadeDelay));
+
+    let fwContainer = inner.querySelector('.intro-fireworks');
+    if (!fwContainer) {
+      fwContainer = document.createElement('div');
+      fwContainer.className = 'intro-fireworks';
+      inner.appendChild(fwContainer);
+    }
+
+    const secondRect = phase2El?.getBoundingClientRect();
+    const innerRect = inner.getBoundingClientRect();
+    const centerX = secondRect ? (secondRect.left + secondRect.width / 2 - innerRect.left) : innerRect.width / 2;
+    const centerY = secondRect ? (secondRect.top + secondRect.height / 2 - innerRect.top) : innerRect.height * 0.4;
+
+    for (let b = 0; b < fwBurstsTotal; b++) {
+      const delay = fwOverlap ? 0 : b * fwSpacing;
+      setTimeout(() => {
+        if (finished) return;
+        if (b < fwNearCenter) {
+          const radius = 70;
+          const ang = Math.random() * Math.PI * 2;
+          const bx = centerX + Math.cos(ang) * radius * Math.random();
+          const by = centerY + Math.sin(ang) * radius * Math.random();
+          createBurst(fwContainer, bx, by, true);
+        } else {
+          const bx = fwRandomScreen ? Math.random() * innerRect.width
+            : innerRect.width * (0.15 + Math.random() * 0.7);
+          const by = fwRandomScreen ? Math.random() * innerRect.height
+            : innerRect.height * (0.20 + Math.random() * 0.55);
+          createBurst(fwContainer, bx, by, false);
+        }
+      }, delay);
+    }
+
+    setTimeout(finishIntro, fireworksDuration);
   }
 
-  skipBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    manualSkip();
-  });
+  function createBurst(container, x, y, nearCenter) {
+    const burst = document.createElement('div');
+    burst.className = 'fw-burst';
+    burst.style.left = x + 'px';
+    burst.style.top = y + 'px';
 
-  document.addEventListener('keydown', (e) => {
+    const particlesCount = randBetween(fwPMin, fwPMax);
+
+    for (let i = 0; i < particlesCount; i++) {
+      const fp = document.createElement('span');
+      fp.className = 'fw-p';
+      const angle = (Math.PI * 2) * (i / particlesCount) + (Math.random() * 0.3);
+      const spread = fwSpreadBase + Math.random() * fwSpreadVar;
+      const actualSpread = nearCenter ? spread * 0.9 : spread;
+      const dx = Math.cos(angle) * actualSpread;
+      const dy = Math.sin(angle) * actualSpread;
+      const size = randBetween(fwSizeMin, fwSizeMax);
+      fp.style.width = size + 'px';
+      fp.style.height = size + 'px';
+      fp.style.background = randFireworkColor();
+      fp.style.setProperty('--fdx', dx.toFixed(1) + 'px');
+      fp.style.setProperty('--fdy', dy.toFixed(1) + 'px');
+      fp.style.setProperty('--f-delay', (Math.random() * 140).toFixed(0) + 'ms');
+      fp.style.setProperty('--f-dur', (800 + Math.random() * 900).toFixed(0) + 'ms');
+      burst.appendChild(fp);
+
+      if (fwTrailEnabled) {
+        const trail = document.createElement('span');
+        trail.className = 'fw-trail';
+        const angleDeg = angle * 180 / Math.PI;
+        const length = Math.sqrt(dx * dx + dy * dy) * fwTrailFactor;
+        trail.style.setProperty('--trail-angle', angleDeg + 'deg');
+        trail.style.setProperty('--trail-length', length + 'px');
+        trail.style.setProperty('--trail-thickness', fwTrailThickness + 'px');
+        trail.style.setProperty('--trail-fade-extra', fwTrailFadeExtra + 'ms');
+        trail.style.background = 'linear-gradient(90deg,' + randFireworkColor() + ', rgba(255,255,255,0))';
+        burst.appendChild(trail);
+      }
+    }
+
+    container.appendChild(burst);
+    setTimeout(() => burst.remove(), 2600 + fwTrailFadeExtra);
+  }
+
+  function randBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  function randFireworkColor() {
+    const palette = [
+      'var(--primary,#e8caa6)',
+      'var(--primary-2,#d4b088)',
+      '#ffd479','#ff9f5b','#5b9cff','#7fb3ff',
+      '#ffe0b3','#ffc3a0','#fff2d0','#ffe8c2'
+    ];
+    return palette[Math.floor(Math.random() * palette.length)];
+  }
+
+  skipBtn?.addEventListener('click', e => { e.stopPropagation(); manualSkip(); });
+  document.addEventListener('keydown', e => {
     if (finished) return;
-    if (['Escape', 'Enter', 'Tab', ' '].includes(e.key)) manualSkip();
+    if (['Escape','Enter','Tab',' '].includes(e.key)) manualSkip();
   }, { passive: true });
-
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', () => {
     if (finished) return;
-    // Si prefieres que solo el botón salte, comenta la siguiente línea:
     manualSkip();
   }, { passive: true });
 
@@ -172,7 +470,7 @@ const {
       phase2El.hidden = false;
       phase2El.textContent = secondText;
     }
-    setTimeout(finishIntro, 400);
+    setTimeout(finishIntro, 900);
   } else {
     requestAnimationFrame(typeFirst);
   }
