@@ -124,6 +124,39 @@
   transition: filter .9s ease, opacity .9s ease;
 }
 
+/* Doble imagen dentro del mismo contenedor */
+.feature-media-inner.media-two {
+  display: block; /* el grid vive en el hijo .media-two-grid */
+}
+.feature-media-inner .media-two-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.feature-media-inner .media-two-grid .media-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.feature-media-inner.media-two img {
+  width: 100%;
+  height: auto;           /* importante: no forzar 100% alto */
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;    /* un poco menos para crear separación visual */
+}
+
+/* Responsive: apilar en pantallas estrechas */
+@media (max-width: 680px){
+  .feature-media-inner .media-two-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Mostrar/ocultar según tema cuando hay variantes */
 .feature-media-inner img.theme-dark { display: none; }
 .dark-theme .feature-media-inner img.theme-dark { display: block; }
@@ -133,9 +166,7 @@
 .feature-media-inner img.feature-contain { object-fit: contain; }
 .feature-media-inner img.feature-cover   { object-fit: cover; }
 
-/* Imagen MÁS GRANDE en filas marcadas con mediaWide (feature-media-lg)
-   - Sensible a la posición: si la imagen va a la izquierda o a la derecha
-   - Ajustada al viewport para no desbordar ni en alto ni en ancho */
+/* Imagen MÁS GRANDE en filas marcadas con mediaWide */
 @media (min-width: 901px){
   .feature-row.feature-media-lg.feature-left  .feature-row-inner { grid-template-columns: 1.5fr 0.5fr; }
   .feature-row.feature-media-lg.feature-right .feature-row-inner { grid-template-columns: 0.5fr 1.5fr; }
@@ -146,7 +177,7 @@
   }
 }
 
-/* En móviles y tablets pequeñas, limitar también la altura para evitar scroll extra */
+/* En móviles y tablets pequeñas, limitar también la altura */
 @media (max-width: 900px){
   .feature-media-inner { max-height: 68vh; }
 }
@@ -258,4 +289,119 @@ body.fs-zoom-active {
     border-color: var(--primary-2);
     box-shadow: 0 16px 46px rgba(0,0,0,.62);
   }
+}
+
+/* Carrusel */
+.carousel-root {
+  position: relative;
+  isolation: isolate;
+}
+
+.carousel-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .75s ease, transform .75s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  box-sizing:border-box;
+}
+
+.carousel-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateZ(0);
+}
+
+.carousel-ui {
+  position: absolute;
+  inset: auto 0 8px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  flex-wrap:wrap;
+  padding:0 10px;
+}
+
+.carousel-btn {
+  background: linear-gradient(135deg,var(--primary), var(--primary-2));
+  color:#0F172A;
+  border:1px solid var(--border);
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  font-size:18px;
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: filter .2s ease, transform .2s ease;
+}
+.carousel-btn:hover {
+  filter:brightness(1.08);
+  transform:translateY(-2px);
+}
+.carousel-btn:active {
+  transform:translateY(0);
+}
+
+.carousel-dots {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:center;
+}
+
+.carousel-dot {
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background: var(--border);
+  border:0;
+  cursor:pointer;
+  position:relative;
+  transition: background .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+.carousel-dot:is(:hover,:focus-visible) {
+  background: var(--primary);
+  box-shadow:0 0 0 3px var(--ring);
+}
+.carousel-dot.is-active {
+  background: var(--primary);
+  transform: scale(1.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-slide { transition:none; }
+  .carousel-dot { transition:none; }
+}
+
+/* Accesibilidad: foco claro */
+.carousel-btn:focus-visible,
+.carousel-dot:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:4px;
+}
+
+/* Tema oscuro ajustes sutiles */
+.dark-theme .carousel-dot {
+  background: rgba(255,255,255,.15);
+}
+.dark-theme .carousel-dot.is-active {
+  background: var(--primary-2);
+}
+.dark-theme .carousel-btn {
+  color:#081121;
 }

@@ -1,9 +1,17 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+
 const pageTitle = "Aviso Legal";
 const pageDescription = "Información legal y condiciones generales de uso del sitio.";
 ---
+
 <BaseLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[
+    { name:"Inicio", href:"/" },
+    { name:"Aviso Legal" }
+  ]} />
+
   <section class="section">
     <div class="container max-680">
       <h1 class="h2 center">{pageTitle}</h1>

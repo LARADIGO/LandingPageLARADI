@@ -1,0 +1,37 @@
+---
+interface Crumb { name: string; href?: string; }
+interface Props { items?: Crumb[]; class?: string; }
+
+const { items = [], class: className = "" } = Astro.props as Props;
+const origin = Astro.url.origin;
+
+const jsonData = {
+  "@context":"https://schema.org",
+  "@type":"BreadcrumbList",
+  "itemListElement": items.map((c,i) => ({
+    "@type":"ListItem",
+    "position": i + 1,
+    "name": c.name,
+    "item": c.href
+      ? (c.href.startsWith('http') ? c.href : origin + (c.href.startsWith('/') ? c.href : '/' + c.href))
+      : origin + Astro.url.pathname
+  }))
+};
+const jsonStr = JSON.stringify(jsonData);
+---
+
+<nav class={`breadcrumbs ${className}`} aria-label="Miga de pan">
+  <ol>
+    {items.map((c,i) => {
+      const isLast = i === items.length - 1;
+      return (
+        <li aria-current={isLast ? "page" : undefined}>
+          {isLast || !c.href
+            ? c.name
+            : <a href={c.href}>{c.name}</a>}
+        </li>
+      );
+    })}
+  </ol>
+</nav>
+<script type="application/ld+json" is:inline set:html={jsonStr}></script>

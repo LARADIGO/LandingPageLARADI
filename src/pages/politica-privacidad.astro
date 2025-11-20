@@ -1,9 +1,17 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+
 const pageTitle = "Política de Privacidad";
 const pageDescription = "Información sobre tratamiento de datos, cookies y derechos del usuario.";
 ---
+
 <BaseLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[
+    { name:"Inicio", href:"/" },
+    { name:"Política de Privacidad" }
+  ]} />
+
   <section class="section">
     <div class="container max-680">
       <h1 class="h2 center">{pageTitle}</h1>

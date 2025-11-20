@@ -106,17 +106,40 @@ const initialStatusClass = errCode ? 'status-error' : '';
         height: 760
       },
       {
-        title:"Informes claros",
-        text:"Ventas por día, producto y empleado.",
-        imgLight:"/assets/features/welcome_page_claro.png",
-        imgDark:"/assets/features/welcome_page.png",
+        title:"Informes claros y Personalizables",
+        text:"Obten una visión rápida y intuitiva de los datos de tu negocio. Observa distintos paneles de informes, modifica y filtra los datos",
+        carousel: true,
+        carouselImages: [
+          {
+            light: "/assets/features/informes.png",
+            dark: "/assets/features/informes_oscuro.png",
+            alt: "Dashboard de informes"
+          },
+          {
+            light: "/assets/features/informes2.png",
+            dark: "/assets/features/informes_oscuro2.png",
+            alt: "Gestión de empleados"
+          },
+          {
+            light: "/assets/features/informes3.png",
+            dark: "/assets/features/informes_oscuro3.png",
+            alt: "Gestión de empleados"
+          },
+          {
+            light: "/assets/features/informes4.png",
+            dark: "/assets/features/informes_oscuro4.png",
+            alt: "Gestión de empleados"
+          },
+        ],
         alt:"Informes y analítica",
         mediaAnim:"blur-in",
         contentAnim:"fade-in",
         altBg:true,
         mediaWide: true,
         width: 1240,
-        height: 760
+        height: 760,
+        autoplayMs: 4500,
+        pauseOnHover: true
       }
     ]}
   />
@@ -287,7 +310,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
         <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
         <noscript><p class="muted">JavaScript desactivado: el CAPTCHA no se aplicará.</p></noscript>
       </form>
-      <!-- Script Turnstile (solo si hay sitekey) -->
+      {/* Script Turnstile (solo si hay sitekey) */}
       {import.meta.env.PUBLIC_TURNSTILE_SITEKEY && (
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       )}

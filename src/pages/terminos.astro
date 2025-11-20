@@ -1,9 +1,17 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+
 const pageTitle = "Términos y Condiciones";
 const pageDescription = "Condiciones de uso y contratación de los servicios TPV.";
 ---
+
 <BaseLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[
+    { name:"Inicio", href:"/" },
+    { name:"Términos y Condiciones" }
+  ]} />
+
   <section class="section">
     <div class="container max-680">
       <h1 class="h2 center">{pageTitle}</h1>

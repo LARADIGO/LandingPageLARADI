@@ -5,20 +5,43 @@ type Anim =
   | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down'
   | 'zoom-in' | 'fade-in' | 'blur-in' | 'rotate-in' | 'scale-up' | 'lift-in';
 
+/**
+ * Estructura de cada imagen del carrusel:
+ * - light: ruta imagen modo claro (png/jpg/webp)
+ * - dark: ruta imagen modo oscuro (opcional)
+ * - alt: texto alternativo
+ * Suficiente con 'light' + alt si no hay variantes.
+ */
+interface CarouselImage {
+  light: string;
+  dark?: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
 interface Item {
   title:string; text:string; alt:string;
   img?:string;
   imgLight?:string;
   imgDark?:string;
+
+  // Carrusel opcional (si carousel = true y carouselImages.length > 0)
+  carousel?: boolean;
+  carouselImages?: CarouselImage[];
+
   side?:Side; mediaAnim?:Anim; contentAnim?:Anim; altBg?:boolean;
-  mediaWide?: boolean; // ancho extra para la columna de la imagen
+  mediaWide?: boolean;
   width?: number;
   height?: number;
+  autoplayMs?: number;    // personalizar intervalo (default 4500)
+  pauseOnHover?: boolean; // default true
 }
 
 const { items = [] as Item[], defer = false } = Astro.props as { items: Item[]; defer?: boolean; };
 const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in","scale-up"];
 ---
+
 <section id="funcionalidades" class={`section features-section full-bleed ${defer ? 'defer' : ''}`}>
   <div class="features-list">
     {
@@ -27,81 +50,202 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
         const mediaAnim = it.mediaAnim || cycle[i % cycle.length];
         const contentAnim = it.contentAnim || cycle[(i+1) % cycle.length];
         const mediaFirst = side === 'left';
-        const hasThemeVariants = Boolean(it.imgLight || it.imgDark);
-        const lightSrc = it.imgLight || it.img;
-        const darkSrc  = it.imgDark  || it.img;
+
+        const isCarousel = Boolean(it.carousel && it.carouselImages && it.carouselImages.length);
+
         const width = it.width || 980;
         const height = it.height || 600;
 
-        // Candidatos WebP (si existen esos archivos)
+        // Imagen única / variantes tema (si no es carrusel)
+        const hasThemeVariants = !isCarousel && Boolean(it.imgLight || it.imgDark);
+        const lightSrc = !isCarousel ? (it.imgLight || it.img) : '';
+        const darkSrc  = !isCarousel ? (it.imgDark  || it.img) : '';
         const lightWebp = lightSrc && lightSrc.match(/\.(png|jpg|jpeg)$/i)
           ? lightSrc.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
         const darkWebp = darkSrc && darkSrc.match(/\.(png|jpg|jpeg)$/i)
           ? darkSrc.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
 
-        const rowClasses = [
-          `feature-${side}`,
-          it.altBg ? 'feature-alt' : '',
-          it.mediaWide ? 'feature-media-lg' : '' // clase condicional
-        ].filter(Boolean).join(' ');
-
         const sizeAttr = it.mediaWide
           ? '(min-width:1200px) 60vw, (min-width:900px) 50vw, 92vw'
           : '(min-width:900px) 42vw, 94vw';
 
-        const MediaBlock = (
-          <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
-            <div class="feature-media-inner dynamic-ratio" data-zoomable style={`aspect-ratio:${width}/${height};`}>
-              {
-                hasThemeVariants
-                ? <>
-                    <picture class="theme-light">
-                      {lightWebp && <source srcset={lightWebp} type="image/webp" />}
-                      {lightSrc && <img
-                        src={lightSrc}
-                        alt={it.alt}
-                        loading="lazy"
-                        decoding="async"
-                        width={width}
-                        height={height}
-                        sizes={sizeAttr}
-                        class="feature-contain theme-light"
-                      />}
-                    </picture>
-                    <picture class="theme-dark">
-                      {darkWebp && <source srcset={darkWebp} type="image/webp" />}
-                      {darkSrc && <img
-                        src={darkSrc}
-                        alt={it.alt}
-                        loading="lazy"
-                        decoding="async"
-                        width={width}
-                        height={height}
-                        sizes={sizeAttr}
-                        class="feature-contain theme-dark"
-                      />}
-                    </picture>
-                  </>
-                : (lightSrc
-                    ? <picture>
-                        {lightWebp && <source srcset={lightWebp} type="image/webp" />}
-                        <img
-                          src={lightSrc}
-                          alt={it.alt}
-                          loading="lazy"
-                          decoding="async"
-                          width={width}
-                          height={height}
-                          sizes={sizeAttr}
-                          class="feature-contain"
+        const rowClasses = [
+          `feature-${side}`,
+          it.altBg ? 'feature-alt' : '',
+          it.mediaWide ? 'feature-media-lg' : ''
+        ].filter(Boolean).join(' ');
+
+        // Bloque Media
+        let MediaBlock;
+        if(isCarousel){
+          // Carrusel: ratio fijo; cada slide su propia <picture>
+          // Serializamos las imágenes como data para el JS (dataset)
+          const carouselId = `carousel-${i}-${Math.random().toString(36).slice(2,9)}`;
+          const autoplayMs = it.autoplayMs && it.autoplayMs > 900 ? it.autoplayMs : 4500;
+          const pauseOnHover = it.pauseOnHover !== false; // true por defecto
+
+          MediaBlock = (
+            <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
+              <div
+                class="feature-media-inner carousel-root"
+                data-carousel
+                data-id={carouselId}
+                data-count={it.carouselImages?.length || 0}
+                data-autoplay={String(autoplayMs)}
+                data-pause-hover={String(pauseOnHover)}
+                style={`aspect-ratio:${width}/${height};`}
+              >
+                <div class="carousel-track" aria-live="polite">
+                  {
+                    (it.carouselImages || []).map((imgObj, idx) => {
+                      const light2 = imgObj.light;
+                      const dark2  = imgObj.dark;
+                      const alt2   = imgObj.alt;
+                      const w2     = imgObj.width || width;
+                      const h2     = imgObj.height || height;
+                      const lightWebp2 = light2 && light2.match(/\.(png|jpg|jpeg)$/i)
+                        ? light2.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
+                      const darkWebp2 = dark2 && dark2.match(/\.(png|jpg|jpeg)$/i)
+                        ? dark2.replace(/\.(png|jpg|jpeg)$/i,'.webp') : '';
+
+                      return (
+                        <div
+                          class={`carousel-slide ${idx===0?'is-active':''}`}
+                          role="group"
+                          aria-roledescription="slide"
+                          aria-label={`${idx+1} de ${(it.carouselImages||[]).length}`}
+                          data-index={idx}
+                        >
+                          {
+                            dark2 || light2
+                              ? <>
+                                  {/* Variante claro */}
+                                  <picture class="theme-light">
+                                    {lightWebp2 && <source srcset={lightWebp2} type="image/webp" />}
+                                    {light2 && <img
+                                      src={light2}
+                                      alt={alt2}
+                                      loading={idx===0 ? "eager" : "lazy"}
+                                      decoding="async"
+                                      width={w2}
+                                      height={h2}
+                                      sizes={sizeAttr}
+                                      class="feature-contain theme-light"
+                                    />}
+                                  </picture>
+                                  {/* Variante oscuro (si existe) */}
+                                  {dark2 && (
+                                    <picture class="theme-dark">
+                                      {darkWebp2 && <source srcset={darkWebp2} type="image/webp" />}
+                                      <img
+                                        src={dark2}
+                                        alt={alt2}
+                                        loading="lazy"
+                                        decoding="async"
+                                        width={w2}
+                                        height={h2}
+                                        sizes={sizeAttr}
+                                        class="feature-contain theme-dark"
+                                      />
+                                    </picture>
+                                  )}
+                                </>
+                              : null
+                          }
+                        </div>
+                      );
+                    })
+                  }
+                </div>
+
+                <div class="carousel-ui" aria-label="Controles carrusel">
+                  <button
+                    type="button"
+                    class="carousel-btn prev"
+                    aria-label="Anterior"
+                    data-carousel-prev
+                  >‹</button>
+                  <button
+                    type="button"
+                    class="carousel-btn next"
+                    aria-label="Siguiente"
+                    data-carousel-next
+                  >›</button>
+                  <div class="carousel-dots" role="tablist">
+                    {
+                      (it.carouselImages || []).map((_, idx) => (
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={idx===0 ? "true":"false"}
+                          aria-label={`Mostrar imagen ${idx+1}`}
+                          class={`carousel-dot ${idx===0?'is-active':''}`}
+                          data-carousel-dot
+                          data-index={idx}
                         />
-                      </picture>
-                    : null
-                  )
-              }
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        );
+          );
+        } else {
+          // Modo estándar (1 imagen con posibles variantes tema)
+          const inner = hasThemeVariants
+            ? <>
+                <picture class="theme-light">
+                  {lightWebp && <source srcset={lightWebp} type="image/webp" />}
+                  {lightSrc && <img
+                      src={lightSrc}
+                      alt={it.alt}
+                      loading="lazy"
+                      decoding="async"
+                      width={width}
+                      height={height}
+                      sizes={sizeAttr}
+                      class="feature-contain theme-light"
+                    />}
+                </picture>
+                <picture class="theme-dark">
+                  {darkWebp && <source srcset={darkWebp} type="image/webp" />}
+                  {darkSrc && <img
+                      src={darkSrc}
+                      alt={it.alt}
+                      loading="lazy"
+                      decoding="async"
+                      width={width}
+                      height={height}
+                      sizes={sizeAttr}
+                      class="feature-contain theme-dark"
+                    />}
+                </picture>
+              </>
+            : (lightSrc
+                ? <picture>
+                    {lightWebp && <source srcset={lightWebp} type="image/webp" />}
+                    <img
+                      src={lightSrc}
+                      alt={it.alt}
+                      loading="lazy"
+                      decoding="async"
+                      width={width}
+                      height={height}
+                      sizes={sizeAttr}
+                      class="feature-contain"
+                    />
+                  </picture>
+                : null
+              );
+
+          MediaBlock = (
+            <div class="feature-media reveal" data-reveal data-anim={mediaAnim} data-stagger={mediaFirst ? "0" : "1"} style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}>
+              <div class="feature-media-inner dynamic-ratio" data-zoomable style={`aspect-ratio:${width}/${height};`}>
+                {inner}
+              </div>
+            </div>
+          );
+        }
 
         const ContentBlock = (
           <div class="feature-content reveal" data-reveal data-anim={contentAnim} data-stagger={mediaFirst ? "1" : "0"} style={mediaFirst ? "--stagger-delay:.14s;" : "--stagger-delay:0s;"}>
@@ -125,13 +269,12 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('[data-reveal]');
-  const containers = document.querySelectorAll('.feature-media-inner.dynamic-ratio');
+  const dynamicRatioContainers = document.querySelectorAll('.feature-media-inner.dynamic-ratio');
 
   function visibleImageIn(container){
     const imgs = Array.from(container.querySelectorAll('img'));
     return imgs.find(img => getComputedStyle(img).display !== 'none') || imgs[0] || null;
   }
-
   function applyRatio(container){
     const img = visibleImageIn(container);
     if (!img) return;
@@ -139,13 +282,11 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
     const h = img.naturalHeight;
     if (w && h) container.style.aspectRatio = `${w}/${h}`;
   }
-
   function applyRatioAll(){
-    containers.forEach(c => applyRatio(c));
+    dynamicRatioContainers.forEach(c => applyRatio(c));
   }
 
-  // Cuando cargue cualquier imagen, ajustar el ratio del contenedor
-  containers.forEach(c => {
+  dynamicRatioContainers.forEach(c => {
     const imgs = c.querySelectorAll('img');
     imgs.forEach(img => {
       if (img.complete) applyRatio(c);
@@ -153,7 +294,7 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
     });
   });
 
-  // Recalcular cuando cambia el tema (clase dark-theme en html/body)
+  // Tema cambia -> recalcular
   const mo = new MutationObserver(applyRatioAll);
   mo.observe(document.documentElement, { attributes:true, attributeFilter:['class'] });
   if (document.body) mo.observe(document.body, { attributes:true, attributeFilter:['class'] });
@@ -178,7 +319,6 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
     overlay.className = 'fs-overlay';
     document.body.appendChild(overlay);
   }
-
   function openZoom(src, alt) {
     if (!src) return;
     overlay.innerHTML = '';
@@ -187,7 +327,6 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
     overlay.appendChild(img);
     overlay.classList.add('is-open');
     document.body.classList.add('fs-zoom-active');
-
     const close = () => {
       overlay.classList.remove('is-open');
       document.body.classList.remove('fs-zoom-active');
@@ -195,22 +334,135 @@ const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in"
       document.removeEventListener('keydown', onEsc);
     };
     const onEsc = (ev) => { if (ev.key === 'Escape') close(); };
-
     overlay.addEventListener('click', close);
     document.addEventListener('keydown', onEsc);
   }
-
   if (mqMobile.matches) {
     document.addEventListener('click', (ev) => {
       const target = ev.target;
       const container = target && target.closest ? target.closest('.feature-media-inner[data-zoomable]') : null;
       if (!container) return;
-      const img = visibleImageIn(container);
+      const img = target.closest('img') || visibleImageIn(container);
       if (!img) return;
       ev.preventDefault();
       ev.stopPropagation();
       openZoom(img.currentSrc || img.src, img.alt || '');
     }, { passive: false });
   }
+
+  // Carrusel JS
+  const carousels = document.querySelectorAll('.carousel-root[data-carousel]');
+  carousels.forEach(root => {
+    const track = root.querySelector('.carousel-track');
+    if(!track) return;
+    const slides = Array.from(track.querySelectorAll('.carousel-slide'));
+    if(!slides.length) return;
+
+    const dotsWrap = root.querySelector('.carousel-dots');
+    const dots = dotsWrap ? Array.from(dotsWrap.querySelectorAll('[data-carousel-dot]')) : [];
+    const btnPrev = root.querySelector('[data-carousel-prev]');
+    const btnNext = root.querySelector('[data-carousel-next]');
+
+    let index = 0;
+    const AUTOPLAY = parseInt(root.getAttribute('data-autoplay')||'4500',10);
+    const PAUSE_HOVER = root.getAttribute('data-pause-hover') === 'true';
+    let timer = null;
+    let isPaused = false;
+
+    function setActive(newIdx){
+      if(newIdx < 0) newIdx = slides.length - 1;
+      if(newIdx >= slides.length) newIdx = 0;
+      slides.forEach((s,i)=>{
+        s.classList.toggle('is-active', i===newIdx);
+      });
+      dots.forEach((d,i)=>{
+        d.classList.toggle('is-active', i===newIdx);
+        d.setAttribute('aria-selected', i===newIdx ? 'true':'false');
+        d.tabIndex = i===newIdx ? 0 : -1;
+      });
+      index = newIdx;
+    }
+
+    function next(){ setActive(index+1); }
+    function prev(){ setActive(index-1); }
+
+    function startAutoplay(){
+      if(reduce) return;
+      stopAutoplay();
+      timer = setInterval(()=>{
+        if(!isPaused) next();
+      }, AUTOPLAY);
+    }
+    function stopAutoplay(){
+      if(timer){ clearInterval(timer); timer = null; }
+    }
+
+    // Dots
+    dots.forEach(d=>{
+      d.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const idx = parseInt(d.getAttribute('data-index')||'0',10);
+        setActive(idx);
+      });
+      d.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          d.click();
+        } else if(e.key==='ArrowRight'){
+          e.preventDefault();
+          setActive(index+1);
+          dots[index].focus();
+        } else if(e.key==='ArrowLeft'){
+          e.preventDefault();
+          setActive(index-1);
+          dots[index].focus();
+        } else if(e.key==='Home'){
+          e.preventDefault();
+          setActive(0);
+          dots[0].focus();
+        } else if(e.key==='End'){
+          e.preventDefault();
+          setActive(slides.length-1);
+          dots[slides.length-1].focus();
+        }
+      });
+    });
+
+    // Prev/Next
+    btnPrev?.addEventListener('click', (e)=>{ e.preventDefault(); prev(); });
+    btnNext?.addEventListener('click', (e)=>{ e.preventDefault(); next(); });
+
+    // Hover Pause
+    if(PAUSE_HOVER){
+      root.addEventListener('mouseenter', ()=>{ isPaused = true; });
+      root.addEventListener('mouseleave', ()=>{ isPaused = false; });
+    }
+
+    // Focus pause (al interactuar con controles)
+    root.addEventListener('focusin', ()=>{ isPaused = true; });
+    root.addEventListener('focusout', ()=>{ isPaused = false; });
+
+    // Touch swipe básica
+    let startX = 0;
+    let isTouching = false;
+    root.addEventListener('touchstart', (e)=>{
+      if(e.touches.length===1){
+        startX = e.touches[0].clientX;
+        isTouching = true;
+      }
+    }, {passive:true});
+    root.addEventListener('touchend', (e)=>{
+      if(!isTouching) return;
+      const endX = e.changedTouches[0].clientX;
+      const diff = endX - startX;
+      if(Math.abs(diff) > 40){
+        if(diff < 0) next(); else prev();
+      }
+      isTouching = false;
+    }, {passive:true});
+
+    setActive(0);
+    startAutoplay();
+  });
 })();
 </script>

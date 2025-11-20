@@ -139,6 +139,9 @@ const jsonLdHead = JSON.stringify([
     </script>
   </head>
   <body>
+    <!-- Skip link accesible -->
+    <a href="#inicio" class="skip-link">Saltar al contenido</a>
+
     <header class="site-header" role="banner">
       <div class="container header-inner">
         <a href="/" class="brand" aria-label="Inicio - TePeuVe">
@@ -162,7 +165,7 @@ const jsonLdHead = JSON.stringify([
       </div>
     </header>
 
-    <main id="inicio">
+    <main id="inicio" tabindex="-1">
       <slot />
     </main>
 
@@ -198,7 +201,6 @@ const jsonLdHead = JSON.stringify([
               return;
             }
             if (entry.isIntersecting && card.dataset.animating !== '1') {
-              card.dataset.animinating = '1';
               card.dataset.animating = '1';
               card.classList.add('card-auto-hover');
               if (card._hoverTimer) { clearTimeout(card._hoverTimer); }
