@@ -1,0 +1,114 @@
+/* Intro Splash con explosión y doble mensaje */
+.intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 40% 30%, rgba(232,202,166,0.35), rgba(232,202,166,0.12) 46%, rgba(232,202,166,0.05) 70%), #fff;
+  color: #0F172A;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  padding: 32px 28px;
+  overflow: hidden;
+  transition: opacity .55s ease, transform .55s cubic-bezier(.25,.9,.25,1);
+}
+
+.dark-theme .intro-splash,
+.intro-splash.intro-theme-dark {
+  background: radial-gradient(circle at 40% 30%, rgba(91,156,255,0.28), rgba(91,156,255,0.14) 46%, rgba(91,156,255,0.06) 70%), #0b0f19;
+  color: #ffffff;
+}
+
+.intro-splash.intro-theme-auto.dark-theme {
+  background: radial-gradient(circle at 40% 30%, rgba(91,156,255,0.28), rgba(91,156,255,0.14) 46%, rgba(91,156,255,0.06) 70%), #0b0f19;
+  color: #ffffff;
+}
+
+.intro-inner {
+  max-width: 680px;
+  text-align: center;
+  position: relative;
+}
+
+.intro-type {
+  font-size: clamp(22px, 5vw, 36px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin: 0 0 18px;
+  min-height: 1.2em;
+  white-space: pre-wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.intro-phase-2 {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .6s ease .05s, transform .6s cubic-bezier(.22,.8,.22,1) .05s;
+}
+.intro-phase-2.intro-second-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Botón Saltar */
+.intro-skip-btn {
+  background: linear-gradient(135deg,var(--primary,#e8caa6), var(--primary-2,#d4b088));
+  color: #0F172A;
+  font-weight: 700;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-display, "Space Grotesk", sans-serif);
+  font-size: 14px;
+  box-shadow: 0 8px 28px rgba(2,6,23,.08);
+  transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+  position: relative;
+  z-index: 3;
+}
+.intro-skip-btn:hover { transform: translateY(-2px); }
+.intro-skip-btn:active { transform: translateY(0); }
+
+.dark-theme .intro-skip-btn {
+  background: linear-gradient(135deg,var(--primary,#5b9cff), var(--primary-2,#7fb3ff));
+  color: #06121d;
+  border-color: rgba(255,255,255,0.12);
+}
+
+.intro-skip-btn:focus-visible {
+  outline: 2px solid var(--primary,#e8caa6);
+  outline-offset: 3px;
+}
+
+/* Explosión del primer texto */
+.intro-explode .intro-phase-1 {
+  animation: introExplode .68s cubic-bezier(.25,.9,.25,1) forwards;
+}
+@keyframes introExplode {
+  0%   { opacity: 1; transform: scale(1);   filter: blur(0); }
+  35%  { opacity: .9; transform: scale(1.08); filter: blur(.5px); }
+  55%  { opacity: .6; transform: scale(1.18); filter: blur(2px); }
+  75%  { opacity: .25; transform: scale(1.35); filter: blur(6px); }
+  100% { opacity: 0; transform: scale(1.6);  filter: blur(12px); }
+}
+
+/* Ocultando final */
+.intro-splash.intro-hide {
+  opacity: 0;
+  transform: scale(.98);
+  pointer-events: none;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .intro-splash,
+  .intro-phase-2 {
+    transition: none;
+  }
+  .intro-explode .intro-phase-1 {
+    animation: none;
+  }
+}

@@ -1,5 +1,7 @@
 ---
 import "@styles/global.css";
+import "@styles/intro-splash.css";
+import IntroSplash from "@components/IntroSplash.astro";
 import ThemeToggle from '@components/ThemeToggle.astro';
 import CookieConsent from '@components/CookieConsent.astro';
 import SiteFooter from '@components/SiteFooter.astro';
@@ -134,6 +136,18 @@ const jsonLdHead = JSON.stringify([
   </head>
   <body>
     <a href="#inicio" class="skip-link">Saltar al contenido</a>
+    
+    <!-- Pantalla de introducción -->
+    <IntroSplash
+      firstMessage="Bienvenido al TPV del futuro..."
+      secondMessage="Te presentamos TePeuVe"
+      secondTypewriter={true}
+      oncePerSession={false}
+      theme="auto"
+      durationMultiplier={1}
+      explodeDelay={620}
+      explodeDuration={680}
+    />
 
     <header class="site-header" role="banner">
       <div class="container header-inner">

@@ -1,0 +1,180 @@
+---
+/**
+ * IntroSplash.astro (versión con doble mensaje y efecto “explosión”)
+ *
+ * Props:
+ *  firstMessage: string          Mensaje inicial (typewriter)
+ *  secondMessage: string         Mensaje posterior tras explosión
+ *  secondTypewriter?: boolean    Si el segundo mensaje también se escribe carácter a carácter
+ *  oncePerSession?: boolean
+ *  theme?: 'light' | 'dark' | 'auto'
+ *  durationMultiplier?: number   Escala la velocidad de typewriter (1 = base)
+ *  explodeDelay?: number         Ms desde fin del primer typewriter hasta iniciar explosión
+ *  explodeDuration?: number      Ms de la animación de explosión
+ *
+ */
+
+
+interface Props {
+  firstMessage?: string;
+  secondMessage?: string;
+  secondTypewriter?: boolean;
+  oncePerSession?: boolean;
+  theme?: 'light' | 'dark' | 'auto';
+  durationMultiplier?: number;
+  explodeDelay?: number;
+  explodeDuration?: number;
+}
+
+const {
+  firstMessage = "Preparando tu experiencia...",
+  secondMessage = "Te presentamos TePeuVe",
+  secondTypewriter = true,
+  oncePerSession = true,
+  theme = 'auto',
+  durationMultiplier = 1,
+  explodeDelay = 420,
+  explodeDuration = 680
+} = Astro.props as Props;
+---
+
+<div
+  id="intro-splash"
+  class={`intro-splash intro-theme-${theme}`}
+  data-once={String(oncePerSession)}
+  data-speed={String(durationMultiplier)}
+  data-explode-delay={String(explodeDelay)}
+  data-explode-duration={String(explodeDuration)}
+  data-second-typewriter={String(secondTypewriter)}
+  aria-hidden="true"
+>
+  <div class="intro-inner">
+    <p class="intro-type intro-phase-1" data-text={firstMessage}></p>
+    <p class="intro-type intro-phase-2" data-text2={secondMessage} hidden></p>
+    <button type="button" class="intro-skip-btn" aria-label="Saltar introducción" data-intro-skip>Saltar</button>
+  </div>
+</div>
+
+<script is:inline>
+(() => {
+  const root = document.getElementById('intro-splash');
+  if(!root) return;
+
+  const once = root.getAttribute('data-once') === 'true';
+  const key = 'tpv_intro_seen_v2';
+  if (once && localStorage.getItem(key)) {
+    root.style.display = 'none';
+    return;
+  }
+
+  const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const speedMult = parseFloat(root.getAttribute('data-speed') || '1') || 1;
+  const explodeDelay = parseInt(root.getAttribute('data-explode-delay') || '420', 10);
+  const explodeDuration = parseInt(root.getAttribute('data-explode-duration') || '680', 10);
+  const secondTypewriter = root.getAttribute('data-second-typewriter') === 'true';
+
+  const phase1El = root.querySelector('.intro-type.intro-phase-1');
+  const phase2El = root.querySelector('.intro-type.intro-phase-2');
+  const skipBtn = root.querySelector('[data-intro-skip]');
+
+  const firstText = phase1El?.getAttribute('data-text') || '';
+  const secondText = phase2El?.getAttribute('data-text2') || '';
+
+  // Timings
+  const CHAR_INTERVAL = 42 / speedMult;
+  const END_DELAY_SECOND = 520 / speedMult;
+
+  let i1 = 0;
+  let i2 = 0;
+  let t1 = null;
+  let t2 = null;
+  let finished = false;
+
+  function finishIntro() {
+    if (finished) return;
+    finished = true;
+    if (once) {
+      try { localStorage.setItem(key, '1'); } catch {}
+    }
+    root.classList.add('intro-hide');
+    setTimeout(() => root.remove(), 650);
+  }
+
+  function typeFirst() {
+    if (!phase1El) return triggerExplosion();
+    if (i1 < firstText.length) {
+      phase1El.textContent = firstText.slice(0, i1 + 1);
+      i1++;
+      t1 = setTimeout(typeFirst, CHAR_INTERVAL);
+    } else {
+      setTimeout(triggerExplosion, explodeDelay);
+    }
+  }
+
+  function triggerExplosion() {
+    if (!phase1El) return showSecond();
+    root.classList.add('intro-explode');
+    setTimeout(() => {
+      phase1El.hidden = true;
+      showSecond();
+    }, explodeDuration);
+  }
+
+  function showSecond() {
+    if (!phase2El) return finishIntro();
+    phase2El.hidden = false;
+    phase2El.classList.add('intro-second-visible');
+
+    if (prefersReduce || !secondTypewriter) {
+      phase2El.textContent = secondText;
+      setTimeout(finishIntro, END_DELAY_SECOND);
+    } else {
+      typeSecond();
+    }
+  }
+
+  function typeSecond() {
+    if (!phase2El) return finishIntro();
+    if (i2 < secondText.length) {
+      phase2El.textContent = secondText.slice(0, i2 + 1);
+      i2++;
+      t2 = setTimeout(typeSecond, CHAR_INTERVAL);
+    } else {
+      setTimeout(finishIntro, END_DELAY_SECOND);
+    }
+  }
+
+  function manualSkip() {
+    if (t1) clearTimeout(t1);
+    if (t2) clearTimeout(t2);
+    finishIntro();
+  }
+
+  skipBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    manualSkip();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (finished) return;
+    if (['Escape', 'Enter', 'Tab', ' '].includes(e.key)) manualSkip();
+  }, { passive: true });
+
+  document.addEventListener('click', (e) => {
+    if (finished) return;
+    // Si prefieres que solo el botón salte, comenta la siguiente línea:
+    manualSkip();
+  }, { passive: true });
+
+  if (prefersReduce) {
+    if (phase1El) phase1El.textContent = firstText;
+    if (phase2El) {
+      phase2El.hidden = false;
+      phase2El.textContent = secondText;
+    }
+    setTimeout(finishIntro, 400);
+  } else {
+    requestAnimationFrame(typeFirst);
+  }
+})();
+</script>
