@@ -567,3 +567,27 @@ input:focus, textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px 
   text-decoration:underline;
 }
 .dark-theme .breadcrumbs a { color:var(--text); }
+
+/* Centrado de grupos exactos de 3 cards */
+.cards.cards-3 {
+  /* Tres columnas iguales */
+  grid-template-columns: repeat(3, 1fr);
+  /* Limita el ancho total a la suma “visual” de 3 cards + 2 gaps para que no queden pegadas a los lados */
+  max-width: 840px; /* Ajusta si quieres más o menos ancho */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mantiene tus breakpoints originales: pasa a 2 columnas y luego a 1 */
+@media (max-width: 1024px) {
+  .cards.cards-3 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 560px; /* Opcional: 2*260 + gap aprox */
+  }
+}
+@media (max-width: 560px) {
+  .cards.cards-3 {
+    grid-template-columns: 1fr;
+    max-width: 420px; /* Opcional, puedes quitarlo */
+  }
+}
