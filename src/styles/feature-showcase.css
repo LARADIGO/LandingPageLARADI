@@ -405,3 +405,110 @@ body.fs-zoom-active {
 .dark-theme .carousel-btn {
   color:#081121;
 }
+
+/* Permitir gestos de zoom (por si otros estilos futuros añaden touch-action). */
+html, body {
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+/* El overlay antes bloqueaba pinch con touch-action:none */
+body.fs-zoom-active {
+  overflow: hidden;
+  /* Permitimos desplazamiento y pinch dentro del overlay */
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+/* Botón fullscreen distintivo */
+.carousel-btn.fullscreen {
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  font-size: 15px;
+  font-weight:600;
+}
+.carousel-btn.fullscreen:hover {
+  filter:none;
+  background: rgba(0,0,0,.75);
+  transform:translateY(-2px);
+}
+.dark-theme .carousel-btn.fullscreen {
+  background: rgba(255,255,255,.22);
+  color:#fff;
+}
+.dark-theme .carousel-btn.fullscreen:hover {
+  background: rgba(255,255,255,.38);
+}
+
+/* Overlay fullscreen reutilizado */
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,14,22,.78);
+  padding: clamp(8px, 4vw, 32px);
+  backdrop-filter: blur(4px) saturate(1.2);
+  -webkit-backdrop-filter: blur(4px) saturate(1.2);
+}
+.fs-overlay.is-open { display: flex; animation: fs-fade .25s ease; }
+@keyframes fs-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.fs-overlay img {
+  max-width: 92vw;
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 24px 90px rgba(0,0,0,.50),
+    0 12px 34px rgba(0,0,0,.40);
+}
+
+.fs-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.fs-btn {
+  background: rgba(0,0,0,.55);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.25);
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  font-size:20px;
+  font-weight:600;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: background .25s ease, transform .25s ease;
+}
+.fs-btn:hover { background: rgba(0,0,0,.75); transform:translateY(-2px); }
+.fs-btn:active { transform:translateY(0); }
+.fs-btn:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:3px;
+}
+
+@media (max-width:680px){
+  .fs-controls {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+  }
+  .fs-btn {
+    width:38px;
+    height:38px;
+    font-size:18px;
+  }
+}

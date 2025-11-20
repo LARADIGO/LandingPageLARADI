@@ -13,14 +13,12 @@ const {
 
 const contactEndpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || "";
 
-// SEO helpers
 const origin = Astro.url.origin;
 const canonicalUrl = origin + Astro.url.pathname;
 const ogImageUrl = new URL(image, origin).href;
 const logoUrl = new URL('/logo.png', origin).href;
 const siteName = 'TePeuVe';
 
-// JSON-LD (serializado previamente y volcado con set:html)
 const jsonLdHead = JSON.stringify([
   {
     "@context":"https://schema.org",
@@ -47,7 +45,7 @@ const jsonLdHead = JSON.stringify([
     "name":"TePeuVe TPV",
     "applicationCategory":"BusinessApplication",
     "operatingSystem":"Web",
-    "offers": {
+      "offers": {
       "@type":"Offer",
       "price":"9.90",
       "priceCurrency":"EUR"
@@ -58,8 +56,9 @@ const jsonLdHead = JSON.stringify([
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <!-- Cambiado: permitimos zoom (quitado user-scalable=no y máximo estricto) -->
     <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+          content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
@@ -67,7 +66,6 @@ const jsonLdHead = JSON.stringify([
     <link rel="alternate" href={canonicalUrl} hreflang="es" />
     <link rel="alternate" href={canonicalUrl} hreflang="x-default" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:site_name" content={siteName} />
@@ -80,7 +78,6 @@ const jsonLdHead = JSON.stringify([
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="TePeuVe - TPV para tu tienda" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -88,14 +85,12 @@ const jsonLdHead = JSON.stringify([
 
     <meta name="theme-color" content="#ffffff" />
 
-    <!-- Favicon / App Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="mask-icon" href="/logo.svg" color="#e8caa6" />
 
-    <!-- DNS + Preconnect -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -109,7 +104,6 @@ const jsonLdHead = JSON.stringify([
       rel="stylesheet"
     />
 
-    <!-- JSON-LD inyectado como texto plano -->
     <script type="application/ld+json" is:inline set:html={jsonLdHead}></script>
 
     <script is:inline>
@@ -139,7 +133,6 @@ const jsonLdHead = JSON.stringify([
     </script>
   </head>
   <body>
-    <!-- Skip link accesible -->
     <a href="#inicio" class="skip-link">Saltar al contenido</a>
 
     <header class="site-header" role="banner">
