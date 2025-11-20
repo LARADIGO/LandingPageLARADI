@@ -68,16 +68,40 @@ const initialStatusClass = errCode ? 'status-error' : '';
     defer={true}
     items={[
       {
-        title:"Escoge entre Modo Claro / Modo Oscuro",
-        text:"Opta por el modo que mejor se adapte a ti.",
-        img:"/assets/features/claro_oscuro.png",
-        alt:"Pantalla de venta rápida",
+        title:"Personalización Total de TePeuVe",
+        text:"Adapta TePeuVe a tu forma de trabajar. Elige entre modo claro u oscuro, configura atajos de teclado para agilizar tareas y ajusta cada función del sistema según las necesidades de tu negocio. Activa tu programa de fidelización, personaliza permisos y selecciona entre varios diseños de interfaz. Un TPV completamente configurable para que tu comercio trabaje más rápido, mejor y a tu manera.",
+        carousel: true,
+        carouselImages: [
+          {
+            light: "/assets/features/claro_oscuro.png",
+            dark: "/assets/features/claro_oscuro.png",
+            alt: "Ajustes de Venta"
+          },
+          {
+            light: "/assets/features/ajustes.png",
+            dark: "/assets/features/ajustes_oscuro.png",
+            alt: "Ajustes de Venta"
+          },
+          {
+            light: "/assets/features/ajustes2.png",
+            dark: "/assets/features/ajustes_oscuro2.png",
+            alt: "Ajustes de Venta"
+          },
+          {
+            light: "/assets/features/fidelizacion.png",
+            dark: "/assets/features/fidelizacion_oscuro.png",
+            alt: "Ajustes de Venta"
+          },
+        ],
+        alt:"Ajustes de Venta",
         mediaAnim:"zoom-in",
         contentAnim:"slide-left",
-        altBg:false,
+        altBg:true,
         mediaWide: true,
         width: 1240,
-        height: 760
+        height: 760,
+        autoplayMs: 4500,
+        pauseOnHover: true
       },
       {
         title:"Gestión de Caja y Control de Efectivo",
@@ -100,7 +124,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
             alt: "Operativa de Caja"
           },
         ],
-        alt:"Gestión de empleados",
+        alt:"Operativa de Caja",
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
         altBg:true,
