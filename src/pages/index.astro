@@ -80,30 +80,61 @@ const initialStatusClass = errCode ? 'status-error' : '';
         height: 760
       },
       {
-        title:"Arqueo de Caja",
-        text:"Realizalo de forma rápida e intuitiva y no dejes que nada se te escape.",
-        imgLight:"/assets/features/arqueo_caja.png",
-        imgDark:"/assets/features/arqueo_caja_oscuro.png",
-        alt:"Gestión de inventario",
+        title:"Gestión de Caja y Control de Efectivo",
+        text:"TePeuVe facilita el control completo de la caja registrando automáticamente todas las transacciones del día. Permite un arqueo de caja rápido e intuitivo. Además, el sistema es compatible con cajones portamonedas automáticos, permitiendo abrir el cajón en cada pago en efectivo de forma instantánea y segura. Un control de caja eficiente para cualquier comercio que necesite un TPV ágil y fiable.",
+        carousel: true,
+        carouselImages: [
+          {
+            light: "/assets/features/arqueo_caja.png",
+            dark: "/assets/features/arqueo_caja_oscuro.png",
+            alt: "Operativa de Caja"
+          },
+          {
+            light: "/assets/features/arqueo_caja2.png",
+            dark: "/assets/features/arqueo_caja_oscuro2.png",
+            alt: "Operativa de Caja"
+          },
+          {
+            light: "/assets/features/arqueo_caja3.png",
+            dark: "/assets/features/arqueo_caja_oscuro3.png",
+            alt: "Operativa de Caja"
+          },
+        ],
+        alt:"Gestión de empleados",
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
         altBg:true,
         mediaWide: true,
         width: 1240,
-        height: 760
+        height: 760,
+        autoplayMs: 4500,
+        pauseOnHover: true
       },
       {
-        title:"Gestiona y Personaliza Empleados",
-        text:"Personaliza cada empleado con avatares o fotos reales.",
-        imgLight:"/assets/features/empleados.png",
-        imgDark:"/assets/features/empleados_oscuro.png",
+        title:"Gestión de Empleados y Roles 100% Personalizada",
+        text:"Crea y gestiona fácilmente a tus empleados en TePeuVe. Asigna a cada trabajador su propio usuario, registra sus ventas y controla permisos mediante roles personalizados. Activa acceso seguro con PIN, elige entre múltiples avatares o sube una foto personalizada para identificar cada perfil. Una gestión rápida, segura y perfecta para cualquier comercio que necesite un TPV profesional.",
+        carousel: true,
+        carouselImages: [
+          {
+            light: "/assets/features/empleados.png",
+            dark: "/assets/features/empleados_oscuro.png",
+            alt: "Gestión de empleados"
+          },
+          {
+            light: "/assets/features/empleados2.png",
+            dark: "/assets/features/empleados_oscuro2.png",
+            alt: "Gestión de empleados"
+          },
+        ],
         alt:"Gestión de empleados",
         mediaAnim:"rotate-in",
         contentAnim:"lift-in",
-        altBg:false,
+        altBg:true,
         mediaWide: true,
         width: 1240,
-        height: 760
+        height: 760,
+        autoplayMs: 4500,
+        pauseOnHover: true
       },
       {
         title:"Informes claros y Personalizables",
@@ -118,17 +149,17 @@ const initialStatusClass = errCode ? 'status-error' : '';
           {
             light: "/assets/features/informes2.png",
             dark: "/assets/features/informes_oscuro2.png",
-            alt: "Gestión de empleados"
+            alt: "Dashboard de informes"
           },
           {
             light: "/assets/features/informes3.png",
             dark: "/assets/features/informes_oscuro3.png",
-            alt: "Gestión de empleados"
+            alt: "Dashboard de informes"
           },
           {
             light: "/assets/features/informes4.png",
             dark: "/assets/features/informes_oscuro4.png",
-            alt: "Gestión de empleados"
+            alt: "Dashboard de informes"
           },
         ],
         alt:"Informes y analítica",
