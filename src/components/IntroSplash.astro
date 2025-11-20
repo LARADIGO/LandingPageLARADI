@@ -86,6 +86,7 @@ interface Props {
   backgroundFinalOpacity?: number;
 
   splashFontPreset?: 'tech' | 'mono' | 'stencil';
+  skipEnabled?: boolean;
 }
 
 const {
@@ -122,7 +123,8 @@ const {
   backgroundFadeDuration = 3200,
   backgroundFinalOpacity = 0.2,
 
-  splashFontPreset = 'tech'
+  splashFontPreset = 'tech',
+  skipEnabled = true
 } = Astro.props as Props;
 ---
 
@@ -155,12 +157,17 @@ const {
   data-bg-fade-delay={String(backgroundFadeDelay)}
   data-bg-fade-duration={String(backgroundFadeDuration)}
   data-bg-final-opacity={String(backgroundFinalOpacity)}
+  data-skip-enabled={String(skipEnabled)}
   aria-hidden="true"
 >
   <div class="intro-inner">
     <p class="intro-type intro-phase-1" data-text={firstMessage}></p>
     <p class="intro-type intro-phase-2" data-text2={secondMessage} hidden></p>
-    <button type="button" class="intro-skip-btn" aria-label="Saltar introducción" data-intro-skip>Saltar</button>
+    {skipEnabled && (
+      <button type="button" class="intro-skip-btn" aria-label="Saltar introducción" data-intro-skip>
+        Saltar
+      </button>
+    )}
   </div>
 </div>
 
@@ -181,7 +188,8 @@ const {
   };
 
   const once = getBool('data-once', false);
-  const key = 'tpv_intro_seen_v6';
+  const skipEnabled = getBool('data-skip-enabled', true);
+  const key = 'tpv_intro_seen_v7';
   if (once && localStorage.getItem(key)) {
     root.style.display = 'none';
     return;
@@ -215,7 +223,7 @@ const {
   const fwTrailFactor = getNum('data-fw-trail-factor', 1.05);
   const fwTrailFadeExtra = getNum('data-fw-trail-fade-extra', 300);
 
-  // Fondo: nuevos parámetros
+  // Fondo
   const bgFadeDelay = getNum('data-bg-fade-delay', 1200);
   const bgFadeDuration = getNum('data-bg-fade-duration', 3200);
   const bgFinalOpacityRaw = parseFloat(root.getAttribute('data-bg-final-opacity') || '0');
@@ -237,18 +245,42 @@ const {
   let i1 = 0, i2 = 0;
   let t1 = null, t2 = null;
   let finished = false, explosionTriggered = false, fireworksTriggered = false;
+  let fireworksFinishTimer = null;
+
+  function clearTimers() {
+    if (t1) clearTimeout(t1);
+    if (t2) clearTimeout(t2);
+    if (fireworksFinishTimer) clearTimeout(fireworksFinishTimer);
+  }
+
+  function detachInteractions() {
+    document.removeEventListener('keydown', onKeydown, passiveOpt);
+    if (skipBtn) skipBtn.removeEventListener('click', onSkipClick);
+    // Si reactivas click global, elimina aquí su listener.
+  }
 
   function finishIntro() {
     if (finished) return;
     finished = true;
+    clearTimers();
+    detachInteractions();
     if (once) { try { localStorage.setItem(key, '1'); } catch {} }
+
+    // Limpieza de partículas / fireworks si existen
+    const particles = inner.querySelector('.intro-particles');
+    const fireworks = inner.querySelector('.intro-fireworks');
+    if (particles) particles.remove();
+    if (fireworks) fireworks.remove();
+
     root.classList.add('intro-hide');
-    setTimeout(() => root.remove(), 650);
+    setTimeout(() => {
+      root.remove();
+    }, 650);
   }
+
   function manualSkip() {
-    if (t1) clearTimeout(t1);
-    if (t2) clearTimeout(t2);
-    finished = true;
+    // No ponemos finished=true aquí para permitir finishIntro ejecutar
+    if (finished) return;
     finishIntro();
   }
 
@@ -289,6 +321,7 @@ const {
       const isSquare = Math.random() < 0.3;
       const dur = 520 + Math.random() * 820;
       const del = Math.random() * 150;
+
       p.style.left = (ox - size / 2) + 'px';
       p.style.top = (oy - size / 2) + 'px';
       p.style.width = size + 'px';
@@ -318,6 +351,7 @@ const {
     }
     root.classList.add('intro-explode');
     setTimeout(() => {
+      if (finished) return;
       phase1El.hidden = true;
       showSecond();
     }, explodeDuration);
@@ -339,7 +373,9 @@ const {
       phase2El.textContent = secondText.slice(0, i2 + 1);
       i2++;
       t2 = setTimeout(typeSecond, CHAR_INTERVAL);
-    } else scheduleFireworks();
+    } else {
+      scheduleFireworks();
+    }
   }
 
   function scheduleFireworks() {
@@ -355,8 +391,9 @@ const {
     if (fireworksTriggered || finished) return;
     fireworksTriggered = true;
 
-    // Iniciar el fade del fondo con los nuevos parámetros
+    // Programar fade del fondo
     setTimeout(() => {
+      if (finished) return;
       root.style.setProperty('--bg-fade-duration', bgFadeDuration + 'ms');
       root.style.setProperty('--bg-final-opacity', String(bgFinalOpacity));
       root.classList.add('intro-bg-fade');
@@ -394,7 +431,7 @@ const {
       }, delay);
     }
 
-    setTimeout(finishIntro, fireworksDuration);
+    fireworksFinishTimer = setTimeout(finishIntro, fireworksDuration);
   }
 
   function createBurst(container, x, y, nearCenter) {
@@ -454,15 +491,20 @@ const {
     return palette[Math.floor(Math.random() * palette.length)];
   }
 
-  skipBtn?.addEventListener('click', e => { e.stopPropagation(); manualSkip(); });
-  document.addEventListener('keydown', e => {
+  const passiveOpt = { passive: true };
+  function onSkipClick(e) {
+    e.stopPropagation();
+    manualSkip();
+  }
+  function onKeydown(e) {
     if (finished) return;
     if (['Escape','Enter','Tab',' '].includes(e.key)) manualSkip();
-  }, { passive: true });
-  document.addEventListener('click', () => {
-    if (finished) return;
-    manualSkip();
-  }, { passive: true });
+  }
+
+  if (skipEnabled && skipBtn) skipBtn.addEventListener('click', onSkipClick);
+  document.addEventListener('keydown', onKeydown, passiveOpt);
+  // Si quieres también cualquier click global para saltar, descomenta:
+  // document.addEventListener('click', manualSkip, passiveOpt);
 
   if (prefersReduce) {
     if (phase1El) phase1El.textContent = firstText;

@@ -1,34 +1,28 @@
-/* Intro Splash con explosión, fondo degradable parametrizable y fireworks con trails */
+/* intro-splash.css (fix skip + presets tipografía) */
 
-.intro-splash { --splash-font: var(--font-display, "Space Grotesk", system-ui, sans-serif); }
+.intro-splash { --splash-font: var(--font-display,"Space Grotesk",system-ui,sans-serif); }
 .intro-splash .intro-type { font-family: var(--splash-font); }
 
-/* Futurista (Orbitron/Chakra Petch) */
-.intro-splash.intro-font-tech { --splash-font: 'Orbitron','Chakra Petch','Space Grotesk',system-ui,sans-serif; }
-.intro-splash.intro-font-tech .intro-type { text-transform: uppercase; letter-spacing: .02em; }
+/* Presets */
+.intro-splash.intro-font-tech      { --splash-font:'Orbitron','Chakra Petch','Space Grotesk',system-ui,sans-serif; }
+.intro-splash.intro-font-tech .intro-type { text-transform:uppercase; letter-spacing:.02em; }
+.intro-splash.intro-font-mono      { --splash-font:'Share Tech Mono','Space Grotesk',monospace; }
+.intro-splash.intro-font-mono .intro-type { letter-spacing:.01em; }
+.intro-splash.intro-font-stencil   { --splash-font:'Saira Stencil One','Space Grotesk',system-ui,sans-serif; }
+.intro-splash.intro-font-stencil .intro-type { text-transform:uppercase; letter-spacing:.015em; }
 
-/* Cyber/Terminal (Share Tech Mono) */
-.intro-splash.intro-font-mono { --splash-font: 'Share Tech Mono','Space Grotesk',monospace; }
-.intro-splash.intro-font-mono .intro-type { letter-spacing: .01em; }
-
-/* Stencil (Saira Stencil One) */
-.intro-splash.intro-font-stencil { --splash-font: 'Saira Stencil One','Space Grotesk',system-ui,sans-serif; }
-.intro-splash.intro-font-stencil .intro-type { text-transform: uppercase; letter-spacing: .015em; }
-
-/* Fondo base via pseudo para poder degradarlo a transparente con control por CSS vars */
 .intro-splash {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: #0F172A;
-  font-family: var(--font-display,"Space Grotesk",system-ui,sans-serif);
-  padding: 32px 28px;
-  overflow: hidden;
-  transition: opacity .55s ease, transform .55s cubic-bezier(.25,.9,.25,1);
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  color:#0F172A;
+  padding:32px 28px;
+  overflow:hidden;
+  transition:opacity .55s ease, transform .55s cubic-bezier(.25,.9,.25,1);
 }
 
 .intro-splash::before {
@@ -38,41 +32,39 @@
   background: radial-gradient(circle at 40% 30%, rgba(232,202,166,0.38), rgba(232,202,166,0.14) 48%, rgba(232,202,166,0.06) 72%), #ffffff;
   z-index:0;
   opacity:1;
-  transition: opacity 0.6s ease;
 }
+
 .dark-theme .intro-splash::before,
 .intro-splash.intro-theme-dark::before,
 .intro-splash.intro-theme-auto.dark-theme::before {
   background: radial-gradient(circle at 40% 30%, rgba(91,156,255,0.35), rgba(91,156,255,0.18) 50%, rgba(91,156,255,0.08) 72%), #0b0f19;
 }
 
-/* Flash breve del fondo */
-.intro-flash { animation: introFlash .26s ease; }
+.intro-flash { animation:introFlash .26s ease; }
 @keyframes introFlash {
-  0%   { filter: brightness(1) saturate(1); }
-  45%  { filter: brightness(1.32) saturate(1.35); }
-  70%  { filter: brightness(1.15) saturate(1.15); }
-  100% { filter: brightness(1) saturate(1); }
+  0% { filter:brightness(1) saturate(1); }
+  45% { filter:brightness(1.32) saturate(1.35); }
+  70% { filter:brightness(1.15) saturate(1.15); }
+  100% { filter:brightness(1) saturate(1); }
 }
 
-/* Degradado del fondo durante fireworks (usa variables CSS) */
 .intro-bg-fade::before {
-  animation: introBgFade var(--bg-fade-duration, 2800ms) ease forwards;
+  animation:introBgFade var(--bg-fade-duration,2800ms) ease forwards;
 }
 @keyframes introBgFade {
-  0%   { opacity: 1; }
-  100% { opacity: var(--bg-final-opacity, 0); }
+  0% { opacity:1; }
+  100% { opacity:var(--bg-final-opacity,0); }
 }
 
 .intro-inner {
-  max-width: 680px;
+  max-width:680px;
   text-align:center;
   position:relative;
   z-index:2;
 }
 
 .intro-type {
-  font-size: clamp(22px,5vw,36px);
+  font-size:clamp(22px,5vw,36px);
   line-height:1.15;
   font-weight:600;
   letter-spacing:-0.5px;
@@ -86,33 +78,32 @@
 .intro-phase-2 {
   opacity:0;
   transform:translateY(14px);
-  transition: opacity .6s ease .05s, transform .6s cubic-bezier(.22,.8,.22,1) .05s;
+  transition:opacity .6s ease .05s, transform .6s cubic-bezier(.22,.8,.22,1) .05s;
 }
 .intro-phase-2.intro-second-visible {
   opacity:1;
   transform:translateY(0);
 }
 
-/* Botón saltar */
 .intro-skip-btn {
-  background: linear-gradient(135deg,var(--primary,#e8caa6), var(--primary-2,#d4b088));
+  background:linear-gradient(135deg,var(--primary,#e8caa6),var(--primary-2,#d4b088));
   color:#0F172A;
   font-weight:700;
   border:1px solid rgba(0,0,0,.08);
   padding:10px 16px;
   border-radius:12px;
   cursor:pointer;
-  font-family:var(--font-display,"Space Grotesk",sans-serif);
+  font-family:var(--splash-font);
   font-size:14px;
   box-shadow:0 8px 28px rgba(2,6,23,.08);
-  transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+  transition:background .25s ease, transform .25s ease, box-shadow .25s ease;
   position:relative;
   z-index:4;
 }
 .intro-skip-btn:hover { transform:translateY(-2px); }
 .intro-skip-btn:active { transform:translateY(0); }
 .dark-theme .intro-skip-btn {
-  background: linear-gradient(135deg,var(--primary,#5b9cff), var(--primary-2,#7fb3ff));
+  background:linear-gradient(135deg,var(--primary,#5b9cff),var(--primary-2,#7fb3ff));
   color:#06121d;
   border-color:rgba(255,255,255,.12);
 }
@@ -121,15 +112,15 @@
   outline-offset:3px;
 }
 
-/* Explosión texto 1 */
+/* Explosión */
 .intro-explode .intro-phase-1 {
   animation:introExplode .68s cubic-bezier(.25,.9,.25,1) forwards;
 }
 @keyframes introExplode {
-  0%   { opacity:1; transform:scale(1); filter:blur(0); }
-  35%  { opacity:.9; transform:scale(1.08); filter:blur(.5px); }
-  55%  { opacity:.6; transform:scale(1.18); filter:blur(2px); }
-  75%  { opacity:.28; transform:scale(1.35); filter:blur(6px); }
+  0% { opacity:1; transform:scale(1); filter:blur(0); }
+  35% { opacity:.9; transform:scale(1.08); filter:blur(.5px); }
+  55% { opacity:.6; transform:scale(1.18); filter:blur(2px); }
+  75% { opacity:.28; transform:scale(1.35); filter:blur(6px); }
   100% { opacity:0; transform:scale(1.6); filter:blur(12px); }
 }
 
@@ -144,9 +135,9 @@
 .intro-particles .p {
   position:absolute;
   border-radius:50%;
-  will-change:transform, opacity, filter;
+  will-change:transform,opacity,filter;
   transform:translate(0,0);
-  animation: particleOut var(--p-dur,800ms) ease-out var(--p-del,0ms) forwards;
+  animation:particleOut var(--p-dur,800ms) ease-out var(--p-del,0ms) forwards;
   filter:blur(var(--p-blur,0px));
 }
 @keyframes particleOut {
@@ -170,45 +161,41 @@
   height:6px;
   transform:translate(-50%, -50%);
 }
-
-/* Partículas fireworks (más “gordas” + glow) */
 .fw-p {
   position:absolute;
   top:0; left:0;
   border-radius:50%;
   opacity:0;
   box-shadow:0 0 4px rgba(255,255,255,.6), 0 0 10px rgba(255,255,255,.45);
-  animation: fwOut var(--f-dur,900ms) cubic-bezier(.25,.9,.25,1) var(--f-delay,0ms) forwards;
-  will-change:transform, opacity;
+  animation:fwOut var(--f-dur,900ms) cubic-bezier(.25,.9,.25,1) var(--f-delay,0ms) forwards;
+  will-change:transform,opacity;
 }
 @keyframes fwOut {
-  0%   { transform:translate(0,0) scale(.55); opacity:0; }
-  10%  { opacity:1; }
-  55%  { opacity:1; }
+  0% { transform:translate(0,0) scale(.55); opacity:0; }
+  10% { opacity:1; }
+  55% { opacity:1; }
   100% { transform:translate(var(--fdx,0px), var(--fdy,0px)) scale(.40); opacity:0; }
 }
-
-/* Trails (estelas) */
 .fw-trail {
   position:absolute;
   top:0; left:0;
   transform-origin:left center;
-  width: var(--trail-length, 40px);
-  height: var(--trail-thickness, 2px);
-  border-radius: var(--trail-thickness,2px);
+  width:var(--trail-length,40px);
+  height:var(--trail-thickness,2px);
+  border-radius:var(--trail-thickness,2px);
   opacity:0;
-  filter: drop-shadow(0 0 4px rgba(255,255,255,.5));
-  animation: fwTrailAnim 900ms ease-out forwards, fwTrailFade linear forwards;
-  animation-delay: var(--f-delay,0ms);
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.5));
+  animation:fwTrailAnim 900ms ease-out forwards, fwTrailFade linear forwards;
+  animation-delay:var(--f-delay,0ms);
 }
 @keyframes fwTrailAnim {
-  0% { transform: rotate(var(--trail-angle,0deg)) scaleX(0); opacity:0; }
-  15% { transform: rotate(var(--trail-angle,0deg)) scaleX(.25); opacity:.85; }
-  60% { transform: rotate(var(--trail-angle,0deg)) scaleX(1); opacity:.75; }
-  100% { transform: rotate(var(--trail-angle,0deg)) scaleX(1); opacity:.55; }
+  0% { transform:rotate(var(--trail-angle,0deg)) scaleX(0); opacity:0; }
+  15% { transform:rotate(var(--trail-angle,0deg)) scaleX(.25); opacity:.85; }
+  60% { transform:rotate(var(--trail-angle,0deg)) scaleX(1); opacity:.75; }
+  100% { transform:rotate(var(--trail-angle,0deg)) scaleX(1); opacity:.55; }
 }
 @keyframes fwTrailFade {
-  0% { }
+  0% {}
   70% { opacity:.55; }
   100% { opacity:0; }
 }
@@ -228,5 +215,6 @@
   .intro-particles,
   .intro-fireworks,
   .fw-trail { display:none !important; }
-  .intro-flash, .intro-bg-fade::before { animation:none; }
+  .intro-flash,
+  .intro-bg-fade::before { animation:none; }
 }
