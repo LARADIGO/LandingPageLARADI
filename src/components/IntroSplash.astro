@@ -90,7 +90,7 @@ interface Props {
 
   logoBurstEnabled?: boolean;
   logoRiseDuration?: number;
-  logoExpandDuration?: number;        // ahora controla expand+shrink
+  logoExpandDuration?: number;
   logoDelayBeforeRise?: number;
   logoShowDelay?: number;
   logoFinalScale?: number;
@@ -101,6 +101,8 @@ interface Props {
   logoStableScale?: number;
   logoElevateOffset?: number;
   logoCircleStableScale?: number;
+
+  logoStyle?: string;
 }
 
 const {
@@ -142,17 +144,18 @@ const {
 
   logoBurstEnabled = true,
   logoRiseDuration = 900,
-  logoExpandDuration = 420,          // rápido por defecto
+  logoExpandDuration = 420,
   logoDelayBeforeRise = 50,
-  logoShowDelay = 120,               // aparición del logo dentro de la fase de shrink
+  logoShowDelay = 120,
   logoFinalScale = 0.95,
   logoCircleSize = 220,
   logoCircleExpandScale = 1.65,
   logoSyncFireworks = false,
 
   logoStableScale = 0.95,
-  logoElevateOffset = 140,
-  logoCircleStableScale = 1.05
+  logoElevateOffset = 220,
+  logoCircleStableScale = 1.05,
+  logoStyle = "glass sparkle"
 } = Astro.props as Props;
 ---
 
@@ -198,6 +201,7 @@ const {
   data-logo-stable-scale={String(logoStableScale)}
   data-logo-elevate-offset={String(logoElevateOffset)}
   data-logo-circle-stable-scale={String(logoCircleStableScale)}
+  data-logo-style={logoStyle}
   aria-hidden="true"
 >
   <div class="intro-inner">
@@ -213,14 +217,14 @@ const {
 
 <script is:inline>
 (() => {
-  const root = document.getElementById('intro-splash');
+  const root=document.getElementById('intro-splash');
   if(!root) return;
 
   const getNum=(a,d)=>{const v=root.getAttribute(a);const n=v===null?NaN:parseFloat(v);return Number.isFinite(n)?n:d;};
   const getBool=(a,d=false)=>{const v=root.getAttribute(a);return v===null?d:v==='true';};
 
   const once=getBool('data-once',false);
-  const key='tpv_intro_seen_v9c';
+  const key='tpv_intro_seen_v9e';
   if(once && localStorage.getItem(key)){ root.style.display='none'; return; }
 
   const skipEnabled=getBool('data-skip-enabled',true);
@@ -246,6 +250,7 @@ const {
   const logoElevateOffset=getNum('data-logo-elevate-offset',140);
   const logoCircleStableScale=getNum('data-logo-circle-stable-scale',1.05);
   const logoSyncFW=getBool('data-logo-sync-fw',false);
+  const logoStyle=root.getAttribute('data-logo-style')||'';
 
   if(logoEnabled && logoSyncFW){
     const totalLogoSeq = logoDelayRise + logoRiseDur + logoExpandDur + logoShowDelay + 150;
@@ -295,7 +300,7 @@ const {
     if(once){ try{ localStorage.setItem(key,'1'); }catch{} }
     inner.querySelector('.intro-particles')?.remove();
     inner.querySelector('.intro-fireworks')?.remove();
-    inner.querySelector('.intro-logo-burst')?.remove();
+    root.querySelector('.intro-logo-burst')?.remove();
     root.classList.add('intro-hide');
     setTimeout(()=>root.remove(),650);
   }
@@ -312,19 +317,15 @@ const {
   function spawnExplosionParticles(){
     if(prefersReduce || !inner || !phase1El) return;
     let container=inner.querySelector('.intro-particles');
-    if(!container){
-      container=document.createElement('div');
-      container.className='intro-particles';
-      inner.appendChild(container);
-    } else container.innerHTML='';
+    if(!container){ container=document.createElement('div'); container.className='intro-particles'; inner.appendChild(container); }
+    else container.innerHTML='';
     const innerRect=inner.getBoundingClientRect();
     const rect=phase1El.getBoundingClientRect();
     const ox=rect.left+rect.width/2-innerRect.left;
     const oy=rect.top+rect.height/2-innerRect.top;
     const COUNT=120;
     for(let i=0;i<COUNT;i++){
-      const p=document.createElement('span');
-      p.className='p';
+      const p=document.createElement('span'); p.className='p';
       const angle=Math.random()*Math.PI*2;
       const dist=100+Math.random()*220;
       const dx=Math.cos(angle)*dist;
@@ -382,14 +383,17 @@ const {
   }
 
   function startLogoBurst(){
-    let logoEl=inner.querySelector('.intro-logo-burst');
+    let logoEl=root.querySelector('.intro-logo-burst');
     if(!logoEl){
       logoEl=document.createElement('div');
       logoEl.className='intro-logo-burst';
       const img=document.createElement('img');
       img.src='/logo.png'; img.alt=''; img.decoding='async';
       logoEl.appendChild(img);
-      inner.appendChild(logoEl);
+      root.appendChild(logoEl); // IMPORTANTE: ahora va en root, no en .intro-inner
+    }
+    if(logoStyle){
+      logoStyle.split(/\s+/).filter(Boolean).forEach(c=>logoEl.classList.add(`style-${c}`));
     }
     logoEl.style.setProperty('--logo-circle-size', logoCircleSize+'px');
     logoEl.style.setProperty('--logo-expand-scale', logoCircleExpandScale);
@@ -399,10 +403,9 @@ const {
     logoEl.style.setProperty('--logo-elevate-offset', logoElevateOffset+'px');
     logoEl.style.setProperty('--logo-circle-stable-scale', logoCircleStableScale);
 
+    // Animaciones
     setTimeout(()=>{ if(!finished) logoEl.classList.add('is-rising'); }, logoDelayRise);
     setTimeout(()=>{ if(!finished) logoEl.classList.add('is-expanding'); }, logoDelayRise + logoRiseDur + 40);
-
-    // Aparece el logo hacia la segunda mitad de la contracción
     setTimeout(()=>{ if(!finished) logoEl.classList.add('logo-revealed'); }, logoDelayRise + logoRiseDur + logoShowDelay);
   }
 
@@ -423,11 +426,7 @@ const {
     }, Math.max(0,bgFadeDelay));
 
     let fwContainer=inner.querySelector('.intro-fireworks');
-    if(!fwContainer){
-      fwContainer=document.createElement('div');
-      fwContainer.className='intro-fireworks';
-      inner.appendChild(fwContainer);
-    }
+    if(!fwContainer){ fwContainer=document.createElement('div'); fwContainer.className='intro-fireworks'; inner.appendChild(fwContainer); }
 
     const secondRect=phase2El?.getBoundingClientRect();
     const innerRect=inner.getBoundingClientRect();
@@ -486,7 +485,7 @@ const {
         trail.style.setProperty('--trail-angle',angleDeg+'deg');
         trail.style.setProperty('--trail-length',length+'px');
         trail.style.setProperty('--trail-thickness',fwTrailThickness+'px');
-        trail.style.setProperty('--trail-fade-extra',fwTrailFadeExtra+'ms');
+        trail.style.setProperty('--trail-fade-extra',fwTrailFadeExtra+'px');
         trail.style.background='linear-gradient(90deg,'+randFireworkColor()+', rgba(255,255,255,0))';
         burst.appendChild(trail);
       }
@@ -497,7 +496,12 @@ const {
 
   function randBetween(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
   function randFireworkColor(){
-    const palette=['var(--primary,#e8caa6)','var(--primary-2,#d4b088','#ffd479','#ff9f5b','#5b9cff','#7fb3ff','#ffe0b3','#ffc3a0','#fff2d0','#ffe8c2'];
+    const palette=[
+      'var(--primary,#e8caa6)',
+      'var(--primary-2,#d4b088)',
+      '#ffd479','#ff9f5b','#5b9cff','#7fb3ff',
+      '#ffe0b3','#ffc3a0','#fff2d0','#ffe8c2'
+    ];
     return palette[Math.floor(Math.random()*palette.length)];
   }
 
@@ -509,7 +513,7 @@ const {
   document.addEventListener('keydown', onKeydown, passiveOpt);
 
   if(prefersReduce){
-    phase1El && (phase1El.textContent=firstText);
+    if(phase1El) phase1El.textContent=firstText;
     if(phase2El){ phase2El.hidden=false; phase2El.textContent=secondText; }
     setTimeout(finishIntro,900);
   } else {
