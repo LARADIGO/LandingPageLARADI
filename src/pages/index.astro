@@ -3,6 +3,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import HeroDiorama from "@components/HeroDiorama.astro";
 import FaqSection from "@components/FaqSection.astro";
 import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio.astro";
+import AboutSection from "@components/AboutSection.astro";
 
 const errCode = Astro.url.searchParams.get('contact_error') || '';
 const messages: Record<string, string> = {
@@ -207,32 +208,52 @@ const initialStatusClass = errCode ? 'status-error' : '';
           <h3>Esencial</h3>
           <p class="price"><span>€</span>9,90<span>/mes</span></p>
           <ul>
-            <li>1 tienda</li>
-            <li>Usuarios limitados</li>
-            <li>Soporte por email</li>
+            <li>1 terminal</li>
+            <li>Control y arqueo de caja</li>
+            <li>Creación de Productos y Categorías</li>
+            <li>Emisión y Personalización de Tickets y Facturas</li>
+            <li>Soporte por Email</li>
           </ul>
           <a href="#contacto" class="btn btn-block">Contactar</a>
         </div>
         <div class="pricing-card featured">
           <h3>Avanzado</h3>
-          <p class="price"><span>€</span>12,90<span>/mes</span></p>
+          <p class="price"><span>€</span>14,90<span>/mes</span></p>
           <ul>
-            <li>Hasta 3 tiendas</li>
-            <li>Inventario avanzado</li>
-            <li>Soporte prioritario</li>
+            <li>2 Terminales</li>
+            <li>Plan Esencial</li>
+            <li>Creación y Personalización de empleados</li>
+            <li>Control y gestión de Inventario</li>
+            <li>Informes básicos</li>
+            <li>Soporte prioritario (&lt;24h)</li>
           </ul>
           <a href="#contacto" class="btn btn-block">Contactar</a>
         </div>
         <div class="pricing-card featured">
           <h3>Pro</h3>
-          <p class="price"><span>€</span>15,90<span>/mes</span></p>
+          <p class="price"><span>€</span>19,90<span>/mes</span></p>
           <ul>
-            <li>Tiendas ilimitadas</li>
-            <li>Integraciones a medida</li>
-            <li>Cuenta dedicada</li>
+            <li>+ de 2 Terminales</li>
+            <li>Plan Avanzado</li>
+            <li>Informes Avanzados y Personalizables</li>
+            <li>Avisos de Bajo Stock</li>
+            <li>Creación de Clientes y Plan de Fidelización</li>
+            <li>Soporte Premium (&lt;2h)</li>
           </ul>
           <a href="#contacto" class="btn btn-block">Contactar</a>
         </div>
+      </div>
+
+      <!-- Nota SEO bajo planes (actualizada con icono y encabezado destacado) -->
+      <div class="pricing-note" role="note" aria-labelledby="pricing-note-heading">
+        <div class="pricing-note__header">
+          <span class="pricing-note__icon" aria-hidden="true">🧩</span>
+          <span id="pricing-note-heading" class="pricing-note__lead">¿Necesitas algo distinto?</span>
+        </div>
+        <p class="pricing-note__text">
+          Si ninguno de estos planes se adapta a tu negocio, contáctanos y te prepararemos un plan de TPV a medida:
+          integración de hardware, módulos personalizados, adaptación VeriFactu y soporte cercano para tu crecimiento.
+        </p>
       </div>
     </div>
   </section>
