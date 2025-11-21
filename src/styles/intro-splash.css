@@ -1,9 +1,9 @@
-/* intro-splash.css (fix skip + presets tipografía) */
+/* intro-splash.css (logo expand + shrink rápido) */
 
 .intro-splash { --splash-font: var(--font-display,"Space Grotesk",system-ui,sans-serif); }
 .intro-splash .intro-type { font-family: var(--splash-font); }
 
-/* Presets */
+/* Presets tipografía */
 .intro-splash.intro-font-tech      { --splash-font:'Orbitron','Chakra Petch','Space Grotesk',system-ui,sans-serif; }
 .intro-splash.intro-font-tech .intro-type { text-transform:uppercase; letter-spacing:.02em; }
 .intro-splash.intro-font-mono      { --splash-font:'Share Tech Mono','Space Grotesk',monospace; }
@@ -112,7 +112,7 @@
   outline-offset:3px;
 }
 
-/* Explosión */
+/* Explosión primer texto */
 .intro-explode .intro-phase-1 {
   animation:introExplode .68s cubic-bezier(.25,.9,.25,1) forwards;
 }
@@ -136,7 +136,6 @@
   position:absolute;
   border-radius:50%;
   will-change:transform,opacity,filter;
-  transform:translate(0,0);
   animation:particleOut var(--p-dur,800ms) ease-out var(--p-del,0ms) forwards;
   filter:blur(var(--p-blur,0px));
 }
@@ -155,12 +154,7 @@
   pointer-events:none;
   z-index:3;
 }
-.fw-burst {
-  position:absolute;
-  width:6px;
-  height:6px;
-  transform:translate(-50%, -50%);
-}
+.fw-burst { position:absolute; width:6px; height:6px; transform:translate(-50%, -50%); }
 .fw-p {
   position:absolute;
   top:0; left:0;
@@ -168,7 +162,6 @@
   opacity:0;
   box-shadow:0 0 4px rgba(255,255,255,.6), 0 0 10px rgba(255,255,255,.45);
   animation:fwOut var(--f-dur,900ms) cubic-bezier(.25,.9,.25,1) var(--f-delay,0ms) forwards;
-  will-change:transform,opacity;
 }
 @keyframes fwOut {
   0% { transform:translate(0,0) scale(.55); opacity:0; }
@@ -200,7 +193,75 @@
   100% { opacity:0; }
 }
 
-/* Cierre */
+/* Logo Burst centrado arriba */
+.intro-logo-burst {
+  position:absolute;
+  left:50%;
+  bottom:-12%;
+  transform:translate(-50%,0) scale(1);
+  width:var(--logo-circle-size,220px);
+  height:var(--logo-circle-size,220px);
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 45% 35%, rgba(255,255,255,.52), rgba(255,255,255,0) 60%),
+    linear-gradient(135deg,var(--primary,#e8caa6),var(--primary-2,#d4b088));
+  box-shadow:0 10px 30px rgba(0,0,0,.14), 0 0 0 3px rgba(255,255,255,.4) inset;
+  opacity:0;
+  z-index:2;
+  overflow:hidden;
+  will-change:transform,opacity,filter;
+}
+.dark-theme .intro-logo-burst {
+  background:
+    radial-gradient(circle at 45% 35%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
+    linear-gradient(135deg,var(--primary,#5b9cff),var(--primary-2,#7fb3ff));
+  box-shadow:0 10px 34px rgba(0,0,0,.55), 0 0 0 3px rgba(0,0,0,.4) inset;
+}
+
+/* Subida hasta offset final */
+.intro-logo-burst.is-rising {
+  animation:logoRiseFinal var(--logo-rise-dur,900ms) cubic-bezier(.22,.78,.25,1) forwards;
+}
+@keyframes logoRiseFinal {
+  0% { opacity:0; transform:translate(-50%,40%) scale(.8); filter:blur(8px); }
+  15% { opacity:.55; }
+  60% { opacity:.9; }
+  100% { opacity:.95; transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(1); filter:blur(0); }
+}
+
+/* Expansión + contracción rápida arriba */
+.intro-logo-burst.is-expanding {
+  animation:logoBurstElevated var(--logo-expand-dur,420ms) cubic-bezier(.42,.9,.35,1) forwards;
+}
+@keyframes logoBurstElevated {
+  0%   { transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(1); opacity:.95; }
+  40%  { transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(var(--logo-expand-scale,1.65)); }
+  60%  { transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(calc(var(--logo-expand-scale,1.65) * .92)); }
+  78%  { transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(calc(var(--logo-circle-stable-scale,1.05) * 1.06)); }
+  100% { transform:translate(-50%, calc(-1 * var(--logo-elevate-offset,140px))) scale(var(--logo-circle-stable-scale,1.05)); opacity:.96; }
+}
+
+/* Logo interno */
+.intro-logo-burst img {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(.38);
+  opacity:0;
+  width:50%;
+  height:auto;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.25));
+  will-change:transform,opacity,filter;
+}
+.intro-logo-burst.logo-revealed img {
+  animation:logoImgQuick .55s cubic-bezier(.25,.9,.25,1) forwards;
+}
+@keyframes logoImgQuick {
+  0% { opacity:0; transform:translate(-50%,-50%) scale(.38); }
+  40% { opacity:.85; transform:translate(-50%,-50%) scale(.88); }
+  70% { opacity:1; transform:translate(-50%,-50%) scale(var(--logo-final-scale,.95)); }
+  100% { opacity:1; transform:translate(-50%,-50%) scale(var(--logo-final-scale,.95)); filter:drop-shadow(0 8px 26px rgba(0,0,0,.25)); }
+}
+
 .intro-hide {
   opacity:0;
   transform:scale(.98);
@@ -214,7 +275,8 @@
   .intro-explode .intro-phase-1 { animation:none; }
   .intro-particles,
   .intro-fireworks,
-  .fw-trail { display:none !important; }
+  .fw-trail,
+  .intro-logo-burst { display:none !important; }
   .intro-flash,
   .intro-bg-fade::before { animation:none; }
 }

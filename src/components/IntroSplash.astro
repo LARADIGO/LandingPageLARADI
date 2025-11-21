@@ -87,6 +87,20 @@ interface Props {
 
   splashFontPreset?: 'tech' | 'mono' | 'stencil';
   skipEnabled?: boolean;
+
+  logoBurstEnabled?: boolean;
+  logoRiseDuration?: number;
+  logoExpandDuration?: number;        // ahora controla expand+shrink
+  logoDelayBeforeRise?: number;
+  logoShowDelay?: number;
+  logoFinalScale?: number;
+  logoCircleSize?: number;
+  logoCircleExpandScale?: number;
+  logoSyncFireworks?: boolean;
+
+  logoStableScale?: number;
+  logoElevateOffset?: number;
+  logoCircleStableScale?: number;
 }
 
 const {
@@ -124,7 +138,21 @@ const {
   backgroundFinalOpacity = 0.2,
 
   splashFontPreset = 'tech',
-  skipEnabled = true
+  skipEnabled = true,
+
+  logoBurstEnabled = true,
+  logoRiseDuration = 900,
+  logoExpandDuration = 420,          // rápido por defecto
+  logoDelayBeforeRise = 50,
+  logoShowDelay = 120,               // aparición del logo dentro de la fase de shrink
+  logoFinalScale = 0.95,
+  logoCircleSize = 220,
+  logoCircleExpandScale = 1.65,
+  logoSyncFireworks = false,
+
+  logoStableScale = 0.95,
+  logoElevateOffset = 140,
+  logoCircleStableScale = 1.05
 } = Astro.props as Props;
 ---
 
@@ -158,6 +186,18 @@ const {
   data-bg-fade-duration={String(backgroundFadeDuration)}
   data-bg-final-opacity={String(backgroundFinalOpacity)}
   data-skip-enabled={String(skipEnabled)}
+  data-logo-enabled={String(logoBurstEnabled)}
+  data-logo-rise-dur={String(logoRiseDuration)}
+  data-logo-expand-dur={String(logoExpandDuration)}
+  data-logo-delay-rise={String(logoDelayBeforeRise)}
+  data-logo-show-delay={String(logoShowDelay)}
+  data-logo-final-scale={String(logoFinalScale)}
+  data-logo-circle-size={String(logoCircleSize)}
+  data-logo-circle-expand-scale={String(logoCircleExpandScale)}
+  data-logo-sync-fw={String(logoSyncFireworks)}
+  data-logo-stable-scale={String(logoStableScale)}
+  data-logo-elevate-offset={String(logoElevateOffset)}
+  data-logo-circle-stable-scale={String(logoCircleStableScale)}
   aria-hidden="true"
 >
   <div class="intro-inner">
@@ -174,345 +214,304 @@ const {
 <script is:inline>
 (() => {
   const root = document.getElementById('intro-splash');
-  if (!root) return;
+  if(!root) return;
 
-  const getNum = (attr, def) => {
-    const v = root.getAttribute(attr);
-    const n = v === null ? NaN : parseFloat(v);
-    return Number.isFinite(n) ? n : def;
-  };
-  const getBool = (attr, def=false) => {
-    const v = root.getAttribute(attr);
-    if (v === null) return def;
-    return v === 'true';
-  };
+  const getNum=(a,d)=>{const v=root.getAttribute(a);const n=v===null?NaN:parseFloat(v);return Number.isFinite(n)?n:d;};
+  const getBool=(a,d=false)=>{const v=root.getAttribute(a);return v===null?d:v==='true';};
 
-  const once = getBool('data-once', false);
-  const skipEnabled = getBool('data-skip-enabled', true);
-  const key = 'tpv_intro_seen_v7';
-  if (once && localStorage.getItem(key)) {
-    root.style.display = 'none';
-    return;
+  const once=getBool('data-once',false);
+  const key='tpv_intro_seen_v9c';
+  if(once && localStorage.getItem(key)){ root.style.display='none'; return; }
+
+  const skipEnabled=getBool('data-skip-enabled',true);
+  const prefersReduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const speedMult=getNum('data-speed',1);
+
+  const explodeDelay=getNum('data-explode-delay',420);
+  const explodeDuration=getNum('data-explode-duration',680);
+  let fireworksDelayAfterSecond=getNum('data-fireworks-delay',2000);
+  const fireworksDuration=getNum('data-fireworks-duration',3000);
+  const flashDuration=getNum('data-flash-duration',260);
+  const secondTypewriter=getBool('data-second-typewriter',true);
+
+  const logoEnabled=getBool('data-logo-enabled',true);
+  const logoRiseDur=getNum('data-logo-rise-dur',900);
+  const logoExpandDur=getNum('data-logo-expand-dur',420);
+  const logoDelayRise=getNum('data-logo-delay-rise',50);
+  const logoShowDelay=getNum('data-logo-show-delay',120);
+  const logoFinalScale=getNum('data-logo-final-scale',0.95);
+  const logoCircleSize=getNum('data-logo-circle-size',220);
+  const logoCircleExpandScale=getNum('data-logo-circle-expand-scale',1.65);
+  const logoStableScale=getNum('data-logo-stable-scale',0.95);
+  const logoElevateOffset=getNum('data-logo-elevate-offset',140);
+  const logoCircleStableScale=getNum('data-logo-circle-stable-scale',1.05);
+  const logoSyncFW=getBool('data-logo-sync-fw',false);
+
+  if(logoEnabled && logoSyncFW){
+    const totalLogoSeq = logoDelayRise + logoRiseDur + logoExpandDur + logoShowDelay + 150;
+    fireworksDelayAfterSecond = Math.max(fireworksDelayAfterSecond, totalLogoSeq);
   }
 
-  const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const speedMult = getNum('data-speed', 1);
+  const fwBurstsTotal=getNum('data-fw-bursts',8);
+  const fwNearCenter=Math.min(getNum('data-fw-near',3), fwBurstsTotal);
+  const fwSpreadBase=getNum('data-fw-spread-base',80);
+  const fwSpreadVar=getNum('data-fw-spread-var',120);
+  const fwRandomScreen=getBool('data-fw-random-screen',true);
+  const fwPMin=getNum('data-fw-pmin',18);
+  const fwPMax=getNum('data-fw-pmax',30);
+  const fwSpacing=getNum('data-fw-spacing',240);
+  const fwOverlap=getBool('data-fw-overlap',false);
+  const fwSizeMin=getNum('data-fw-size-min',4);
+  const fwSizeMax=getNum('data-fw-size-max',9);
+  const fwTrailEnabled=getBool('data-fw-trail',true);
+  const fwTrailThickness=getNum('data-fw-trail-thickness',2);
+  const fwTrailFactor=getNum('data-fw-trail-factor',1.05);
+  const fwTrailFadeExtra=getNum('data-fw-trail-fade-extra',300);
 
-  // Timings
-  const explodeDelay = getNum('data-explode-delay', 420);
-  const explodeDuration = getNum('data-explode-duration', 680);
-  const fireworksDelayAfterSecond = getNum('data-fireworks-delay', 2000);
-  const fireworksDuration = getNum('data-fireworks-duration', 3000);
-  const flashDuration = getNum('data-flash-duration', 260);
-  const secondTypewriter = getBool('data-second-typewriter', true);
+  const bgFadeDelay=getNum('data-bg-fade-delay',1200);
+  const bgFadeDuration=getNum('data-bg-fade-duration',3200);
+  const bgFinalOpacityRaw=parseFloat(root.getAttribute('data-bg-final-opacity')||'0');
+  const bgFinalOpacity=Number.isFinite(bgFinalOpacityRaw)?Math.max(0,Math.min(1,bgFinalOpacityRaw)):0;
 
-  // Fireworks config
-  const fwBurstsTotal = getNum('data-fw-bursts', 8);
-  const fwNearCenter = Math.min(getNum('data-fw-near', 3), fwBurstsTotal);
-  const fwSpreadBase = getNum('data-fw-spread-base', 80);
-  const fwSpreadVar = getNum('data-fw-spread-var', 120);
-  const fwRandomScreen = getBool('data-fw-random-screen', true);
-  const fwPMin = getNum('data-fw-pmin', 18);
-  const fwPMax = getNum('data-fw-pmax', 30);
-  const fwSpacing = getNum('data-fw-spacing', 240);
-  const fwOverlap = getBool('data-fw-overlap', false);
-  const fwSizeMin = getNum('data-fw-size-min', 4);
-  const fwSizeMax = getNum('data-fw-size-max', 9);
-  const fwTrailEnabled = getBool('data-fw-trail', true);
-  const fwTrailThickness = getNum('data-fw-trail-thickness', 2);
-  const fwTrailFactor = getNum('data-fw-trail-factor', 1.05);
-  const fwTrailFadeExtra = getNum('data-fw-trail-fade-extra', 300);
+  const inner=root.querySelector('.intro-inner');
+  const phase1El=root.querySelector('.intro-phase-1');
+  const phase2El=root.querySelector('.intro-phase-2');
+  const skipBtn=root.querySelector('[data-intro-skip]');
 
-  // Fondo
-  const bgFadeDelay = getNum('data-bg-fade-delay', 1200);
-  const bgFadeDuration = getNum('data-bg-fade-duration', 3200);
-  const bgFinalOpacityRaw = parseFloat(root.getAttribute('data-bg-final-opacity') || '0');
-  const bgFinalOpacity = Number.isFinite(bgFinalOpacityRaw)
-    ? Math.max(0, Math.min(1, bgFinalOpacityRaw))
-    : 0;
+  const firstText=phase1El?.getAttribute('data-text')||'';
+  const secondText=phase2El?.getAttribute('data-text2')||'';
 
-  const inner = root.querySelector('.intro-inner');
-  const phase1El = root.querySelector('.intro-phase-1');
-  const phase2El = root.querySelector('.intro-phase-2');
-  const skipBtn = root.querySelector('[data-intro-skip]');
+  const CHAR_INTERVAL=42/speedMult;
 
-  const firstText = phase1El?.getAttribute('data-text') || '';
-  const secondText = phase2El?.getAttribute('data-text2') || '';
+  let i1=0,i2=0,t1=null,t2=null;
+  let finished=false, explosionTriggered=false, fireworksTriggered=false;
+  let fireworksFinishTimer=null;
 
-  const CHAR_INTERVAL = 42 / speedMult;
-  const END_DELAY_SECOND = 560 / speedMult;
-
-  let i1 = 0, i2 = 0;
-  let t1 = null, t2 = null;
-  let finished = false, explosionTriggered = false, fireworksTriggered = false;
-  let fireworksFinishTimer = null;
-
-  function clearTimers() {
-    if (t1) clearTimeout(t1);
-    if (t2) clearTimeout(t2);
-    if (fireworksFinishTimer) clearTimeout(fireworksFinishTimer);
-  }
-
-  function detachInteractions() {
-    document.removeEventListener('keydown', onKeydown, passiveOpt);
-    if (skipBtn) skipBtn.removeEventListener('click', onSkipClick);
-    // Si reactivas click global, elimina aquí su listener.
-  }
-
-  function finishIntro() {
-    if (finished) return;
-    finished = true;
-    clearTimers();
-    detachInteractions();
-    if (once) { try { localStorage.setItem(key, '1'); } catch {} }
-
-    // Limpieza de partículas / fireworks si existen
-    const particles = inner.querySelector('.intro-particles');
-    const fireworks = inner.querySelector('.intro-fireworks');
-    if (particles) particles.remove();
-    if (fireworks) fireworks.remove();
-
+  function clearTimers(){ if(t1)clearTimeout(t1); if(t2)clearTimeout(t2); if(fireworksFinishTimer)clearTimeout(fireworksFinishTimer); }
+  function detach(){ document.removeEventListener('keydown', onKeydown, passiveOpt); skipBtn?.removeEventListener('click', onSkipClick); }
+  function finishIntro(){
+    if(finished) return;
+    finished=true; clearTimers(); detach();
+    if(once){ try{ localStorage.setItem(key,'1'); }catch{} }
+    inner.querySelector('.intro-particles')?.remove();
+    inner.querySelector('.intro-fireworks')?.remove();
+    inner.querySelector('.intro-logo-burst')?.remove();
     root.classList.add('intro-hide');
-    setTimeout(() => {
-      root.remove();
-    }, 650);
+    setTimeout(()=>root.remove(),650);
+  }
+  function manualSkip(){ if(finished) return; finishIntro(); }
+
+  function typeFirst(){
+    if(!phase1El) return triggerExplosion();
+    if(i1<firstText.length){
+      phase1El.textContent=firstText.slice(0,i1+1);
+      i1++; t1=setTimeout(typeFirst,CHAR_INTERVAL);
+    } else setTimeout(triggerExplosion,explodeDelay);
   }
 
-  function manualSkip() {
-    // No ponemos finished=true aquí para permitir finishIntro ejecutar
-    if (finished) return;
-    finishIntro();
-  }
-
-  function typeFirst() {
-    if (!phase1El) return triggerExplosion();
-    if (i1 < firstText.length) {
-      phase1El.textContent = firstText.slice(0, i1 + 1);
-      i1++;
-      t1 = setTimeout(typeFirst, CHAR_INTERVAL);
-    } else {
-      setTimeout(triggerExplosion, explodeDelay);
-    }
-  }
-
-  function spawnExplosionParticles() {
-    if (prefersReduce || !inner || !phase1El) return;
-    let container = inner.querySelector('.intro-particles');
-    if (!container) {
-      container = document.createElement('div');
-      container.className = 'intro-particles';
+  function spawnExplosionParticles(){
+    if(prefersReduce || !inner || !phase1El) return;
+    let container=inner.querySelector('.intro-particles');
+    if(!container){
+      container=document.createElement('div');
+      container.className='intro-particles';
       inner.appendChild(container);
-    } else container.innerHTML = '';
-
-    const innerRect = inner.getBoundingClientRect();
-    const rect = phase1El.getBoundingClientRect();
-    const ox = rect.left + rect.width / 2 - innerRect.left;
-    const oy = rect.top + rect.height / 2 - innerRect.top;
-
-    const COUNT = 120;
-    for (let i = 0; i < COUNT; i++) {
-      const p = document.createElement('span');
-      p.className = 'p';
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 100 + Math.random() * 220;
-      const dx = Math.cos(angle) * dist;
-      const dy = Math.sin(angle) * dist;
-      const size = 3 + Math.random() * 7;
-      const isSquare = Math.random() < 0.3;
-      const dur = 520 + Math.random() * 820;
-      const del = Math.random() * 150;
-
-      p.style.left = (ox - size / 2) + 'px';
-      p.style.top = (oy - size / 2) + 'px';
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.borderRadius = isSquare ? '3px' : '50%';
-      const useAlt = Math.random() < 0.35;
-      p.style.background = useAlt ? 'var(--primary-2,#d4b088)' : 'var(--primary,#e8caa6)';
-      p.style.opacity = (0.8 + Math.random() * 0.15).toFixed(2);
-      p.style.setProperty('--dx', dx.toFixed(1) + 'px');
-      p.style.setProperty('--dy', dy.toFixed(1) + 'px');
-      p.style.setProperty('--p-dur', Math.round(dur) + 'ms');
-      p.style.setProperty('--p-del', Math.round(del) + 'ms');
-      p.style.setProperty('--p-blur', (Math.random() * 2).toFixed(1) + 'px');
+    } else container.innerHTML='';
+    const innerRect=inner.getBoundingClientRect();
+    const rect=phase1El.getBoundingClientRect();
+    const ox=rect.left+rect.width/2-innerRect.left;
+    const oy=rect.top+rect.height/2-innerRect.top;
+    const COUNT=120;
+    for(let i=0;i<COUNT;i++){
+      const p=document.createElement('span');
+      p.className='p';
+      const angle=Math.random()*Math.PI*2;
+      const dist=100+Math.random()*220;
+      const dx=Math.cos(angle)*dist;
+      const dy=Math.sin(angle)*dist;
+      const size=3+Math.random()*7;
+      const dur=520+Math.random()*820;
+      const del=Math.random()*150;
+      p.style.left=(ox-size/2)+'px';
+      p.style.top=(oy-size/2)+'px';
+      p.style.width=size+'px';
+      p.style.height=size+'px';
+      p.style.borderRadius=Math.random()<0.3?'3px':'50%';
+      p.style.background=Math.random()<0.35?'var(--primary-2,#d4b088)':'var(--primary,#e8caa6)';
+      p.style.opacity=(0.8+Math.random()*0.15).toFixed(2);
+      p.style.setProperty('--dx',dx.toFixed(1)+'px');
+      p.style.setProperty('--dy',dy.toFixed(1)+'px');
+      p.style.setProperty('--p-dur',Math.round(dur)+'ms');
+      p.style.setProperty('--p-del',Math.round(del)+'ms');
+      p.style.setProperty('--p-blur',(Math.random()*2).toFixed(1)+'px');
       container.appendChild(p);
     }
-    setTimeout(() => container?.remove(), explodeDuration + 1600);
+    setTimeout(()=>container?.remove(), explodeDuration+1600);
   }
 
-  function triggerExplosion() {
-    if (explosionTriggered || finished) return;
-    explosionTriggered = true;
-    if (!phase1El) return showSecond();
-    if (!prefersReduce) {
+  function triggerExplosion(){
+    if(explosionTriggered || finished) return;
+    explosionTriggered=true;
+    if(!phase1El) return showSecond();
+    if(!prefersReduce){
       spawnExplosionParticles();
       root.classList.add('intro-flash');
-      setTimeout(() => root.classList.remove('intro-flash'), flashDuration);
+      setTimeout(()=>root.classList.remove('intro-flash'), flashDuration);
     }
     root.classList.add('intro-explode');
-    setTimeout(() => {
-      if (finished) return;
-      phase1El.hidden = true;
-      showSecond();
-    }, explodeDuration);
+    setTimeout(()=>{ if(finished)return; phase1El.hidden=true; showSecond(); }, explodeDuration);
   }
 
-  function showSecond() {
-    if (!phase2El) return finishIntro();
-    phase2El.hidden = false;
+  function showSecond(){
+    if(!phase2El) return finishIntro();
+    phase2El.hidden=false;
     phase2El.classList.add('intro-second-visible');
-    if (prefersReduce || !secondTypewriter) {
-      phase2El.textContent = secondText;
+    if(logoEnabled && !prefersReduce) startLogoBurst();
+    if(prefersReduce || !secondTypewriter){
+      phase2El.textContent=secondText;
       scheduleFireworks();
     } else typeSecond();
   }
 
-  function typeSecond() {
-    if (!phase2El) return finishIntro();
-    if (i2 < secondText.length) {
-      phase2El.textContent = secondText.slice(0, i2 + 1);
-      i2++;
-      t2 = setTimeout(typeSecond, CHAR_INTERVAL);
-    } else {
-      scheduleFireworks();
-    }
+  function typeSecond(){
+    if(!phase2El) return finishIntro();
+    if(i2<secondText.length){
+      phase2El.textContent=secondText.slice(0,i2+1);
+      i2++; t2=setTimeout(typeSecond,CHAR_INTERVAL);
+    } else scheduleFireworks();
   }
 
-  function scheduleFireworks() {
-    if (finished) return;
-    if (prefersReduce) {
-      setTimeout(finishIntro, 600);
-      return;
+  function startLogoBurst(){
+    let logoEl=inner.querySelector('.intro-logo-burst');
+    if(!logoEl){
+      logoEl=document.createElement('div');
+      logoEl.className='intro-logo-burst';
+      const img=document.createElement('img');
+      img.src='/logo.png'; img.alt=''; img.decoding='async';
+      logoEl.appendChild(img);
+      inner.appendChild(logoEl);
     }
-    setTimeout(() => launchFireworks(), fireworksDelayAfterSecond);
+    logoEl.style.setProperty('--logo-circle-size', logoCircleSize+'px');
+    logoEl.style.setProperty('--logo-expand-scale', logoCircleExpandScale);
+    logoEl.style.setProperty('--logo-rise-dur', logoRiseDur+'ms');
+    logoEl.style.setProperty('--logo-expand-dur', logoExpandDur+'ms');
+    logoEl.style.setProperty('--logo-final-scale', logoStableScale);
+    logoEl.style.setProperty('--logo-elevate-offset', logoElevateOffset+'px');
+    logoEl.style.setProperty('--logo-circle-stable-scale', logoCircleStableScale);
+
+    setTimeout(()=>{ if(!finished) logoEl.classList.add('is-rising'); }, logoDelayRise);
+    setTimeout(()=>{ if(!finished) logoEl.classList.add('is-expanding'); }, logoDelayRise + logoRiseDur + 40);
+
+    // Aparece el logo hacia la segunda mitad de la contracción
+    setTimeout(()=>{ if(!finished) logoEl.classList.add('logo-revealed'); }, logoDelayRise + logoRiseDur + logoShowDelay);
   }
 
-  function launchFireworks() {
-    if (fireworksTriggered || finished) return;
-    fireworksTriggered = true;
+  function scheduleFireworks(){
+    if(finished) return;
+    if(prefersReduce){ setTimeout(finishIntro,600); return; }
+    setTimeout(()=>launchFireworks(), fireworksDelayAfterSecond);
+  }
 
-    // Programar fade del fondo
-    setTimeout(() => {
-      if (finished) return;
-      root.style.setProperty('--bg-fade-duration', bgFadeDuration + 'ms');
+  function launchFireworks(){
+    if(fireworksTriggered || finished) return;
+    fireworksTriggered=true;
+    setTimeout(()=>{
+      if(finished) return;
+      root.style.setProperty('--bg-fade-duration', bgFadeDuration+'ms');
       root.style.setProperty('--bg-final-opacity', String(bgFinalOpacity));
       root.classList.add('intro-bg-fade');
-    }, Math.max(0, bgFadeDelay));
+    }, Math.max(0,bgFadeDelay));
 
-    let fwContainer = inner.querySelector('.intro-fireworks');
-    if (!fwContainer) {
-      fwContainer = document.createElement('div');
-      fwContainer.className = 'intro-fireworks';
+    let fwContainer=inner.querySelector('.intro-fireworks');
+    if(!fwContainer){
+      fwContainer=document.createElement('div');
+      fwContainer.className='intro-fireworks';
       inner.appendChild(fwContainer);
     }
 
-    const secondRect = phase2El?.getBoundingClientRect();
-    const innerRect = inner.getBoundingClientRect();
-    const centerX = secondRect ? (secondRect.left + secondRect.width / 2 - innerRect.left) : innerRect.width / 2;
-    const centerY = secondRect ? (secondRect.top + secondRect.height / 2 - innerRect.top) : innerRect.height * 0.4;
+    const secondRect=phase2El?.getBoundingClientRect();
+    const innerRect=inner.getBoundingClientRect();
+    const centerX=secondRect?(secondRect.left+secondRect.width/2-innerRect.left):innerRect.width/2;
+    const centerY=secondRect?(secondRect.top+secondRect.height/2-innerRect.top):innerRect.height*0.4;
 
-    for (let b = 0; b < fwBurstsTotal; b++) {
-      const delay = fwOverlap ? 0 : b * fwSpacing;
-      setTimeout(() => {
-        if (finished) return;
-        if (b < fwNearCenter) {
-          const radius = 70;
-          const ang = Math.random() * Math.PI * 2;
-          const bx = centerX + Math.cos(ang) * radius * Math.random();
-          const by = centerY + Math.sin(ang) * radius * Math.random();
-          createBurst(fwContainer, bx, by, true);
+    for(let b=0;b<fwBurstsTotal;b++){
+      const delay=fwOverlap?0:b*fwSpacing;
+      setTimeout(()=>{
+        if(finished) return;
+        if(b<fwNearCenter){
+          const radius=70;
+          const ang=Math.random()*Math.PI*2;
+          const bx=centerX+Math.cos(ang)*radius*Math.random();
+          const by=centerY+Math.sin(ang)*radius*Math.random();
+          createBurst(fwContainer,bx,by,true);
         } else {
-          const bx = fwRandomScreen ? Math.random() * innerRect.width
-            : innerRect.width * (0.15 + Math.random() * 0.7);
-          const by = fwRandomScreen ? Math.random() * innerRect.height
-            : innerRect.height * (0.20 + Math.random() * 0.55);
-          createBurst(fwContainer, bx, by, false);
+          const bx=fwRandomScreen?Math.random()*innerRect.width:innerRect.width*(0.15+Math.random()*0.7);
+          const by=fwRandomScreen?Math.random()*innerRect.height:innerRect.height*(0.20+Math.random()*0.55);
+          createBurst(fwContainer,bx,by,false);
         }
       }, delay);
     }
-
-    fireworksFinishTimer = setTimeout(finishIntro, fireworksDuration);
+    fireworksFinishTimer=setTimeout(finishIntro, fireworksDuration);
   }
 
-  function createBurst(container, x, y, nearCenter) {
-    const burst = document.createElement('div');
-    burst.className = 'fw-burst';
-    burst.style.left = x + 'px';
-    burst.style.top = y + 'px';
-
-    const particlesCount = randBetween(fwPMin, fwPMax);
-
-    for (let i = 0; i < particlesCount; i++) {
-      const fp = document.createElement('span');
-      fp.className = 'fw-p';
-      const angle = (Math.PI * 2) * (i / particlesCount) + (Math.random() * 0.3);
-      const spread = fwSpreadBase + Math.random() * fwSpreadVar;
-      const actualSpread = nearCenter ? spread * 0.9 : spread;
-      const dx = Math.cos(angle) * actualSpread;
-      const dy = Math.sin(angle) * actualSpread;
-      const size = randBetween(fwSizeMin, fwSizeMax);
-      fp.style.width = size + 'px';
-      fp.style.height = size + 'px';
-      fp.style.background = randFireworkColor();
-      fp.style.setProperty('--fdx', dx.toFixed(1) + 'px');
-      fp.style.setProperty('--fdy', dy.toFixed(1) + 'px');
-      fp.style.setProperty('--f-delay', (Math.random() * 140).toFixed(0) + 'ms');
-      fp.style.setProperty('--f-dur', (800 + Math.random() * 900).toFixed(0) + 'ms');
+  function createBurst(container,x,y,nearCenter){
+    const burst=document.createElement('div');
+    burst.className='fw-burst';
+    burst.style.left=x+'px';
+    burst.style.top=y+'px';
+    const particlesCount=randBetween(fwPMin,fwPMax);
+    for(let i=0;i<particlesCount;i++){
+      const fp=document.createElement('span');
+      fp.className='fw-p';
+      const angle=(Math.PI*2)*(i/particlesCount)+(Math.random()*0.3);
+      const spread=fwSpreadBase+Math.random()*fwSpreadVar;
+      const actualSpread=nearCenter?spread*0.9:spread;
+      const dx=Math.cos(angle)*actualSpread;
+      const dy=Math.sin(angle)*actualSpread;
+      const size=randBetween(fwSizeMin,fwSizeMax);
+      fp.style.width=size+'px';
+      fp.style.height=size+'px';
+      fp.style.background=randFireworkColor();
+      fp.style.setProperty('--fdx',dx.toFixed(1)+'px');
+      fp.style.setProperty('--fdy',dy.toFixed(1)+'px');
+      fp.style.setProperty('--f-delay',(Math.random()*140).toFixed(0)+'ms');
+      fp.style.setProperty('--f-dur',(800+Math.random()*900).toFixed(0)+'ms');
       burst.appendChild(fp);
 
-      if (fwTrailEnabled) {
-        const trail = document.createElement('span');
-        trail.className = 'fw-trail';
-        const angleDeg = angle * 180 / Math.PI;
-        const length = Math.sqrt(dx * dx + dy * dy) * fwTrailFactor;
-        trail.style.setProperty('--trail-angle', angleDeg + 'deg');
-        trail.style.setProperty('--trail-length', length + 'px');
-        trail.style.setProperty('--trail-thickness', fwTrailThickness + 'px');
-        trail.style.setProperty('--trail-fade-extra', fwTrailFadeExtra + 'ms');
-        trail.style.background = 'linear-gradient(90deg,' + randFireworkColor() + ', rgba(255,255,255,0))';
+      if(fwTrailEnabled){
+        const trail=document.createElement('span');
+        trail.className='fw-trail';
+        const angleDeg=angle*180/Math.PI;
+        const length=Math.sqrt(dx*dx+dy*dy)*fwTrailFactor;
+        trail.style.setProperty('--trail-angle',angleDeg+'deg');
+        trail.style.setProperty('--trail-length',length+'px');
+        trail.style.setProperty('--trail-thickness',fwTrailThickness+'px');
+        trail.style.setProperty('--trail-fade-extra',fwTrailFadeExtra+'ms');
+        trail.style.background='linear-gradient(90deg,'+randFireworkColor()+', rgba(255,255,255,0))';
         burst.appendChild(trail);
       }
     }
-
     container.appendChild(burst);
-    setTimeout(() => burst.remove(), 2600 + fwTrailFadeExtra);
+    setTimeout(()=>burst.remove(),2600+fwTrailFadeExtra);
   }
 
-  function randBetween(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-  function randFireworkColor() {
-    const palette = [
-      'var(--primary,#e8caa6)',
-      'var(--primary-2,#d4b088)',
-      '#ffd479','#ff9f5b','#5b9cff','#7fb3ff',
-      '#ffe0b3','#ffc3a0','#fff2d0','#ffe8c2'
-    ];
-    return palette[Math.floor(Math.random() * palette.length)];
+  function randBetween(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function randFireworkColor(){
+    const palette=['var(--primary,#e8caa6)','var(--primary-2,#d4b088','#ffd479','#ff9f5b','#5b9cff','#7fb3ff','#ffe0b3','#ffc3a0','#fff2d0','#ffe8c2'];
+    return palette[Math.floor(Math.random()*palette.length)];
   }
 
-  const passiveOpt = { passive: true };
-  function onSkipClick(e) {
-    e.stopPropagation();
-    manualSkip();
-  }
-  function onKeydown(e) {
-    if (finished) return;
-    if (['Escape','Enter','Tab',' '].includes(e.key)) manualSkip();
-  }
+  const passiveOpt={passive:true};
+  function onSkipClick(e){ e.stopPropagation(); manualSkip(); }
+  function onKeydown(e){ if(finished) return; if(['Escape','Enter','Tab',' '].includes(e.key)) manualSkip(); }
 
-  if (skipEnabled && skipBtn) skipBtn.addEventListener('click', onSkipClick);
+  if(skipEnabled && skipBtn) skipBtn.addEventListener('click', onSkipClick);
   document.addEventListener('keydown', onKeydown, passiveOpt);
-  // Si quieres también cualquier click global para saltar, descomenta:
-  // document.addEventListener('click', manualSkip, passiveOpt);
 
-  if (prefersReduce) {
-    if (phase1El) phase1El.textContent = firstText;
-    if (phase2El) {
-      phase2El.hidden = false;
-      phase2El.textContent = secondText;
-    }
-    setTimeout(finishIntro, 900);
+  if(prefersReduce){
+    phase1El && (phase1El.textContent=firstText);
+    if(phase2El){ phase2El.hidden=false; phase2El.textContent=secondText; }
+    setTimeout(finishIntro,900);
   } else {
     requestAnimationFrame(typeFirst);
   }
