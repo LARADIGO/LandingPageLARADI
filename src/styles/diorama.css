@@ -17,8 +17,6 @@
     0 18px 50px rgba(17,35,28,.10),
     0 2px 0 rgba(255,255,255,.6) inset,
     0 -2px 0 rgba(0,0,0,.04) inset;
-  --dio-bevel-top: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0) 40%);
-  --dio-bevel-bottom: linear-gradient(0deg, rgba(0,0,0,.06), rgba(0,0,0,0) 40%);
 }
 
 .wrap { max-width:1280px; margin-inline:auto; padding: clamp(16px,3vw,28px); }
@@ -75,10 +73,7 @@
 }
 
 @media (max-width: 980px){
-  .stage {
-    min-height: unset;
-    padding-top: 4px;
-  }
+  .stage { min-height: unset; padding-top: 4px; }
 }
 
 @media (min-width: 981px){
@@ -125,14 +120,13 @@
   box-shadow:0 12px 36px rgba(2,6,23,.18);
   position:relative;
   transition: box-shadow .35s ease;
-  z-index:2; /* asegúrate de que nada tape el borde inferior */
+  z-index:2;
 }
 @media (hover:hover) and (pointer:fine) {
   .hero-media-box:hover { box-shadow: 0 18px 48px rgba(2,6,23,.24); }
 }
 
-/* Imagen por defecto (desktop) */
-/* FIX BORDER: eliminamos border-radius:0 y forzamos redondeo también en la propia imagen/picture */
+/* Imagen (desktop cover) */
 .stage img {
   display:block;
   width:100%;
@@ -142,33 +136,33 @@
   transform-origin:center;
   transition:none;
 }
-
-/* Aplicar mismo radio al contenido interno para que no “aplane” el borde inferior */
 .hero-media-box picture,
-.hero-media-box img {
-  border-radius:20px;
-}
+.hero-media-box img { border-radius:20px; }
 
-/* ---- Ajustes móvil: mostrar completa sin recortar ---- */
+/* --- Móvil: SIN hueco extra --- */
 @media (max-width: 980px){
   .hero-media-box {
-    aspect-ratio:auto !important;
-    min-height: 420px;
-    display:flex;
+    /* Quitamos min-height y flex que generaban el espacio vacío */
+    min-height: unset;
+    display:block;
+    aspect-ratio: auto !important;
   }
   .hero-media-box picture,
   .hero-media-box img {
-    height:100%;
+    height:auto;
   }
   .stage img {
     object-fit:contain;
   }
 }
 
-/* Modo contain también en desktop si se usa la clase */
-.hero-media-box.contain-mode img {
-  object-fit:contain;
+/* Variante opcional para forzar cover también en móvil (si la aplicas) */
+.hero-media-box.tight img {
+  object-fit:cover !important;
 }
+
+/* Contain también en desktop si se usa la clase */
+.hero-media-box.contain-mode img { object-fit:contain; }
 
 /* Ola */
 .waves {
@@ -211,7 +205,6 @@
 .dark-theme .diorama-page h1 { color:var(--text); }
 .dark-theme .diorama-page .lead,
 .dark-theme .diorama-page .bullets { color:var(--muted); }
-.dark-theme .diorama-page .btn { background:transparent; color:var(--text); border-color:var(--border); }
+.dark-theme .diorama-page .btn { background:transparent; color:var(--text); border:1px solid var(--border); }
 .dark-theme .diorama-page .btn.primary { background:var(--dio-primary-pastel); color:#0F172A; border-color:var(--dio-primary-pastel); }
-
 .diorama-page .btn.primary:hover { background:var(--dio-primary-pastel-hover); border-color:var(--dio-primary-pastel-hover); }
