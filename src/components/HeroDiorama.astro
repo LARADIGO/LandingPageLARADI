@@ -8,6 +8,7 @@ interface Props{
   splineUrl?: string;
   imageWidth?: number;
   imageHeight?: number;
+  heroImageContain?: boolean; // NUEVO opcional (true = object-fit:contain también en desktop)
 }
 const {
   title = 'El TPV para tu tienda, simple y en regla',
@@ -17,24 +18,22 @@ const {
   imageSrc = '/assets/features/welcome_page.png',
   splineUrl = '',
   imageWidth = 1200,
-  imageHeight = 720
+  imageHeight = 720,
+  heroImageContain = false
 } = Astro.props as Props;
 
-/**
- * Rendimiento:
- * - fetchpriority="high" para LCP
- * - width/height para evitar CLS
- * - <picture> con WebP (requiere el .webp generado)
- * - sizes para elegir tamaño óptimo según viewport
- */
 const webpCandidate = imageSrc.endsWith('.png')
   ? imageSrc.replace(/\.png$/i, '.webp')
   : imageSrc.endsWith('.jpg') || imageSrc.endsWith('.jpeg')
     ? imageSrc.replace(/\.(jpg|jpeg)$/i, '.webp')
     : '';
 
-// Columna de la imagen ≈ 56-58vw en desktop (2 columnas, 0.85fr/1.15fr)
 const sizes = '(min-width: 981px) 56vw, 92vw';
+
+// Solo aplicamos aspect-ratio inline para desktop (lo anulamos en móvil con CSS)
+// Si no quieres aspect-ratio nunca, elimina este style.
+const boxStyle = `aspect-ratio:${imageWidth}/${imageHeight};`;
+const containClass = heroImageContain ? 'contain-mode' : '';
 ---
 <section class="diorama-page" aria-label="Hero estilo diorama">
   <div class="wrap">
@@ -58,7 +57,7 @@ const sizes = '(min-width: 981px) 56vw, 92vw';
           <div class="media">
             {splineUrl
               ? (
-                  <div class="hero-media-box" style={`aspect-ratio:${imageWidth}/${imageHeight};`}>
+                  <div class={`hero-media-box ${containClass}`} style={boxStyle}>
                     <iframe
                       src={splineUrl}
                       title="Diorama 3D"
@@ -70,7 +69,7 @@ const sizes = '(min-width: 981px) 56vw, 92vw';
                   </div>
                 )
               : (
-                  <div class="hero-media-box" style={`aspect-ratio:${imageWidth}/${imageHeight};`}>
+                  <div class={`hero-media-box ${containClass}`} style={boxStyle}>
                     <picture style="display:block; width:100%; height:100%;">
                       {webpCandidate && <source srcset={webpCandidate} type="image/webp" />}
                       <img
@@ -103,14 +102,12 @@ const sizes = '(min-width: 981px) 56vw, 92vw';
       const hero = document.querySelector('.diorama-page');
       const path = document.querySelector('.waves .wave-path');
       if (!path || !hero || reduce) return;
-
       const io = new IntersectionObserver((entries) => {
-        for (const e of entries) {
+        entries.forEach(e => {
           if (e.isIntersecting) path.classList.add('is-animating');
           else path.classList.remove('is-animating');
-        }
+        });
       }, { threshold: 0.15 });
-
       io.observe(hero);
     })();
   </script>

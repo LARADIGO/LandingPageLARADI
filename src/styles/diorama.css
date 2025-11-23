@@ -21,15 +21,12 @@
   --dio-bevel-bottom: linear-gradient(0deg, rgba(0,0,0,.06), rgba(0,0,0,0) 40%);
 }
 
-/* Aumentamos el ancho máximo del contenedor para dar más aire a la imagen */
 .wrap { max-width:1280px; margin-inline:auto; padding: clamp(16px,3vw,28px); }
 
 .diorama-page {
   background: linear-gradient(135deg, var(--dio-bg-1), var(--dio-bg-2));
   color: var(--dio-ink);
   font-family: var(--font-sans);
-
-  /* Variables ola */
   --wave-fill-base: #ECF2EC;
   --wave-glow-color: var(--primary);
 }
@@ -45,35 +42,45 @@
 }
 
 .hero-grid {
-  position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
   --hero-pad: clamp(20px, 3.6vw, 44px);
-  --hero-image-gutter: clamp(28px,4vw,72px); /* espacio que reservamos a la derecha */
+  --hero-image-gutter: clamp(28px,4vw,72px);
   padding: var(--hero-pad);
-  display:grid; gap: clamp(16px,2.5vw,32px);
+  display:grid;
+  gap: clamp(16px,2.5vw,32px);
   grid-template-columns: 0.85fr 1.15fr;
   align-items:center;
 }
+
 @media (max-width: 980px){
   .hero-grid {
     grid-template-columns: 1fr;
     --hero-pad: clamp(16px, 4vw, 28px);
     --hero-image-gutter: 0px;
+    gap: 20px;
+    padding-top: 20px;
   }
 }
 
-/* Escena sin “cuadrado” y con halos por detrás */
+/* Escena */
 .stage {
   position: relative;
   min-height: 520px;
-  border: none;
   background: transparent;
   overflow: visible;
-  box-shadow: none;
   display: grid;
   place-items: center;
+  box-shadow: none;
 }
 
-/* Extensión controlada: añadimos ancho pero dejamos gutter a la derecha */
+@media (max-width: 980px){
+  .stage {
+    min-height: unset;
+    padding-top: 4px;
+  }
+}
+
 @media (min-width: 981px){
   .hero-grid > .stage {
     width: calc(100% + var(--hero-pad) - var(--hero-image-gutter));
@@ -81,7 +88,7 @@
   }
 }
 
-/* Halos degradados detrás (tema claro marrón, tema oscuro azul) */
+/* Halos */
 .stage::before {
   content:"";
   position:absolute;
@@ -102,42 +109,68 @@
 .stage .media {
   width: 100%;
   height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  z-index:1;
 }
 
-/* Contenedor que recorta y aplica sombra: evita bordes blancos */
+/* Caja imagen */
 .hero-media-box {
-  width: 100%;
-  height: auto;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 12px 36px rgba(2,6,23,.18);
+  width:100%;
+  height:auto;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 12px 36px rgba(2,6,23,.18);
+  position:relative;
+  transition: box-shadow .35s ease;
+  z-index:2; /* asegúrate de que nada tape el borde inferior */
 }
 @media (hover:hover) and (pointer:fine) {
   .hero-media-box:hover { box-shadow: 0 18px 48px rgba(2,6,23,.24); }
 }
 
-/* La imagen rellena el contenedor; sin huecos laterales */
+/* Imagen por defecto (desktop) */
+/* FIX BORDER: eliminamos border-radius:0 y forzamos redondeo también en la propia imagen/picture */
 .stage img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* antes contain */
-  border-radius: 0;  /* el radio lo hereda el contenedor que recorta */
-  box-shadow: none; /* sombra en el contenedor */
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  box-shadow:none;
   transform-origin:center;
-  transition: none;
+  transition:none;
 }
 
-@media (max-width: 600px){
-  .stage { padding: 5%; }
+/* Aplicar mismo radio al contenido interno para que no “aplane” el borde inferior */
+.hero-media-box picture,
+.hero-media-box img {
+  border-radius:20px;
 }
 
-/* Ola y animación */
+/* ---- Ajustes móvil: mostrar completa sin recortar ---- */
+@media (max-width: 980px){
+  .hero-media-box {
+    aspect-ratio:auto !important;
+    min-height: 420px;
+    display:flex;
+  }
+  .hero-media-box picture,
+  .hero-media-box img {
+    height:100%;
+  }
+  .stage img {
+    object-fit:contain;
+  }
+}
+
+/* Modo contain también en desktop si se usa la clase */
+.hero-media-box.contain-mode img {
+  object-fit:contain;
+}
+
+/* Ola */
 .waves {
   position:absolute; left:0; right:0; bottom:0; height:140px;
   pointer-events:none; z-index:0;
@@ -154,25 +187,20 @@
     wave-float 10s ease-in-out infinite,
     wave-glow 4.8s ease-in-out infinite;
 }
-@keyframes wave-float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(12px); }
-  100% { transform: translateY(0); }
-}
+@keyframes wave-float { 0% {transform:translateY(0);} 50% {transform:translateY(12px);} 100% {transform:translateY(0);} }
 @keyframes wave-glow {
-  0%   { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
-  50%  { fill: var(--wave-glow-color); opacity: 0.97; filter: saturate(1.04) brightness(1.05); }
-  100% { fill: var(--wave-fill-base); opacity: 1; filter: saturate(1) brightness(1); }
+  0% { fill: var(--wave-fill-base); opacity:1; filter:saturate(1) brightness(1); }
+  50% { fill: var(--wave-glow-color); opacity:.97; filter:saturate(1.04) brightness(1.05); }
+  100% { fill: var(--wave-fill-base); opacity:1; filter:saturate(1) brightness(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .wave-path { animation: none !important; transform: none !important; filter: none !important; }
+  .wave-path { animation:none !important; transform:none !important; filter:none !important; }
 }
 
 /* Tema oscuro */
 .dark-theme .diorama-page {
   background:linear-gradient(135deg,#0c1219,#101a24);
   color:var(--text);
-
   --wave-fill-base: rgba(255,255,255,.06);
   --wave-glow-color: var(--primary);
 }
