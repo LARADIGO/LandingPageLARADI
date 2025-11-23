@@ -35,35 +35,54 @@ const initialStatusClass = errCode ? 'status-error' : '';
     imageHeight={720}
   />
 
-  <section id="caracteristicas" class="section">
-    <div class="container">
-      <h2 class="h2 center">Características clave</h2>
-      <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
+<section id="caracteristicas" class="section">
+  <div class="container">
+    <h2 class="h2 center">Características clave</h2>
+    <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
 
-      <div class="cards">
-        <article class="card">
-          <div class="card-ico">💳</div>
-          <h3>Cobro en segundos</h3>
-          <p>Flujo de venta ágil, atajos de teclado y lector de códigos.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">📦</div>
-          <h3>Inventario</h3>
-          <p>Variantes, costes y niveles de stock por tienda.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">🧾</div>
-          <h3>Tickets y cierres</h3>
-          <p>Historial, devoluciones, arqueos y exportación contable.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">📈</div>
-          <h3>Informes</h3>
-          <p>Ventas por día, producto y empleado. Descarga a CSV.</p>
-        </article>
-      </div>
+    <div class="features-list" role="list">
+      <article class="feature-item" role="listitem" aria-labelledby="f-cobros">
+        <div class="feature-ico" aria-hidden="true">💳</div>
+        <h3 id="f-cobros" class="feature-title">Gestión de cobros</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-facturas">
+        <div class="feature-ico" aria-hidden="true">🧾</div>
+        <h3 id="f-facturas" class="feature-title">Facturas y tickets</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-informes">
+        <div class="feature-ico" aria-hidden="true">📈</div>
+        <h3 id="f-informes" class="feature-title">Informes</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-inventario">
+        <div class="feature-ico" aria-hidden="true">📦</div>
+        <h3 id="f-inventario" class="feature-title">Inventario</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-arqueo">
+        <div class="feature-ico" aria-hidden="true">💼</div>
+        <h3 id="f-arqueo" class="feature-title">Arqueo de caja</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-empleados">
+        <div class="feature-ico" aria-hidden="true">👥</div>
+        <h3 id="f-empleados" class="feature-title">Gestión de empleados</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-verifactu">
+        <div class="feature-ico" aria-hidden="true">🛡️</div>
+        <h3 id="f-verifactu" class="feature-title">VeriFactu (modelo no‑VeriFactu)</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-clientes">
+        <div class="feature-ico" aria-hidden="true">🎁</div>
+        <h3 id="f-clientes" class="feature-title">Clientes y fidelización</h3>
+      </article>
     </div>
-  </section>
+  </div>
+</section>
 
   <FeatureShowcaseDynamicRatio
     defer={true}
@@ -200,13 +219,35 @@ const initialStatusClass = errCode ? 'status-error' : '';
     ]}
   />
 
-  <section id="precios" class="section alt defer">
+  <section id="verifactu" class="section alt verifactu-section defer">
+    <div class="container">
+      <h2 class="h2 center">VeriFactu</h2>
+      <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
+      <div class="cards cards-3">
+        <article class="card"><div class="card-ico">🛡️</div><h3>¿Qué es VeriFactu?</h3><p>Sistema que garantiza integridad y trazabilidad de los registros de facturación.</p></article>
+        <article class="card"><div class="card-ico">📅</div><h3>Entrada 2026</h3><p>Su obligatoriedad comienza en 2026; anticiparte reduce riesgos y costes.</p></article>
+        <article class="card"><div class="card-ico">⚙️</div><h3>Impacto técnico</h3><p>Secuencialidad, firma/hash, almacenamiento seguro y posible envío telemático.</p></article>
+      </div>
+      <p class="center" style="margin-top:26px;">
+        <span class="vf-cta">
+          <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
+          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria"
+               width="28" height="28"
+               loading="lazy"
+               decoding="async"
+               class="vf-cta__logo" />
+        </span>
+      </p>
+    </div>
+  </section>
+
+    <section id="precios" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Escoge tu plan</h2>
       <div class="pricing-grid">
         <div class="pricing-card featured">
           <h3>Esencial</h3>
-          <p class="price"><span>€</span>9,90<span>/mes</span></p>
+          <p class="price">9,90<span>€</span><span>/mes</span></p>
           <ul>
             <li>1 terminal</li>
             <li>Control y arqueo de caja</li>
@@ -218,7 +259,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
         </div>
         <div class="pricing-card featured">
           <h3>Avanzado</h3>
-          <p class="price"><span>€</span>14,90<span>/mes</span></p>
+          <p class="price">14,90<span>€</span><span>/mes</span></p>
           <ul>
             <li>2 Terminales</li>
             <li>Plan Esencial</li>
@@ -231,7 +272,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
         </div>
         <div class="pricing-card featured">
           <h3>Pro</h3>
-          <p class="price"><span>€</span>19,90<span>/mes</span></p>
+          <p class="price">19,90<span>€</span><span>/mes</span></p>
           <ul>
             <li>+ de 2 Terminales</li>
             <li>Plan Avanzado</li>
@@ -255,28 +296,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
           integración de hardware, módulos personalizados, adaptación VeriFactu y soporte cercano para tu crecimiento.
         </p>
       </div>
-    </div>
-  </section>
-
-  <section id="verifactu" class="section alt verifactu-section defer">
-    <div class="container">
-      <h2 class="h2 center">VeriFactu</h2>
-      <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
-      <div class="cards cards-3">
-        <article class="card"><div class="card-ico">🛡️</div><h3>¿Qué es VeriFactu?</h3><p>Sistema que garantiza integridad y trazabilidad de los registros de facturación.</p></article>
-        <article class="card"><div class="card-ico">📅</div><h3>Entrada 2026</h3><p>Su obligatoriedad comienza en 2026; anticiparte reduce riesgos y costes.</p></article>
-        <article class="card"><div class="card-ico">⚙️</div><h3>Impacto técnico</h3><p>Secuencialidad, firma/hash, almacenamiento seguro y posible envío telemático.</p></article>
-      </div>
-      <p class="center" style="margin-top:26px;">
-        <span class="vf-cta">
-          <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
-          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria"
-               width="28" height="28"
-               loading="lazy"
-               decoding="async"
-               class="vf-cta__logo" />
-        </span>
-      </p>
     </div>
   </section>
 
