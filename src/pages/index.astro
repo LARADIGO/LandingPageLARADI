@@ -299,34 +299,32 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-  <section id="sobre" class="section alt defer">
-    <div class="container">
-      <h2 class="h2 center">Quiénes somos</h2>
-      <p class="lead center max-680">Equipo encargado de que tengas tu TPV y puedas trabajar con él de forma sencilla y en regla.</p>
-      <div class="cards">
-        <article class="card">
-          <div class="card-ico">🤝</div>
-          <h3>Soporte cercano</h3>
-          <p>Atención y tiempos de respuesta rápidos (normalmente en menos de 24h).</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">🛍️</div>
-          <h3>Experiencia en retail</h3>
-          <p>Conocimiento práctico de caja, inventario y periféricos.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">🔐</div>
-          <h3>Seguridad y cumplimiento</h3>
-          <p>Buenas prácticas y alineados con requisitos VeriFactu.</p>
-        </article>
-        <article class="card">
-          <div class="card-ico">🚀</div>
-          <h3>Evolución continua</h3>
-          <p>Mejoras frecuentes enfocadas en valor real.</p>
-        </article>
-      </div>
+<section id="sobre" class="section alt defer">
+  <div class="container">
+    <h2 class="h2 center">Quiénes somos</h2>
+    <p class="lead center max-680">Somos un equipo pequeño y cercano: desarrollamos este TPV pensando en las pymes para que dispongan de una herramienta completa y fácil de usar, y además cuenten con nuestra ayuda ante cualquier duda o problema.</p>
+
+    <div class="team-grid" role="list">
+      <article class="team-member" role="listitem" aria-labelledby="team-1">
+        <img class="team-photo" src="/assets/team/diego.jpg" alt="Foto de Diego" width="280" height="280" />
+        <div class="team-body">
+          <h3 id="team-1">Diego Miret</h3>
+          <p class="muted">Ingeniero Informático</p>
+          <p>He desarrollado la parte técnica del sistema: backend, integraciones con periféricos y la arquitectura para que el TPV sea estable y escalable. Si tienes dudas técnicas, puedo ayudarte a ponerlo en marcha.</p>
+        </div>
+      </article>
+
+      <article class="team-member" role="listitem" aria-labelledby="team-2">
+        <img class="team-photo" src="/assets/team/lara.jpg" alt="Foto de Lara" width="280" height="280" />
+        <div class="team-body">
+          <h3 id="team-2">Lara González</h3>
+          <p class="muted">Ingeniera de Telecomunicaciones</p>
+          <p>Me encargo de la experiencia de usuario, conectividad y del cumplimiento con requisitos fiscales (VeriFactu). Si necesitas asesoramiento sobre integración de hardware o flujo de caja, estamos para ayudarte.</p>
+        </div>
+      </article>
     </div>
-  </section>
+  </div>
+</section>
 
   <FaqSection
     defer={true}
