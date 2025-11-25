@@ -35,85 +35,73 @@ const initialStatusClass = errCode ? 'status-error' : '';
     imageHeight={720}
   />
 
-<section id="caracteristicas" class="section">
-  <div class="container">
-    <h2 class="h2 center">Características clave</h2>
-    <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
+  <section id="caracteristicas" class="section">
+    <div class="container">
+      <h2 class="h2 center">Características clave</h2>
+      <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
 
-    <div class="features-list" role="list">
-      <article class="feature-item" role="listitem" aria-labelledby="f-cobros">
-        <div class="feature-ico" aria-hidden="true">💳</div>
-        <h3 id="f-cobros" class="feature-title">Gestión de cobros</h3>
-      </article>
+      <div class="features-list" role="list" data-features>
+        <article class="feature-item" role="listitem" aria-labelledby="f-cobros" data-feature="cobros">
+          <div class="feature-ico" aria-hidden="true">💳</div>
+          <h3 id="f-cobros" class="feature-title">Gestión de cobros</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-facturas">
-        <div class="feature-ico" aria-hidden="true">🧾</div>
-        <h3 id="f-facturas" class="feature-title">Facturas y tickets</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-facturas" data-feature="facturas">
+          <div class="feature-ico" aria-hidden="true">🧾</div>
+          <h3 id="f-facturas" class="feature-title">Facturas y tickets</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-informes">
-        <div class="feature-ico" aria-hidden="true">📈</div>
-        <h3 id="f-informes" class="feature-title">Informes</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-informes" data-feature="informes">
+          <div class="feature-ico" aria-hidden="true">📈</div>
+          <h3 id="f-informes" class="feature-title">Informes</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-inventario">
-        <div class="feature-ico" aria-hidden="true">📦</div>
-        <h3 id="f-inventario" class="feature-title">Inventario</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-inventario" data-feature="inventario">
+          <div class="feature-ico" aria-hidden="true">📦</div>
+          <h3 id="f-inventario" class="feature-title">Inventario</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-arqueo">
-        <div class="feature-ico" aria-hidden="true">💼</div>
-        <h3 id="f-arqueo" class="feature-title">Arqueo de caja</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-arqueo" data-feature="arqueo">
+          <div class="feature-ico" aria-hidden="true">💼</div>
+          <h3 id="f-arqueo" class="feature-title">Arqueo de caja</h3>
+          <span class="coin" aria-hidden="true"></span>
+          <span class="coin" aria-hidden="true"></span>
+          <span class="coin" aria-hidden="true"></span>
+          <span class="coin" aria-hidden="true"></span>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-empleados">
-        <div class="feature-ico" aria-hidden="true">👥</div>
-        <h3 id="f-empleados" class="feature-title">Gestión de empleados</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-empleados" data-feature="empleados">
+          <div class="feature-ico" aria-hidden="true">👥</div>
+          <h3 id="f-empleados" class="feature-title">Gestión de empleados</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-verifactu">
-        <div class="feature-ico" aria-hidden="true">🛡️</div>
-        <h3 id="f-verifactu" class="feature-title">VeriFactu (modelo no‑VeriFactu)</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-verifactu" data-feature="verifactu">
+          <div class="feature-ico" aria-hidden="true">🛡️</div>
+          <h3 id="f-verifactu" class="feature-title">VeriFactu</h3>
+        </article>
 
-      <article class="feature-item" role="listitem" aria-labelledby="f-clientes">
-        <div class="feature-ico" aria-hidden="true">🎁</div>
-        <h3 id="f-clientes" class="feature-title">Clientes y fidelización</h3>
-      </article>
+        <article class="feature-item" role="listitem" aria-labelledby="f-clientes" data-feature="clientes">
+          <div class="feature-ico" aria-hidden="true">🎁</div>
+          <h3 id="f-clientes" class="feature-title">Clientes y fidelización</h3>
+        </article>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <FeatureShowcaseDynamicRatio
     defer={true}
     items={[
       {
         title:"Personalización Total de TePeuVe",
-        text:"Adapta TePeuVe a tu forma de trabajar. Elige entre modo claro u oscuro, configura atajos de teclado para agilizar tareas y ajusta cada función del sistema según las necesidades de tu negocio. Activa tu programa de fidelización, personaliza permisos y selecciona entre varios diseños de interfaz. Un TPV completamente configurable para que tu comercio trabaje más rápido, mejor y a tu manera.",
+        text:"Adapta TePeuVe a tu forma de trabajar. Elige entre modo claro u oscuro, configura atajos y ajusta cada módulo a tu negocio.",
         carousel: true,
         carouselImages: [
-          {
-            light: "/assets/features/claro_oscuro.png",
-            dark: "/assets/features/claro_oscuro.png",
-            alt: "Ajustes de Venta"
-          },
-          {
-            light: "/assets/features/ajustes.png",
-            dark: "/assets/features/ajustes_oscuro.png",
-            alt: "Ajustes de Venta"
-          },
-          {
-            light: "/assets/features/ajustes2.png",
-            dark: "/assets/features/ajustes_oscuro2.png",
-            alt: "Ajustes de Venta"
-          },
-          {
-            light: "/assets/features/fidelizacion.png",
-            dark: "/assets/features/fidelizacion_oscuro.png",
-            alt: "Ajustes de Venta"
-          },
+          { light: "/assets/features/claro_oscuro.png", dark: "/assets/features/claro_oscuro.png", alt: "Modo claro y oscuro" },
+          { light: "/assets/features/ajustes.png", dark: "/assets/features/ajustes_oscuro.png", alt: "Panel de ajustes" },
+          { light: "/assets/features/ajustes2.png", dark: "/assets/features/ajustes_oscuro2.png", alt: "Ajustes avanzados" },
+          { light: "/assets/features/fidelizacion.png", dark: "/assets/features/fidelizacion_oscuro.png", alt: "Fidelización de clientes" },
         ],
-        alt:"Ajustes de Venta",
+        alt:"Personalización del TPV",
         mediaAnim:"zoom-in",
         contentAnim:"slide-left",
         altBg:true,
@@ -125,26 +113,14 @@ const initialStatusClass = errCode ? 'status-error' : '';
       },
       {
         title:"Gestión de Caja y Control de Efectivo",
-        text:"TePeuVe facilita el control completo de la caja registrando automáticamente todas las transacciones del día. Permite un arqueo de caja rápido e intuitivo. Además, el sistema es compatible con cajones portamonedas automáticos, permitiendo abrir el cajón en cada pago en efectivo de forma instantánea y segura. Un control de caja eficiente para cualquier comercio que necesite un TPV ágil y fiable.",
+        text:"Control automático de movimientos y arqueos rápidos. Compatible con cajón portamonedas.",
         carousel: true,
         carouselImages: [
-          {
-            light: "/assets/features/arqueo_caja.png",
-            dark: "/assets/features/arqueo_caja_oscuro.png",
-            alt: "Operativa de Caja"
-          },
-          {
-            light: "/assets/features/arqueo_caja2.png",
-            dark: "/assets/features/arqueo_caja_oscuro2.png",
-            alt: "Operativa de Caja"
-          },
-          {
-            light: "/assets/features/arqueo_caja3.png",
-            dark: "/assets/features/arqueo_caja_oscuro3.png",
-            alt: "Operativa de Caja"
-          },
+          { light: "/assets/features/arqueo_caja.png", dark: "/assets/features/arqueo_caja_oscuro.png", alt: "Arqueo de caja" },
+          { light: "/assets/features/arqueo_caja2.png", dark: "/assets/features/arqueo_caja_oscuro2.png", alt: "Histórico de arqueos" },
+          { light: "/assets/features/arqueo_caja3.png", dark: "/assets/features/arqueo_caja_oscuro3.png", alt: "Detalle de movimientos" },
         ],
-        alt:"Operativa de Caja",
+        alt:"Gestión de caja",
         mediaAnim:"scale-up",
         contentAnim:"slide-right",
         altBg:true,
@@ -155,20 +131,12 @@ const initialStatusClass = errCode ? 'status-error' : '';
         pauseOnHover: true
       },
       {
-        title:"Gestión de Empleados y Roles 100% Personalizada",
-        text:"Crea y gestiona fácilmente a tus empleados en TePeuVe. Asigna a cada trabajador su propio usuario, registra sus ventas y controla permisos mediante roles personalizados. Activa acceso seguro con PIN, elige entre múltiples avatares o sube una foto personalizada para identificar cada perfil. Una gestión rápida, segura y perfecta para cualquier comercio que necesite un TPV profesional.",
+        title:"Gestión de Empleados y Roles Personalizados",
+        text:"Usuarios, roles, permisos granulares, PIN seguro y registro de ventas por empleado.",
         carousel: true,
         carouselImages: [
-          {
-            light: "/assets/features/empleados.png",
-            dark: "/assets/features/empleados_oscuro.png",
-            alt: "Gestión de empleados"
-          },
-          {
-            light: "/assets/features/empleados2.png",
-            dark: "/assets/features/empleados_oscuro2.png",
-            alt: "Gestión de empleados"
-          },
+          { light: "/assets/features/empleados.png", dark: "/assets/features/empleados_oscuro.png", alt: "Listado de empleados" },
+          { light: "/assets/features/empleados2.png", dark: "/assets/features/empleados_oscuro2.png", alt: "Roles y permisos" },
         ],
         alt:"Gestión de empleados",
         mediaAnim:"rotate-in",
@@ -182,31 +150,15 @@ const initialStatusClass = errCode ? 'status-error' : '';
       },
       {
         title:"Informes claros y Personalizables",
-        text:"Obten una visión rápida y intuitiva de los datos de tu negocio. Observa distintos paneles de informes, modifica y filtra los datos",
+        text:"Paneles filtrables y métricas clave. Ajusta vistas y compara periodos para tomar decisiones.",
         carousel: true,
         carouselImages: [
-          {
-            light: "/assets/features/informes.png",
-            dark: "/assets/features/informes_oscuro.png",
-            alt: "Dashboard de informes"
-          },
-          {
-            light: "/assets/features/informes2.png",
-            dark: "/assets/features/informes_oscuro2.png",
-            alt: "Dashboard de informes"
-          },
-          {
-            light: "/assets/features/informes3.png",
-            dark: "/assets/features/informes_oscuro3.png",
-            alt: "Dashboard de informes"
-          },
-          {
-            light: "/assets/features/informes4.png",
-            dark: "/assets/features/informes_oscuro4.png",
-            alt: "Dashboard de informes"
-          },
+          { light: "/assets/features/informes.png", dark: "/assets/features/informes_oscuro.png", alt: "Dashboard principal" },
+          { light: "/assets/features/informes2.png", dark: "/assets/features/informes_oscuro2.png", alt: "Filtros de informes" },
+          { light: "/assets/features/informes3.png", dark: "/assets/features/informes_oscuro3.png", alt: "Detalle por producto" },
+          { light: "/assets/features/informes4.png", dark: "/assets/features/informes_oscuro4.png", alt: "Comparativas temporales" },
         ],
-        alt:"Informes y analítica",
+        alt:"Panel de informes",
         mediaAnim:"blur-in",
         contentAnim:"fade-in",
         altBg:true,
@@ -241,7 +193,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-    <section id="precios" class="section alt defer">
+  <section id="precios" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Escoge tu plan</h2>
       <div class="pricing-grid">
@@ -285,7 +237,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
         </div>
       </div>
 
-      <!-- Nota SEO bajo planes (actualizada con icono y encabezado destacado) -->
       <div class="pricing-note" role="note" aria-labelledby="pricing-note-heading">
         <div class="pricing-note__header">
           <span class="pricing-note__icon" aria-hidden="true">🧩</span>
@@ -299,48 +250,48 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </div>
   </section>
 
-<section id="sobre" class="section alt defer">
-  <div class="container">
-    <h2 class="h2 center">Quiénes somos</h2>
-    <p class="lead center max-680">Somos un equipo pequeño y cercano: desarrollamos este TPV pensando en las pymes para que dispongan de una herramienta completa y fácil de usar, y además cuenten con nuestra ayuda ante cualquier duda o problema.</p>
+  <section id="sobre" class="section alt defer">
+    <div class="container">
+      <h2 class="h2 center">Quiénes somos</h2>
+      <p class="lead center max-680">Somos un equipo pequeño y cercano: desarrollamos este TPV pensando en las pymes para que dispongan de una herramienta completa y fácil de usar.</p>
 
-    <div class="team-grid" role="list">
-      <article class="team-member" role="listitem" aria-labelledby="team-1">
-        <img class="team-photo" src="/assets/team/diego.jpg" alt="Foto de Diego" width="280" height="280" />
-        <div class="team-body">
-          <h3 id="team-1">Diego Miret</h3>
-          <p class="muted">Ingeniero Informático</p>
-          <p>He desarrollado la parte técnica del sistema: backend, integraciones con periféricos y la arquitectura para que el TPV sea estable y escalable. Si tienes dudas técnicas, puedo ayudarte a ponerlo en marcha.</p>
-        </div>
-      </article>
+      <div class="team-grid" role="list">
+        <article class="team-member" role="listitem" aria-labelledby="team-1">
+          <img class="team-photo" src="/assets/team/diego.jpg" alt="Foto de Diego" width="280" height="280" />
+          <div class="team-body">
+            <h3 id="team-1">Diego Miret</h3>
+            <p class="muted">Ingeniero Informático</p>
+            <p>Backend, periféricos e infraestructura estable y escalable. Te ayudo con la parte técnica.</p>
+          </div>
+        </article>
 
-      <article class="team-member" role="listitem" aria-labelledby="team-2">
-        <img class="team-photo" src="/assets/team/lara.jpg" alt="Foto de Lara" width="280" height="280" />
-        <div class="team-body">
-          <h3 id="team-2">Lara González</h3>
-          <p class="muted">Ingeniera de Telecomunicaciones</p>
-          <p>Me encargo de la experiencia de usuario, conectividad y del cumplimiento con requisitos fiscales (VeriFactu). Si necesitas asesoramiento sobre integración de hardware o flujo de caja, estamos para ayudarte.</p>
-        </div>
-      </article>
+        <article class="team-member" role="listitem" aria-labelledby="team-2">
+          <img class="team-photo" src="/assets/team/lara.jpg" alt="Foto de Lara" width="280" height="280" />
+          <div class="team-body">
+            <h3 id="team-2">Lara González</h3>
+            <p class="muted">Ingeniera de Telecomunicaciones</p>
+            <p>UX, conectividad y adecuación fiscal (VeriFactu). Asesoría en hardware y flujo de caja.</p>
+          </div>
+        </article>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <FaqSection
     defer={true}
     title="Preguntas frecuentes"
     description="Resolvemos dudas sobre el TPV y VeriFactu."
     items={[
-      { question: "¿Qué tipo de negocio puede usar TePeuVe?", answer: "TePeuVe está diseñado para prácticamente cualquier negocio que necesite un TPV fácil, intuitivo, rápido y completo. Nuestra herramienta se adapta a diferentes sectores permitiendo gestionar ventas, stock, clientes y caja desde un único lugar." },
-      { question: "¿Qué necesito para que TePeuVe funcione?", answer: "TePeuVe no exige equipos especiales. Puedes usar casi cualquier ordenador, incluso un portátil antiguo que ya tengas por casa. Si tienes dudas sobre qué equipo es mejor para tu comercio, te asesoramos desde el primer momento: contáctanos y te ayudamos a elegir la opción más económica y eficiente para montar tu TPV." },
-      { question: "¿Puedo conectar una impresora de tickets, lector de códigos o un cajón portamonedas?", answer: "Sí. TePeuVe es compatible con impresoras de tickets, lectores de códigos de barras, balanzas y cajones portamonedas automáticos." },
-      { question: "¿Hay contrato de permanencia?", answer: "No. Puedes cancelar cuando quieras sin penalizaciones." },
-      { question: "¿Puedo probar TePeuVe gratis antes de contratarlo?", answer: "Sí. TePeuVe ofrece una prueba gratuita de 30 días para que puedas evaluar todas las funciones del TPV para comercios sin compromiso. Ideal para comprobar si nuestro software TPV encaja con tu negocio antes de suscribirte." },
-      { question: "¿Ofrecéis soporte prioritario?", answer: "Sí, en planes avanzados y Pro, con tiempos de respuesta reducidos." },
-      { question: "¿Cumple con VeriFactu?", answer: "Se prepara para requisitos de integridad, secuencialidad y trazabilidad exigidos." },
-      { question: "¿Puedo gestionar clientes y su historial de compras?", answer: "Sí. Puedes registrar clientes, ver su historial de compras y activar un programa de fidelización personalizado. Ideal para negocios que quieren potenciar ventas recurrentes y conocer mejor a sus clientes." },
-      { question: "¿El TPV permite crear descuentos o promociones?", answer: "Sí. TePeuVe incluye opciones para crear descuentos, promociones automáticas y precios especiales, lo que te permite aumentar ventas en fechas clave o aplicar ofertas específicas por producto." },
-      { question: "¿Puedo trabajar con varios empleados, cajas o establecimientos?", answer: "Sí. Puedes crear usuarios para empleados, asignar roles y permisos, y gestionar múltiples cajas desde el mismo negocio." },
+      { question: "¿Qué tipo de negocio puede usar TePeuVe?", answer: "Cualquier comercio que necesite un TPV rápido, intuitivo y con control de inventario, clientes y caja." },
+      { question: "¿Qué necesito para que funcione?", answer: "Un PC o portátil estándar. Te asesoramos si necesitas hardware adicional." },
+      { question: "¿Compatibilidad con periféricos?", answer: "Impresoras de tickets, lectores de códigos, balanzas y cajón portamonedas automático." },
+      { question: "¿Hay permanencia?", answer: "No. Puedes cancelar en cualquier momento." },
+      { question: "¿Prueba gratuita?", answer: "Sí, 30 días para evaluar el TPV sin compromiso." },
+      { question: "¿Soporte prioritario?", answer: "Disponible en planes Avanzado y Pro." },
+      { question: "¿Cumplimiento VeriFactu?", answer: "Preparamos integridad, secuencialidad y trazabilidad exigidas." },
+      { question: "¿Gestión de clientes?", answer: "Registro, historial de compras y fidelización configurable." },
+      { question: "¿Descuentos y promociones?", answer: "Sí, reglas automáticas y precios especiales." },
+      { question: "¿Multi‑empleado y cajas?", answer: "Usuarios, roles personalizados y múltiples cajas." },
     ]}
     data-accordion="false"
     data-persist="true"
@@ -356,7 +307,7 @@ const initialStatusClass = errCode ? 'status-error' : '';
   <section id="contacto" class="section alt defer">
     <div class="container">
       <h2 class="h2 center">Contacto</h2>
-      <p class="lead center max-680">Cuéntanos tus dudas y pregunta lo que necesitas, te responderemos en menos de 24h.</p>
+      <p class="lead center max-680">Cuéntanos tus dudas y te respondemos en menos de 24h.</p>
       <form id="contact-form"
             class="form"
             method="POST"
@@ -408,7 +359,6 @@ const initialStatusClass = errCode ? 'status-error' : '';
         <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
         <noscript><p class="muted">JavaScript desactivado: el CAPTCHA no se aplicará.</p></noscript>
       </form>
-      {/* Script Turnstile (solo si hay sitekey) */}
       {import.meta.env.PUBLIC_TURNSTILE_SITEKEY && (
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       )}
@@ -426,4 +376,95 @@ const initialStatusClass = errCode ? 'status-error' : '';
       } catch {}
     </script>
   )}
+
+  <!-- Script animaciones características (reveal + replay fiable hover/click/touch) + detector 1 vs 2 líneas -->
+  <script is:inline>
+    (() => {
+      const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const list = document.querySelector('[data-features]');
+      if (!list || prefersReduce) return;
+
+      const items = Array.from(list.querySelectorAll('.feature-item'));
+
+      // Mapa de clases para re-disparar las animaciones
+      const featureClassMap = {
+        cobros: 'fx-cobros',
+        facturas: 'fx-facturas',
+        informes: 'fx-informes',
+        inventario: 'fx-inventario',
+        arqueo: 'fx-arqueo',
+        empleados: 'fx-empleados',
+        verifactu: 'fx-verifactu',
+        clientes: 'fx-clientes'
+      };
+
+      const runFeature = (el) => {
+        const f = el.dataset.feature;
+        const cls = featureClassMap[f];
+        if (!cls) return;
+        el.classList.remove(cls); // quitar anterior
+        // Forzar reflow para poder reañadir la clase
+        void el.offsetWidth;
+        el.classList.add(cls);
+      };
+
+      // Reveal inicial con IO
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          if (!el.classList.contains('revealed')) {
+            el.classList.add('revealed');
+            runFeature(el); // animación inicial
+          }
+          io.unobserve(el);
+        });
+      }, { threshold: .35, rootMargin: '0px 0px -5% 0px' });
+
+      items.forEach(it => io.observe(it));
+
+      // Re-disparo por interacción (desktop hover, móvil tap, foco teclado)
+      items.forEach(el => {
+        const trigger = () => runFeature(el);
+        el.addEventListener('mouseenter', trigger);
+        el.addEventListener('focus', trigger);
+        el.addEventListener('click', trigger);
+        el.addEventListener('touchstart', trigger, { passive: true });
+      });
+
+      // --- Detector 1 línea vs 2 líneas para centrar o alinear arriba en móvil ---
+      let resizeT;
+      const markMultilines = () => {
+        items.forEach(it => {
+          const title = it.querySelector('.feature-title');
+          if (!title) return;
+          const cs = getComputedStyle(title);
+          let lh = parseFloat(cs.lineHeight);
+          if (Number.isNaN(lh)) {
+            const fs = parseFloat(cs.fontSize) || 14;
+            lh = fs * 1.2; // fallback
+          }
+          const sh = title.scrollHeight;
+          // Umbral ~1.6x para distinguir 2 líneas (con clamp a 2)
+          if (sh > lh * 1.6) {
+            it.classList.add('is-multiline');
+          } else {
+            it.classList.remove('is-multiline');
+          }
+        });
+      };
+
+      // Ejecutar tras render y cuando cambie el layout
+      const scheduleMark = () => requestAnimationFrame(markMultilines);
+      scheduleMark();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(markMultilines).catch(() => {});
+      }
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(markMultilines, 120);
+      }, { passive: true });
+      window.addEventListener('orientationchange', () => setTimeout(markMultilines, 150), { passive: true });
+    })();
+  </script>
 </BaseLayout>
