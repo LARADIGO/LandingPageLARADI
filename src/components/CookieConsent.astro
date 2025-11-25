@@ -1,13 +1,16 @@
 ---
 import "../styles/cookie-consent.css";
 /**
- * Banner Consent Mode GA4 con expiración 7 días.
+ * Banner Consent Mode GA4 + Google Ads.
+ * Expira a los 7 días; al aceptar se concede analytics y ads básicas.
+ * Ajusta mensaje para reflejar Ads si procede.
  */
 ---
 <div id="cookie-consent" class="cc-wrap" data-state="init" aria-live="polite">
   <div class="cc-card">
     <div class="cc-text">
-      Usamos analítica de Google (GA4) para mejorar el sitio. Puedes aceptar o rechazar las cookies de analítica.
+      Usamos analítica (GA4) y medición de conversiones (Google Ads) para mejorar y conocer el rendimiento.
+      Puedes aceptar o rechazar las cookies de medición.
       <a href="/politica-privacidad" class="cc-link">Más info</a>
     </div>
     <div class="cc-actions">
@@ -22,71 +25,76 @@ import "../styles/cookie-consent.css";
 
 <script is:inline>
 (() => {
-  const KEY = 'cookie_consent';
+  const KEY = 'cookie_consent_v2';
   const EXP_MS = 7 * 24 * 60 * 60 * 1000;
 
   function gtag(){ (window.dataLayer = window.dataLayer || []).push(arguments); }
-  function now(){ return Date.now(); }
+  const now = () => Date.now();
 
-  function load() {
+  function load(){
     try {
       const raw = localStorage.getItem(KEY);
-      if (!raw) return null;
+      if(!raw) return null;
       const obj = JSON.parse(raw);
-      if (!obj || !obj.value || !obj.ts) return null;
-      if (now() - obj.ts > EXP_MS) return null;
+      if(!obj || !obj.value || !obj.ts) return null;
+      if(now() - obj.ts > EXP_MS) return null;
       return obj;
-    } catch (e) {
-      return null;
+    } catch { return null; }
+  }
+
+  function save(value){
+    try { localStorage.setItem(KEY, JSON.stringify({ value, ts: now() })); } catch {}
+  }
+
+  function apply(value){
+    // Ajusta si quieres permitir personalización de anuncios
+    if(value === 'accepted'){
+      gtag('consent','update',{
+        analytics_storage:'granted',
+        ad_storage:'granted',
+        ad_user_data:'denied',
+        ad_personalization:'denied'
+      });
+    } else {
+      gtag('consent','update',{
+        analytics_storage:'denied',
+        ad_storage:'denied',
+        ad_user_data:'denied',
+        ad_personalization:'denied'
+      });
     }
   }
 
-  function save(value) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ value: value, ts: now() }));
-    } catch (e) {}
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrap = document.getElementById('cookie-consent');
+    if(!wrap) return;
+    const manageBtn = wrap.querySelector('.cc-manage');
 
-  function apply(value) {
-    var consent = value === 'accepted'
-      ? { analytics_storage: 'granted', ad_user_data: 'denied', ad_personalization: 'denied', ad_storage: 'denied' }
-      : { analytics_storage: 'denied',  ad_user_data: 'denied', ad_personalization: 'denied', ad_storage: 'denied' };
-    gtag('consent', 'update', consent);
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var wrap = document.getElementById('cookie-consent');
-    if (!wrap) return;
-
-    var manageBtn = wrap.querySelector('.cc-manage');
-
-    var stored = load();
-    if (stored) {
-      wrap.setAttribute('data-state', 'done');
-      if (manageBtn) manageBtn.classList.remove('hp');
+    const stored = load();
+    if(stored){
+      wrap.dataset.state = 'done';
+      manageBtn && manageBtn.classList.remove('hp');
       apply(stored.value);
     } else {
-      wrap.setAttribute('data-state', 'ask');
-      if (manageBtn) manageBtn.classList.add('hp');
+      wrap.dataset.state = 'ask';
+      manageBtn && manageBtn.classList.add('hp');
     }
 
-    wrap.addEventListener('click', function(ev) {
-      var target = ev.target;
-      var btn = target.closest ? target.closest('[data-action]') : null;
-      if (!btn) return;
-
-      var action = btn.getAttribute('data-action');
-      if (action === 'accept') {
+    wrap.addEventListener('click', (ev) => {
+      const btn = ev.target.closest?.('[data-action]');
+      if(!btn) return;
+      const action = btn.getAttribute('data-action');
+      if(action === 'accept'){
         save('accepted'); apply('accepted');
-        wrap.setAttribute('data-state', 'done');
-        if (manageBtn) manageBtn.classList.remove('hp');
-      } else if (action === 'reject') {
+        wrap.dataset.state = 'done';
+        manageBtn && manageBtn.classList.remove('hp');
+      } else if(action === 'reject'){
         save('rejected'); apply('rejected');
-        wrap.setAttribute('data-state', 'done');
-        if (manageBtn) manageBtn.classList.remove('hp');
-      } else if (action === 'manage') {
-        wrap.setAttribute('data-state', 'ask');
-        if (manageBtn) manageBtn.classList.add('hp');
+        wrap.dataset.state = 'done';
+        manageBtn && manageBtn.classList.remove('hp');
+      } else if(action === 'manage'){
+        wrap.dataset.state = 'ask';
+        manageBtn && manageBtn.classList.add('hp');
       }
     });
   });

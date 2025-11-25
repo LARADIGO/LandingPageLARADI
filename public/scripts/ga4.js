@@ -7,14 +7,15 @@
   function send(name, props){
     try {
       gtag('event', name, {
-        ...props,
         page_path: location.pathname,
-        transport_type: 'beacon'
+        page_title: document.title || '',
+        transport_type: 'beacon',
+        ...props
       });
     } catch {}
   }
 
-  // pricing_view (una vez)
+  // pricing_view (una vez por sesión)
   (function(){
     const section = document.querySelector('#precios');
     if(!section) return;
@@ -24,7 +25,7 @@
       const io = new IntersectionObserver((entries)=>{
         entries.forEach(e=>{
           if(e.isIntersecting && (e.intersectionRatio||0)>=0.35){
-            send('pricing_view', {});
+            send('pricing_view',{});
             sessionStorage.setItem(key,'1');
             io.disconnect();
           }
@@ -32,16 +33,16 @@
       }, {threshold:[0.35]});
       io.observe(section);
     } else {
-      setTimeout(()=>{ send('pricing_view', {}); sessionStorage.setItem(key,'1'); },1200);
+      setTimeout(()=>{ send('pricing_view',{}); sessionStorage.setItem(key,'1'); },1200);
     }
   })();
 
-  // FAQ open/close (ya disparados también desde componente; este fallback por si no carga el script del componente)
+  // FAQ open/close
   (function(){
     const faqRoot = document.querySelector('.faq-section');
     if(!faqRoot) return;
     document.addEventListener('click', (ev)=>{
-      const summary = ev.target.closest && ev.target.closest('details summary');
+      const summary = ev.target.closest?.('details summary');
       if(!summary) return;
       const details = summary.parentElement;
       if(!details || !faqRoot.contains(details)) return;
@@ -50,33 +51,31 @@
         const q = (details.querySelector('.faq-question')?.textContent || '').trim().slice(0,120);
         const all = Array.from(faqRoot.querySelectorAll('details'));
         const index = Math.max(0, all.indexOf(details));
-        send(open?'faq_open':'faq_close',{ question: q, faq_id: details.id||'', index });
-      }, 30);
+        send(open?'faq_open':'faq_close',{ question:q, faq_id:details.id||'', index });
+      },30);
     }, {capture:true});
   })();
 
-  // Botones expandir / colapsar (analítica adicional si el componente fallara)
+  // Expand/collapse all
   (function(){
     document.addEventListener('click',(ev)=>{
-      const btnExpand = ev.target.closest('.faq-expand-all');
-      if(btnExpand) send('faq_expand_all',{});
-      const btnCollapse = ev.target.closest('.faq-collapse-all');
-      if(btnCollapse) send('faq_collapse_all',{});
+      if(ev.target.closest('.faq-expand-all')) send('faq_expand_all',{});
+      if(ev.target.closest('.faq-collapse-all')) send('faq_collapse_all',{});
     }, {capture:true});
   })();
 
   // CTA probar gratis
   (function(){
     document.addEventListener('click',(ev)=>{
-      const a = ev.target.closest && ev.target.closest('a[href="#contacto"], a[href="/#contacto"]');
+      const a = ev.target.closest?.('a[href="#contacto"], a[href="/#contacto"]');
       if(!a) return;
       const section = a.closest('section[id]');
       const from = section?.id || (a.closest('header, main, footer, section')?.tagName.toLowerCase()) || 'unknown';
       const plan = a.closest('.pricing-card')?.querySelector('h3')?.textContent?.trim() || '';
       send('cta_probar_gratis_click',{
         from,
-        ...(plan?{plan}:{}),
-        link_text:(a.textContent||'').trim().slice(0,64)
+        link_text:(a.textContent||'').trim().slice(0,64),
+        ...(plan?{plan}:{})
       });
     }, {capture:true});
   })();
@@ -84,7 +83,7 @@
   // Delegación genérica data-analytics
   (function(){
     document.addEventListener('click',(ev)=>{
-      const el = ev.target.closest && ev.target.closest('[data-analytics]');
+      const el = ev.target.closest?.('[data-analytics]');
       if(!el) return;
       const name = el.getAttribute('data-analytics') || '';
       if(!name) return;
@@ -93,9 +92,9 @@
         const raw = el.getAttribute('data-analytics-props');
         if(raw) props = JSON.parse(raw);
       } catch {}
-      if(!props['plan']){
+      if(!props.plan){
         const plan = el.closest('.pricing-card')?.querySelector('h3')?.textContent?.trim() || '';
-        if(plan) props['plan'] = plan;
+        if(plan) props.plan = plan;
       }
       send(name, props);
     }, {capture:true});
@@ -104,12 +103,12 @@
   // outbound links
   (function(){
     document.addEventListener('click',(e)=>{
-      const a = e.target.closest && e.target.closest('a[href^="http"]');
+      const a = e.target.closest?.('a[href^="http"]');
       if(!a) return;
       try {
         const url = new URL(a.href);
         if(url.origin === location.origin) return;
-        send('outbound_click', { url: a.href });
+        send('outbound_click',{ url:a.href });
       } catch {}
     }, {capture:true});
   })();
