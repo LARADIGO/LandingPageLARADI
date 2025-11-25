@@ -1,0 +1,54 @@
+---
+import "../../styles/sections/verifactu.css";
+---
+<section id="verifactu" class="section alt verifactu-section defer">
+  <div class="container">
+    <h2 class="h2 center">VeriFactu</h2>
+    <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
+    <div class="cards cards-3" role="list">
+      <article class="card" role="listitem" aria-labelledby="vf-que">
+        <div class="card-ico" aria-hidden="true">🛡️</div>
+        <h3 id="vf-que">¿Qué es VeriFactu?</h3>
+        <p>Sistema que garantiza integridad y trazabilidad de los registros de facturación.</p>
+      </article>
+      <article class="card" role="listitem" aria-labelledby="vf-cuando">
+        <div class="card-ico" aria-hidden="true">📅</div>
+        <h3 id="vf-cuando">Entrada 2026</h3>
+        <p>Su obligatoriedad comienza en 2026; anticiparte reduce riesgos y costes.</p>
+      </article>
+      <article class="card" role="listitem" aria-labelledby="vf-impacto">
+        <div class="card-ico" aria-hidden="true">⚙️</div>
+        <h3 id="vf-impacto">Impacto técnico</h3>
+        <p>Secuencialidad, firma/hash, almacenamiento seguro y posible envío telemático.</p>
+      </article>
+    </div>
+    <p class="center" style="margin-top:26px;">
+      <span class="vf-cta">
+        <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
+        <img src="/assets/logos/aeat.svg"
+             alt="Agencia Tributaria"
+             width="28" height="28"
+             loading="lazy"
+             decoding="async"
+             class="vf-cta__logo" />
+      </span>
+    </p>
+  </div>
+  <script is:inline>
+    (() => {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+      const cards = document.querySelectorAll('#verifactu .cards.cards-3 .card');
+      if (!cards.length) return;
+      const io = new IntersectionObserver((ents) => {
+        ents.forEach(ent => {
+          if (ent.isIntersecting) {
+            ent.target.classList.add('is-visible');
+            io.unobserve(ent.target);
+          }
+        });
+      }, { threshold:.3 });
+      cards.forEach(c => io.observe(c));
+    })();
+  </script>
+</section>

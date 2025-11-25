@@ -13,7 +13,6 @@ interface CarouselImage {
   width?: number;
   height?: number;
 }
-
 interface Item {
   title: string;
   text: string;
@@ -35,24 +34,18 @@ interface Item {
   fullscreenButton?: boolean;
 }
 
-const {
-  items = [] as Item[],
-  defer = false
-} = Astro.props as { items?: Item[]; defer?: boolean };
+const { items = [] as Item[], defer = false } =
+  Astro.props as { items?: Item[]; defer?: boolean };
 
 const cycle: Anim[] = ["slide-left","slide-right","slide-up","zoom-in","lift-in","scale-up"];
-
-/* Utilidades */
 
 function isValidString(v: any): v is string {
   return typeof v === 'string' && v.trim().length > 0;
 }
-
 function computeWebpPath(path?: string): string {
   if (!path || !/\.(png|jpe?g)$/i.test(path)) return '';
   return path.replace(/\.(png|jpe?g)$/i, '.webp');
 }
-
 function buildRowClasses(it: Item, side: Side): string {
   return [
     `feature-${side}`,
@@ -60,25 +53,20 @@ function buildRowClasses(it: Item, side: Side): string {
     it.mediaWide ? 'feature-media-lg' : ''
   ].filter(Boolean).join(' ');
 }
-
 function buildSizes(it: Item): string {
   return it.mediaWide
     ? '(min-width:1200px) 60vw, (min-width:900px) 50vw, 92vw'
     : '(min-width:900px) 42vw, 94vw';
 }
-
 ---
-<section id="funcionalidades" class={`section features-section full-bleed ${defer ? 'defer' : ''}`}>
-  <div class="features-list">
+
+<section class={`section showcase-section ${defer ? 'defer' : ''}`}>
+  <div class="showcase-bg"></div>
+  <div class="showcase-inner">
     {
       items.length === 0
-        ? (
-          <p class="muted center" style="margin:40px 0;">
-            (No hay elementos de feature configurados)
-          </p>
-        )
+        ? <p class="muted center" style="margin:40px 0;">(No hay feature configurado)</p>
         : items.map((it, i) => {
-            // Seguridad mínima: si falta título o texto, saltar.
             if (!isValidString(it?.title) || !isValidString(it?.text)) {
               return (
                 <article class="feature-row feature-left">
@@ -92,7 +80,7 @@ function buildSizes(it: Item): string {
               );
             }
 
-            const side: Side = it.side || ((i % 2 === 0) ? 'left' : 'right');
+            const side: Side = it.side || 'left'; // puedes cambiar a (i % 2 ? 'right' : 'left') si quieres alternar
             const mediaAnim = it.mediaAnim || cycle[i % cycle.length];
             const contentAnim = it.contentAnim || cycle[(i + 1) % cycle.length];
             const mediaFirst = side === 'left';
@@ -107,9 +95,8 @@ function buildSizes(it: Item): string {
 
             let mediaVNode;
 
-            // MODO CARRUSEL
             if (isCarousel) {
-              const carouselId = `carousel-${i}-${Math.random().toString(36).slice(2,9)}`;
+              const carouselId = `carousel-${Math.random().toString(36).slice(2,9)}`;
               const autoplayMs = (it.autoplayMs && it.autoplayMs > 500) ? it.autoplayMs : 4500;
               const pauseOnHover = it.pauseOnHover !== false;
 
@@ -117,8 +104,8 @@ function buildSizes(it: Item): string {
                 <div class="feature-media reveal"
                   data-reveal
                   data-anim={mediaAnim}
-                  data-stagger={mediaFirst ? "0" : "1"}
-                  style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}
+                  data-stagger="0"
+                  style="--stagger-delay:0s;"
                 >
                   <div
                     class="feature-media-inner carousel-root"
@@ -139,31 +126,27 @@ function buildSizes(it: Item): string {
                           const hImg     = imgObj.height || height;
                           const lightWebp = computeWebpPath(lightSrc);
                           const darkWebp  = computeWebpPath(darkSrc);
-
                           return (
                             <div
-                              class={`carousel-slide ${idx === 0 ? 'is-active' : ''}`}
+                              class={`carousel-slide ${idx===0?'is-active':''}`}
                               role="group"
                               aria-roledescription="slide"
                               aria-label={`${idx+1} de ${it.carouselImages!.length}`}
                               data-index={idx}
                             >
-                              {/* Tema claro */}
                               <picture class="theme-light">
                                 {lightWebp && <source srcset={lightWebp} type="image/webp" />}
                                 {lightSrc && <img
                                   src={lightSrc}
                                   alt={altImg}
-                                  loading={idx === 0 ? "eager" : "lazy"}
+                                  loading={idx===0 ? "eager" : "lazy"}
                                   decoding="async"
                                   width={wImg}
                                   height={hImg}
                                   sizes={sizes}
                                   class="feature-contain theme-light"
-                                  data-src-light={lightSrc}
-                                />}
+                                /> }
                               </picture>
-                              {/* Tema oscuro */}
                               {darkSrc && (
                                 <picture class="theme-dark">
                                   {darkWebp && <source srcset={darkWebp} type="image/webp" />}
@@ -176,7 +159,6 @@ function buildSizes(it: Item): string {
                                     height={hImg}
                                     sizes={sizes}
                                     class="feature-contain theme-dark"
-                                    data-src-dark={darkSrc}
                                   />
                                 </picture>
                               )}
@@ -190,70 +172,46 @@ function buildSizes(it: Item): string {
                       <button type="button" class="carousel-btn prev" aria-label="Anterior" data-carousel-prev>‹</button>
                       <button type="button" class="carousel-btn next" aria-label="Siguiente" data-carousel-next>›</button>
                       {showFullscreenBtn && (
-                        <button type="button"
+                        <button
+                          type="button"
                           class="carousel-btn fullscreen"
-                          aria-label="Ver en pantalla completa"
+                          aria-label="Pantalla completa"
                           data-carousel-fullscreen
                         >⤢</button>
                       )}
                       <div class="carousel-dots" role="tablist">
-                        {
-                          it.carouselImages!.map((_, idx) => (
-                            <button
-                              type="button"
-                              role="tab"
-                              aria-selected={idx === 0 ? "true":"false"}
-                              aria-label={`Mostrar imagen ${idx+1}`}
-                              class={`carousel-dot ${idx===0?'is-active':''}`}
-                              data-carousel-dot
-                              data-index={idx}
-                            />
-                          ))
-                        }
+                        {it.carouselImages!.map((_, idx) => (
+                          <button
+                            type="button"
+                            role="tab"
+                            aria-selected={idx===0 ? "true":"false"}
+                            aria-label={`Mostrar imagen ${idx+1}`}
+                            class={`carousel-dot ${idx===0?'is-active':''}`}
+                            data-carousel-dot
+                            data-index={idx}
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
               );
             } else {
-              // MODO SIMPLE
-              const hasThemeVariants = Boolean(it.imgLight || it.imgDark);
               const lightSrc = it.imgLight || it.img;
               const darkSrc  = it.imgDark || it.img;
               const lightWebp = computeWebpPath(lightSrc);
               const darkWebp  = computeWebpPath(darkSrc);
 
-              const inner = hasThemeVariants
-                ? <>
-                    <picture class="theme-light">
-                      {lightWebp && <source srcset={lightWebp} type="image/webp" />}
-                      {lightSrc && <img
-                        src={lightSrc}
-                        alt={it.alt || it.title}
-                        loading="lazy"
-                        decoding="async"
-                        width={width}
-                        height={height}
-                        sizes={sizes}
-                        class="feature-contain theme-light"
-                      />}
-                    </picture>
-                    <picture class="theme-dark">
-                      {darkWebp && <source srcset={darkWebp} type="image/webp" />}
-                      {darkSrc && <img
-                        src={darkSrc}
-                        alt={it.alt || it.title}
-                        loading="lazy"
-                        decoding="async"
-                        width={width}
-                        height={height}
-                        sizes={sizes}
-                        class="feature-contain theme-dark"
-                      />}
-                    </picture>
-                  </>
-                : (lightSrc
-                    ? <picture>
+              mediaVNode = (
+                <div class="feature-media reveal"
+                  data-reveal
+                  data-anim={mediaAnim}
+                  data-stagger="0"
+                  style="--stagger-delay:0s;"
+                >
+                  <div class="feature-media-inner dynamic-ratio" data-zoomable style={`aspect-ratio:${width}/${height};`}>
+                    {lightSrc && (
+                      <picture class={darkSrc ? "theme-light" : ""}>
                         {lightWebp && <source srcset={lightWebp} type="image/webp" />}
                         <img
                           src={lightSrc}
@@ -266,18 +224,22 @@ function buildSizes(it: Item): string {
                           class="feature-contain"
                         />
                       </picture>
-                    : null
-                  );
-
-              mediaVNode = (
-                <div class="feature-media reveal"
-                  data-reveal
-                  data-anim={mediaAnim}
-                  data-stagger={mediaFirst ? "0" : "1"}
-                  style={mediaFirst ? "--stagger-delay:0s;" : "--stagger-delay:.14s;"}
-                >
-                  <div class="feature-media-inner dynamic-ratio" data-zoomable style={`aspect-ratio:${width}/${height};`}>
-                    {inner}
+                    )}
+                    {darkSrc && (
+                      <picture class="theme-dark">
+                        {darkWebp && <source srcset={darkWebp} type="image/webp" />}
+                        <img
+                          src={darkSrc}
+                          alt={it.alt || it.title}
+                          loading="lazy"
+                          decoding="async"
+                          width={width}
+                          height={height}
+                          sizes={sizes}
+                          class="feature-contain theme-dark"
+                        />
+                      </picture>
+                    )}
                   </div>
                 </div>
               );
@@ -287,8 +249,8 @@ function buildSizes(it: Item): string {
               <div class="feature-content reveal"
                 data-reveal
                 data-anim={contentAnim}
-                data-stagger={mediaFirst ? "1" : "0"}
-                style={mediaFirst ? "--stagger-delay:.14s;" : "--stagger-delay:0s;"}
+                data-stagger="1"
+                style="--stagger-delay:.14s;"
               >
                 <h3>{it.title}</h3>
                 <p>{it.text}</p>
@@ -310,8 +272,6 @@ function buildSizes(it: Item): string {
 <script is:inline>
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* Revelaciones */
   const reveals = document.querySelectorAll('[data-reveal]');
   if (reduce) {
     reveals.forEach(e => e.classList.add('is-visible'));
@@ -319,54 +279,91 @@ function buildSizes(it: Item): string {
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.isIntersecting) e.target.classList.add('is-visible');
-        else e.target.classList.remove('is-visible');
       }
     }, { threshold: .25 });
     reveals.forEach(e => io.observe(e));
   }
 
-  /* Ajuste ratio contenedores simples */
-  const ratioContainers = document.querySelectorAll('.feature-media-inner.dynamic-ratio');
-  function visibleImageIn(container){
-    const imgs = Array.from(container.querySelectorAll('img'));
-    return imgs.find(img => getComputedStyle(img).display !== 'none') || imgs[0] || null;
-  }
-  function applyRatio(container){
-    const img = visibleImageIn(container);
-    if (!img) return;
-    if (img.naturalWidth && img.naturalHeight) {
-      container.style.aspectRatio = img.naturalWidth + '/' + img.naturalHeight;
+  const carousels = document.querySelectorAll('.carousel-root[data-carousel]');
+  carousels.forEach(root => {
+    const slides = Array.from(root.querySelectorAll('.carousel-slide'));
+    if(!slides.length) return;
+    const dots = Array.from(root.querySelectorAll('[data-carousel-dot]'));
+    const btnPrev = root.querySelector('[data-carousel-prev]');
+    const btnNext = root.querySelector('[data-carousel-next]');
+    const btnFs  = root.querySelector('[data-carousel-fullscreen]');
+    let index=0;
+    const AUTOPLAY=parseInt(root.getAttribute('data-autoplay')||'4500',10);
+    const PAUSE_HOVER=root.getAttribute('data-pause-hover')==='true';
+    let timer=null,isPaused=false;
+
+    function setActive(n){
+      if(n<0)n=slides.length-1;
+      if(n>=slides.length)n=0;
+      slides.forEach((s,i)=>s.classList.toggle('is-active',i===n));
+      dots.forEach((d,i)=>{
+        d.classList.toggle('is-active',i===n);
+        d.setAttribute('aria-selected',i===n?'true':'false');
+        d.tabIndex=i===n?0:-1;
+      });
+      index=n;
+      prefetchNext(root,index);
     }
-  }
-  ratioContainers.forEach(c => {
-    const imgs = c.querySelectorAll('img');
-    imgs.forEach(img => {
-      if (img.complete) applyRatio(c);
-      else img.addEventListener('load', () => applyRatio(c), { once: true });
+    function next(){setActive(index+1);}
+    function prev(){setActive(index-1);}
+    function start(){ if(reduce) return; stop(); timer=setInterval(()=>{if(!isPaused)next();},AUTOPLAY); }
+    function stop(){ if(timer){clearInterval(timer);timer=null;} }
+
+    dots.forEach(d=>{
+      d.addEventListener('click',e=>{
+        e.preventDefault();
+        setActive(parseInt(d.getAttribute('data-index')||'0',10));
+      });
+    });
+    btnPrev?.addEventListener('click',e=>{e.preventDefault();prev();});
+    btnNext?.addEventListener('click',e=>{e.preventDefault();next();});
+    if(PAUSE_HOVER){
+      root.addEventListener('mouseenter',()=>{isPaused=true;});
+      root.addEventListener('mouseleave',()=>{isPaused=false;});
+    }
+    root.addEventListener('focusin',()=>{isPaused=true;});
+    root.addEventListener('focusout',()=>{isPaused=false;});
+
+    let startX=0,touching=false;
+    root.addEventListener('touchstart',e=>{
+      if(e.touches.length===1){startX=e.touches[0].clientX;touching=true;}
+    },{passive:true});
+    root.addEventListener('touchend',e=>{
+      if(!touching)return;
+      const diff=e.changedTouches[0].clientX-startX;
+      if(Math.abs(diff)>40){ diff<0?next():prev(); }
+      touching=false;
+    },{passive:true});
+
+    setActive(0);
+    start();
+
+    btnFs?.addEventListener('click',(e)=>{
+      e.preventDefault();
+      openFullscreen(root,index);
     });
   });
-  const mo = new MutationObserver(() => ratioContainers.forEach(applyRatio));
-  mo.observe(document.documentElement, { attributes:true, attributeFilter:['class'] });
 
-  /* Overlay pantalla completa */
+  // Fullscreen overlay (reutilizado)
   let overlay = document.querySelector('.fs-overlay');
-  if (!overlay) {
+  if(!overlay){
     overlay = document.createElement('div');
-    overlay.className = 'fs-overlay';
+    overlay.className='fs-overlay';
+    overlay.setAttribute('tabindex','-1');
     document.body.appendChild(overlay);
   }
   overlay.setAttribute('role','dialog');
   overlay.setAttribute('aria-modal','true');
 
-  let fsState = { root: null, slides: [], index: 0 };
-
-  function fireGA(name, props={}){
-    const gtag = window.gtag || function(){};
-    try { gtag('event', name, { ...props, page_path: location.pathname, transport_type:'beacon' }); } catch {}
-  }
+  let fsState = { root:null, slides:[], index:0 };
 
   function renderFullscreen(){
-    overlay.innerHTML = '';
+    overlay.innerHTML='';
     const slide = fsState.slides[fsState.index];
     if(!slide) return;
     const imgLight = slide.querySelector('picture.theme-light img');
@@ -380,8 +377,8 @@ function buildSizes(it: Item): string {
     overlay.appendChild(img);
 
     const controls = document.createElement('div');
-    controls.className = 'fs-controls';
-    controls.innerHTML = `
+    controls.className='fs-controls';
+    controls.innerHTML=`
       <button type="button" class="fs-btn fs-prev" aria-label="Anterior">‹</button>
       <button type="button" class="fs-btn fs-next" aria-label="Siguiente">›</button>
       <button type="button" class="fs-btn fs-close" aria-label="Cerrar">✕</button>
@@ -390,7 +387,7 @@ function buildSizes(it: Item): string {
     prefetchNext(fsState.root, fsState.index, true);
   }
 
-  function openFullscreen(root, index){
+  function openFullscreen(root,index){
     const slides = Array.from(root.querySelectorAll('.carousel-slide'));
     if(!slides.length) return;
     fsState.root = root;
@@ -400,9 +397,7 @@ function buildSizes(it: Item): string {
     overlay.classList.add('is-open');
     document.body.classList.add('fs-zoom-active');
     overlay.focus();
-    fireGA('carousel_fullscreen', { id: root.getAttribute('data-id') || '', index });
   }
-
   function closeFullscreen(){
     overlay.classList.remove('is-open');
     document.body.classList.remove('fs-zoom-active');
@@ -416,138 +411,39 @@ function buildSizes(it: Item): string {
     renderFullscreen();
   }
 
-  overlay.addEventListener('click', (e)=>{
+  overlay.addEventListener('click',(e)=>{
     if(e.target.classList.contains('fs-prev')) { e.stopPropagation(); prevFs(); }
     else if(e.target.classList.contains('fs-next')) { e.stopPropagation(); nextFs(); }
     else if(e.target.classList.contains('fs-close')) { e.stopPropagation(); closeFullscreen(); }
     else { closeFullscreen(); }
   });
-  document.addEventListener('keydown', (e)=>{
+  document.addEventListener('keydown',(e)=>{
     if(!overlay.classList.contains('is-open')) return;
     if(e.key==='Escape'){ e.preventDefault(); closeFullscreen(); }
     else if(e.key==='ArrowRight'){ e.preventDefault(); nextFs(); }
     else if(e.key==='ArrowLeft'){ e.preventDefault(); prevFs(); }
   });
 
-  /* Carruseles */
-  const carousels = document.querySelectorAll('.carousel-root[data-carousel]');
-  carousels.forEach(root => {
-    const slides = Array.from(root.querySelectorAll('.carousel-slide'));
-    if(!slides.length) return;
-
-    const dotsWrap = root.querySelector('.carousel-dots');
-    const dots = dotsWrap ? Array.from(dotsWrap.querySelectorAll('[data-carousel-dot]')) : [];
-    const btnPrev = root.querySelector('[data-carousel-prev]');
-    const btnNext = root.querySelector('[data-carousel-next]');
-    const btnFullscreen = root.querySelector('[data-carousel-fullscreen]');
-
-    let index = 0;
-    const AUTOPLAY = parseInt(root.getAttribute('data-autoplay')||'4500', 10);
-    const PAUSE_HOVER = root.getAttribute('data-pause-hover') === 'true';
-    let timer = null;
-    let isPaused = false;
-
-    function setActive(newIdx){
-      if(newIdx < 0) newIdx = slides.length - 1;
-      if(newIdx >= slides.length) newIdx = 0;
-      slides.forEach((s,i)=> s.classList.toggle('is-active', i===newIdx));
-      dots.forEach((d,i)=>{
-        d.classList.toggle('is-active', i===newIdx);
-        d.setAttribute('aria-selected', i===newIdx?'true':'false');
-        d.tabIndex = i===newIdx ? 0 : -1;
-      });
-      index = newIdx;
-      prefetchNext(root, index);
-    }
-
-    function next(){ setActive(index+1); }
-    function prev(){ setActive(index-1); }
-
-    function startAutoplay(){
-      if(reduce) return;
-      stopAutoplay();
-      timer = setInterval(()=>{ if(!isPaused) next(); }, AUTOPLAY);
-    }
-    function stopAutoplay(){
-      if(timer){ clearInterval(timer); timer=null; }
-    }
-
-    dots.forEach(d=>{
-      d.addEventListener('click', (e)=>{
-        e.preventDefault();
-        const idx = parseInt(d.getAttribute('data-index')||'0',10);
-        setActive(idx);
-      });
-      d.addEventListener('keydown',(e)=>{
-        if(['Enter',' '].includes(e.key)){
-          e.preventDefault(); d.click();
-        } else if(e.key==='ArrowRight'){
-          e.preventDefault(); setActive(index+1); dots[index].focus();
-        } else if(e.key==='ArrowLeft'){
-          e.preventDefault(); setActive(index-1); dots[index].focus();
-        } else if(e.key==='Home'){
-          e.preventDefault(); setActive(0); dots[0].focus();
-        } else if(e.key==='End'){
-          e.preventDefault(); setActive(slides.length-1); dots[slides.length-1].focus();
-        }
-      });
-    });
-
-    btnPrev?.addEventListener('click',(e)=>{ e.preventDefault(); prev(); });
-    btnNext?.addEventListener('click',(e)=>{ e.preventDefault(); next(); });
-    btnFullscreen?.addEventListener('click',(e)=>{ e.preventDefault(); openFullscreen(root, index); });
-
-    if(PAUSE_HOVER){
-      root.addEventListener('mouseenter', ()=>{ isPaused=true; });
-      root.addEventListener('mouseleave', ()=>{ isPaused=false; });
-    }
-    root.addEventListener('focusin', ()=>{ isPaused=true; });
-    root.addEventListener('focusout', ()=>{ isPaused=false; });
-
-    let startX=0, touching=false;
-    root.addEventListener('touchstart',(e)=>{
-      if(e.touches.length===1){
-        startX=e.touches[0].clientX;
-        touching=true;
-      }
-    }, {passive:true});
-    root.addEventListener('touchend',(e)=>{
-      if(!touching) return;
-      const endX=e.changedTouches[0].clientX;
-      const diff=endX-startX;
-      if(Math.abs(diff)>40){
-        if(diff<0) next(); else prev();
-      }
-      touching=false;
-    }, {passive:true});
-
-    setActive(0);
-    startAutoplay();
-  });
-
-  /* Prefetch siguiente slide (tema claro) */
-  function prefetchNext(root, currentIndex, fullscreen=false){
-    try {
-      const slides = Array.from(root.querySelectorAll('.carousel-slide'));
-      if(!slides.length) return;
-      const nextIndex = (currentIndex + 1) % slides.length;
-      const nextSlide = slides[nextIndex];
-      if(!nextSlide) return;
-      const imgLight = nextSlide.querySelector('picture.theme-light img');
-      if(!imgLight) return;
-      const src = imgLight.getAttribute('src');
-      if(!src) return;
-      const key = 'pf-' + src + (fullscreen?'-fs':'');
+  function prefetchNext(root,currentIndex,fullscreen=false){
+    try{
+      const slides=Array.from(root.querySelectorAll('.carousel-slide'));
+      if(!slides.length)return;
+      const nextSlide = slides[(currentIndex+1)%slides.length];
+      if(!nextSlide)return;
+      const imgLight = nextSlide.querySelector('picture.theme-light img') || nextSlide.querySelector('img');
+      if(!imgLight)return;
+      const src=imgLight.getAttribute('src');
+      if(!src)return;
+      const key='pf-'+src+(fullscreen?'-fs':'');
       if(!document.querySelector('link[data-prefetch="'+key+'"]')){
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = src;
-        link.as = 'image';
-        link.setAttribute('data-prefetch', key);
+        const link=document.createElement('link');
+        link.rel='prefetch';
+        link.href=src;
+        link.as='image';
+        link.setAttribute('data-prefetch',key);
         document.head.appendChild(link);
       }
-    } catch {}
+    }catch{}
   }
-
 })();
 </script>

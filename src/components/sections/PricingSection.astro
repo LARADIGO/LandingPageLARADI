@@ -1,0 +1,129 @@
+---
+import "../../styles/sections/pricing.css";
+---
+<section id="precios" class="section alt defer">
+  <div class="container">
+    <h2 class="h2 center">Escoge tu plan</h2>
+    <div class="pricing-grid" role="list" data-pricing-grid>
+      <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="esencial" aria-label="Plan Esencial 9,90 euros al mes">
+        <h3>Esencial</h3>
+        <p class="price">9,90<span>€</span><span>/mes</span></p>
+        <ul>
+          <li>1 terminal</li>
+          <li>Control y arqueo de caja</li>
+          <li>Creación de Productos y Categorías</li>
+          <li>Emisión y Personalización de Tickets y Facturas</li>
+          <li>Soporte por Email</li>
+        </ul>
+        <a href="#contacto" class="btn btn-block" aria-label="Contactar sobre plan Esencial">Contactar</a>
+      </div>
+      <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="avanzado" aria-label="Plan Avanzado 14,90 euros al mes">
+        <h3>Avanzado</h3>
+        <p class="price">14,90<span>€</span><span>/mes</span></p>
+        <ul>
+          <li>2 Terminales</li>
+          <li>Plan Esencial</li>
+          <li>Creación y Personalización de empleados</li>
+          <li>Control y gestión de Inventario</li>
+          <li>Informes básicos</li>
+          <li>Soporte prioritario (&lt;24h)</li>
+        </ul>
+        <a href="#contacto" class="btn btn-block" aria-label="Contactar sobre plan Avanzado">Contactar</a>
+      </div>
+      <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="pro" aria-label="Plan Pro 19,90 euros al mes">
+        <h3>Pro</h3>
+        <p class="price">19,90<span>€</span><span>/mes</span></p>
+        <ul>
+          <li>+ de 2 Terminales</li>
+          <li>Plan Avanzado</li>
+          <li>Informes Avanzados y Personalizables</li>
+          <li>Avisos de Bajo Stock</li>
+          <li>Creación de Clientes y Plan de Fidelización</li>
+          <li>Soporte Premium (&lt;2h)</li>
+        </ul>
+        <a href="#contacto" class="btn btn-block" aria-label="Contactar sobre plan Pro">Contactar</a>
+      </div>
+    </div>
+
+    <div class="pricing-note" role="note" aria-labelledby="pricing-note-heading">
+      <div class="pricing-note__header">
+        <span class="pricing-note__icon" aria-hidden="true">🧩</span>
+        <span id="pricing-note-heading" class="pricing-note__lead">¿Necesitas algo distinto?</span>
+      </div>
+      <p class="pricing-note__text">
+        Si ninguno de estos planes se adapta a tu negocio, contáctanos y te prepararemos un plan de TPV a medida:
+        integración de hardware, módulos personalizados, adaptación VeriFactu y soporte cercano para tu crecimiento.
+      </p>
+    </div>
+  </div>
+
+  <!-- Script para selección táctil / accesible -->
+  <script is:inline>
+    (() => {
+      const grid = document.querySelector('[data-pricing-grid]');
+      if (!grid) return;
+      const cards = Array.from(grid.querySelectorAll('.pricing-card'));
+      const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function clearActive() {
+        grid.classList.remove('has-active');
+        cards.forEach(c => c.classList.remove('is-active'));
+      }
+      function activate(card) {
+        cards.forEach(c => c.classList.toggle('is-active', c === card));
+        grid.classList.add('has-active');
+      }
+
+      // Desktop: efecto hover ya lo hace CSS; móvil / teclado: toggle al tocar/focus + Enter.
+      cards.forEach(card => {
+        // Tap / click
+        card.addEventListener('click', e => {
+          // Evitar que el enlace inside dispare doble (solo si click en card fuera de btn)
+          if ((e.target as HTMLElement).closest('a')) return;
+          if (card.classList.contains('is-active')) {
+            clearActive();
+          } else {
+            activate(card);
+          }
+        });
+
+        // Teclado (Enter o Space)
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (card.classList.contains('is-active')) clearActive();
+            else activate(card);
+          } else if (e.key === 'Escape') {
+            clearActive();
+            card.blur();
+          }
+        });
+
+        // Al perder foco, si el foco se va fuera de la grid y no hay click en otra card, limpiar
+        card.addEventListener('blur', () => {
+          // Delay breve para permitir foco moverse dentro de la grid
+          setTimeout(() => {
+            const active = document.activeElement;
+            if (!grid.contains(active)) {
+              clearActive();
+            }
+          }, 120);
+        });
+      });
+
+      // Clic fuera para limpiar en móvil
+      document.addEventListener('click', e => {
+        if (!grid.contains(e.target as Node)) clearActive();
+      });
+
+      // Si reduce motion, no aplicamos blur (quitamos clase has-active al activarse)
+      if (prefersReduce) {
+        grid.addEventListener('click', () => {
+          // Sustituir efecto por solo outline
+          grid.classList.remove('has-active');
+          cards.forEach(c => c.classList.remove('is-active'));
+        }, { capture: true });
+      }
+    })();
+  </script>
+</section>

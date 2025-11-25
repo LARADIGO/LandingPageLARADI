@@ -1,0 +1,56 @@
+---
+import "../../styles/sections/features.css";
+const { } = Astro.props;
+---
+<section id="caracteristicas" class="section features-section">
+  <div class="container">
+    <h2 class="h2 center">Características clave</h2>
+    <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
+
+    <div class="features-list" role="list" data-features>
+      <article class="feature-item" role="listitem" aria-labelledby="f-cobros" data-feature="cobros">
+        <div class="feature-ico" aria-hidden="true">💳</div>
+        <h3 id="f-cobros" class="feature-title">Gestión de cobros</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-facturas" data-feature="facturas">
+        <div class="feature-ico" aria-hidden="true">🧾</div>
+        <h3 id="f-facturas" class="feature-title">Facturas y tickets</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-informes" data-feature="informes">
+        <div class="feature-ico" aria-hidden="true">📈</div>
+        <h3 id="f-informes" class="feature-title">Informes</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-inventario" data-feature="inventario">
+        <div class="feature-ico" aria-hidden="true">📦</div>
+        <h3 id="f-inventario" class="feature-title">Inventario</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-arqueo" data-feature="arqueo">
+        <div class="feature-ico" aria-hidden="true">💼</div>
+        <h3 id="f-arqueo" class="feature-title">Arqueo de caja</h3>
+        <span class="coin" aria-hidden="true"></span>
+        <span class="coin" aria-hidden="true"></span>
+        <span class="coin" aria-hidden="true"></span>
+        <span class="coin" aria-hidden="true"></span>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-empleados" data-feature="empleados">
+        <div class="feature-ico" aria-hidden="true">👥</div>
+        <h3 id="f-empleados" class="feature-title">Gestión de empleados</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-verifactu" data-feature="verifactu">
+        <div class="feature-ico" aria-hidden="true">🛡️</div>
+        <h3 id="f-verifactu" class="feature-title">VeriFactu</h3>
+      </article>
+
+      <article class="feature-item" role="listitem" aria-labelledby="f-clientes" data-feature="clientes">
+        <div class="feature-ico" aria-hidden="true">🎁</div>
+        <h3 id="f-clientes" class="feature-title">Clientes y fidelización</h3>
+      </article>
+    </div>
+  </div>
+</section>

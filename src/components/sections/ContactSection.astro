@@ -1,0 +1,70 @@
+---
+import "../../styles/sections/contact.css";
+interface Props {
+  initialStatus: string;
+  initialStatusClass: string;
+  endpoint?: string;
+  turnstileSiteKey?: string;
+}
+const { initialStatus = "", initialStatusClass = "", endpoint = "", turnstileSiteKey = "" } = Astro.props;
+---
+<section id="contacto" class="section alt defer contact-section">
+  <div class="container">
+    <h2 class="h2 center">Contacto</h2>
+    <p class="lead center max-680">Cuéntanos tus dudas y te respondemos en menos de 24h.</p>
+    <form id="contact-form"
+          class="form"
+          method="POST"
+          action={endpoint}>
+      <p class="hp" aria-hidden="true">
+        <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
+      </p>
+      <div class="form-grid">
+        <div>
+          <label for="name">Nombre</label>
+          <input id="name" name="name" type="text" required placeholder="Tu nombre" autocomplete="name" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email"
+                 name="email"
+                 type="email"
+                 required
+                 placeholder="tu@ejemplo.com"
+                 autocomplete="email"
+                 inputmode="email"
+                 pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
+                 title="Introduce un email válido (usuario@dominio.ext)" />
+        </div>
+        <div class="full">
+          <label for="message">Mensaje</label>
+          <textarea id="message" name="message" rows="4" required placeholder="¿Qué necesitas?" spellcheck="true"></textarea>
+        </div>
+        <div class="full consent-row">
+          <label class="consent" for="privacy">
+            <input id="privacy" name="privacy" type="checkbox" required />
+            <span>Acepto la <a href="/politica-privacidad" target="_blank" rel="noopener">Política de privacidad</a>.</span>
+          </label>
+        </div>
+        <div class="full captcha-wrap">
+          <div class="cf-turnstile"
+               data-sitekey={turnstileSiteKey}
+               data-theme="auto"
+               data-size="normal"></div>
+        </div>
+      </div>
+      <div id="contact-status"
+           class={"muted " + initialStatusClass}
+           role="status"
+           aria-live="polite"
+           style="min-height:1.2em;">
+        {initialStatus}
+      </div>
+      <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
+      <noscript><p class="muted">JavaScript desactivado: el CAPTCHA no se aplicará.</p></noscript>
+    </form>
+    {turnstileSiteKey && (
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    )}
+  </div>
+</section>

@@ -1,0 +1,124 @@
+/* VeriFactu sección específica */
+
+.verifactu-section {
+  position:relative;
+}
+
+/* Wrapper de las 3 cards */
+.verifactu-section .cards.cards-3 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+  max-width:840px;
+  margin:32px auto 0; /* centrado */
+  padding:0 8px;
+}
+
+@media (max-width:1024px){
+  .verifactu-section .cards.cards-3 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    max-width:560px;
+  }
+}
+@media (max-width:560px){
+  .verifactu-section .cards.cards-3 {
+    grid-template-columns:1fr;
+    max-width:460px;
+    gap:14px;
+  }
+}
+
+/* Card dentro de VeriFactu: se apoya en estilos globales de .card
+   Añadimos pequeñas variaciones locales sin romper otros usos */
+.verifactu-section .cards.cards-3 .card {
+  min-height:160px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:18px 18px 16px;
+  position:relative;
+  opacity:0;
+  transform:translateY(14px) scale(.96);
+  filter:blur(2px);
+  transition:
+    opacity .5s ease,
+    transform .5s cubic-bezier(.25,.9,.25,1),
+    filter .45s ease;
+}
+
+.verifactu-section .cards.cards-3 .card.is-visible {
+  opacity:1;
+  transform:translateY(0) scale(1);
+  filter:blur(0);
+}
+
+.verifactu-section .cards.cards-3 .card h3 {
+  margin:0 0 8px;
+  font-size:16px;
+  font-family:var(--font-display);
+  font-weight:600;
+  letter-spacing:-0.3px;
+  color:var(--text-strong);
+}
+.dark-theme .verifactu-section .cards.cards-3 .card h3 {
+  color:var(--text);
+}
+
+.verifactu-section .cards.cards-3 .card p {
+  margin:0;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--muted);
+}
+.dark-theme .verifactu-section .cards.cards-3 .card p {
+  color:var(--muted);
+}
+
+/* Icono dentro de la card */
+.verifactu-section .cards.cards-3 .card .card-ico {
+  font-size:26px;
+  line-height:1;
+  width:auto;
+  height:auto;
+  display:inline-block;
+  margin-bottom:6px;
+  transition:transform .45s cubic-bezier(.25,.9,.25,1), filter .35s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .verifactu-section .cards.cards-3 .card:hover .card-ico {
+    transform:rotate(-6deg) scale(1.08);
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.15));
+  }
+}
+
+/* Ajustes muy pequeños en móvil */
+@media (max-width:560px){
+  .verifactu-section .cards.cards-3 .card {
+    padding:16px 16px 14px;
+    min-height:auto;
+  }
+  .verifactu-section .cards.cards-3 .card h3 { font-size:15px; }
+  .verifactu-section .cards.cards-3 .card p { font-size:13.5px; }
+}
+
+/* CTA inferior (ya lo tenías) */
+.verifactu-section .vf-cta {
+  display:inline-flex;
+  align-items:center;
+  gap:.7em;
+}
+.verifactu-section .vf-cta__logo {
+  width:3.2em;
+  height:3.2em;
+  object-fit:contain;
+}
+
+/* Reduce motion: quita fade si el usuario lo prefiere */
+@media (prefers-reduced-motion:reduce){
+  .verifactu-section .cards.cards-3 .card {
+    opacity:1 !important;
+    transform:none !important;
+    filter:none !important;
+    transition:none !important;
+  }
+}

@@ -3,7 +3,11 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import HeroDiorama from "@components/HeroDiorama.astro";
 import FaqSection from "@components/FaqSection.astro";
 import FeatureShowcaseDynamicRatio from "@components/FeatureShowcaseDynamicRatio.astro";
-import AboutSection from "@components/AboutSection.astro";
+import FeaturesSection from "@components/sections/FeaturesSection.astro";
+import VerifactuSection from "@components/sections/VerifactuSection.astro";
+import PricingSection from "@components/sections/PricingSection.astro";
+import TeamSection from "@components/sections/TeamSection.astro";
+import ContactSection from "@components/sections/ContactSection.astro";
 
 const errCode = Astro.url.searchParams.get('contact_error') || '';
 const messages: Record<string, string> = {
@@ -17,9 +21,91 @@ const messages: Record<string, string> = {
   INTERNAL_ERROR: 'Error interno. Inténtalo más tarde.',
   METHOD_NOT_ALLOWED: 'Método no permitido.'
 };
-
 const initialStatus = errCode ? (messages[errCode] || 'No se pudo enviar el mensaje.') : '';
 const initialStatusClass = errCode ? 'status-error' : '';
+const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT || '';
+const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY || '';
+
+// Reutilizamos el mismo array que antes
+const showcaseItems = [
+  {
+    title:"Personalización Total de TePeuVe",
+    text:"Adapta TePeuVe a tu forma de trabajar. Elige entre modo claro u oscuro, configura atajos y ajusta cada módulo a tu negocio.",
+    carousel: true,
+    carouselImages: [
+      { light: "/assets/features/claro_oscuro.png", dark: "/assets/features/claro_oscuro.png", alt: "Modo claro y oscuro" },
+      { light: "/assets/features/ajustes.png", dark: "/assets/features/ajustes_oscuro.png", alt: "Panel de ajustes" },
+      { light: "/assets/features/ajustes2.png", dark: "/assets/features/ajustes_oscuro2.png", alt: "Ajustes avanzados" },
+      { light: "/assets/features/fidelizacion.png", dark: "/assets/features/fidelizacion_oscuro.png", alt: "Fidelización de clientes" },
+    ],
+    alt:"Personalización del TPV",
+    mediaAnim:"zoom-in",
+    contentAnim:"slide-left",
+    altBg:true,
+    mediaWide: true,
+    width: 1240,
+    height: 760,
+    autoplayMs: 4500,
+    pauseOnHover: true
+  },
+  {
+    title:"Gestión de Caja y Control de Efectivo",
+    text:"Control automático de movimientos y arqueos rápidos. Compatible con cajón portamonedas.",
+    carousel: true,
+    carouselImages: [
+      { light: "/assets/features/arqueo_caja.png", dark: "/assets/features/arqueo_caja_oscuro.png", alt: "Arqueo de caja" },
+      { light: "/assets/features/arqueo_caja2.png", dark: "/assets/features/arqueo_caja_oscuro2.png", alt: "Histórico de arqueos" },
+      { light: "/assets/features/arqueo_caja3.png", dark: "/assets/features/arqueo_caja_oscuro3.png", alt: "Detalle de movimientos" },
+    ],
+    alt:"Gestión de caja",
+    mediaAnim:"scale-up",
+    contentAnim:"slide-right",
+    altBg:true,
+    mediaWide: true,
+    width: 1240,
+    height: 760,
+    autoplayMs: 4500,
+    pauseOnHover: true
+  },
+  {
+    title:"Gestión de Empleados y Roles Personalizados",
+    text:"Usuarios, roles, permisos granulares, PIN seguro y registro de ventas por empleado.",
+    carousel: true,
+    carouselImages: [
+      { light: "/assets/features/empleados.png", dark: "/assets/features/empleados_oscuro.png", alt: "Listado de empleados" },
+      { light: "/assets/features/empleados2.png", dark: "/assets/features/empleados_oscuro2.png", alt: "Roles y permisos" },
+    ],
+    alt:"Gestión de empleados",
+    mediaAnim:"rotate-in",
+    contentAnim:"lift-in",
+    altBg:true,
+    mediaWide: true,
+    width: 1240,
+    height: 760,
+    autoplayMs: 4500,
+    pauseOnHover: true
+  },
+  {
+    title:"Informes claros y Personalizables",
+    text:"Paneles filtrables y métricas clave. Ajusta vistas y compara periodos para tomar decisiones.",
+    carousel: true,
+    carouselImages: [
+      { light: "/assets/features/informes.png", dark: "/assets/features/informes_oscuro.png", alt: "Dashboard principal" },
+      { light: "/assets/features/informes2.png", dark: "/assets/features/informes_oscuro2.png", alt: "Filtros de informes" },
+      { light: "/assets/features/informes3.png", dark: "/assets/features/informes_oscuro3.png", alt: "Detalle por producto" },
+      { light: "/assets/features/informes4.png", dark: "/assets/features/informes_oscuro4.png", alt: "Comparativas temporales" },
+    ],
+    alt:"Panel de informes",
+    mediaAnim:"blur-in",
+    contentAnim:"fade-in",
+    altBg:true,
+    mediaWide: true,
+    width: 1240,
+    height: 760,
+    autoplayMs: 4500,
+    pauseOnHover: true
+  }
+];
 ---
 <BaseLayout
   title="TePeuVe"
@@ -28,254 +114,20 @@ const initialStatusClass = errCode ? 'status-error' : '';
   <HeroDiorama
     title="Software TPV sencillo para tiendas y pequeños negocios"
     subtitle="Vende, gestiona tu inventario y emite tickets y facturas en segundos. TePeuVe es ligero, rápido y cumple con todas las exigencias de VeriFactu."
-    ctaHref="#contacto"
-    cta2Href="#precios"
     imageSrc="/assets/features/welcome_page.png"
     imageWidth={1200}
     imageHeight={720}
   />
 
-  <section id="caracteristicas" class="section">
-    <div class="container">
-      <h2 class="h2 center">Características clave</h2>
-      <p class="lead center max-680">Todo lo que necesitas para vender de forma sencilla y sin preocupaciones</p>
+  <FeaturesSection />
 
-      <div class="features-list" role="list" data-features>
-        <article class="feature-item" role="listitem" aria-labelledby="f-cobros" data-feature="cobros">
-          <div class="feature-ico" aria-hidden="true">💳</div>
-          <h3 id="f-cobros" class="feature-title">Gestión de cobros</h3>
-        </article>
+  {showcaseItems.map(item => (
+    <FeatureShowcaseDynamicRatio items={[item]} />
+  ))}
 
-        <article class="feature-item" role="listitem" aria-labelledby="f-facturas" data-feature="facturas">
-          <div class="feature-ico" aria-hidden="true">🧾</div>
-          <h3 id="f-facturas" class="feature-title">Facturas y tickets</h3>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-informes" data-feature="informes">
-          <div class="feature-ico" aria-hidden="true">📈</div>
-          <h3 id="f-informes" class="feature-title">Informes</h3>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-inventario" data-feature="inventario">
-          <div class="feature-ico" aria-hidden="true">📦</div>
-          <h3 id="f-inventario" class="feature-title">Inventario</h3>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-arqueo" data-feature="arqueo">
-          <div class="feature-ico" aria-hidden="true">💼</div>
-          <h3 id="f-arqueo" class="feature-title">Arqueo de caja</h3>
-          <span class="coin" aria-hidden="true"></span>
-          <span class="coin" aria-hidden="true"></span>
-          <span class="coin" aria-hidden="true"></span>
-          <span class="coin" aria-hidden="true"></span>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-empleados" data-feature="empleados">
-          <div class="feature-ico" aria-hidden="true">👥</div>
-          <h3 id="f-empleados" class="feature-title">Gestión de empleados</h3>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-verifactu" data-feature="verifactu">
-          <div class="feature-ico" aria-hidden="true">🛡️</div>
-          <h3 id="f-verifactu" class="feature-title">VeriFactu</h3>
-        </article>
-
-        <article class="feature-item" role="listitem" aria-labelledby="f-clientes" data-feature="clientes">
-          <div class="feature-ico" aria-hidden="true">🎁</div>
-          <h3 id="f-clientes" class="feature-title">Clientes y fidelización</h3>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <FeatureShowcaseDynamicRatio
-    defer={true}
-    items={[
-      {
-        title:"Personalización Total de TePeuVe",
-        text:"Adapta TePeuVe a tu forma de trabajar. Elige entre modo claro u oscuro, configura atajos y ajusta cada módulo a tu negocio.",
-        carousel: true,
-        carouselImages: [
-          { light: "/assets/features/claro_oscuro.png", dark: "/assets/features/claro_oscuro.png", alt: "Modo claro y oscuro" },
-          { light: "/assets/features/ajustes.png", dark: "/assets/features/ajustes_oscuro.png", alt: "Panel de ajustes" },
-          { light: "/assets/features/ajustes2.png", dark: "/assets/features/ajustes_oscuro2.png", alt: "Ajustes avanzados" },
-          { light: "/assets/features/fidelizacion.png", dark: "/assets/features/fidelizacion_oscuro.png", alt: "Fidelización de clientes" },
-        ],
-        alt:"Personalización del TPV",
-        mediaAnim:"zoom-in",
-        contentAnim:"slide-left",
-        altBg:true,
-        mediaWide: true,
-        width: 1240,
-        height: 760,
-        autoplayMs: 4500,
-        pauseOnHover: true
-      },
-      {
-        title:"Gestión de Caja y Control de Efectivo",
-        text:"Control automático de movimientos y arqueos rápidos. Compatible con cajón portamonedas.",
-        carousel: true,
-        carouselImages: [
-          { light: "/assets/features/arqueo_caja.png", dark: "/assets/features/arqueo_caja_oscuro.png", alt: "Arqueo de caja" },
-          { light: "/assets/features/arqueo_caja2.png", dark: "/assets/features/arqueo_caja_oscuro2.png", alt: "Histórico de arqueos" },
-          { light: "/assets/features/arqueo_caja3.png", dark: "/assets/features/arqueo_caja_oscuro3.png", alt: "Detalle de movimientos" },
-        ],
-        alt:"Gestión de caja",
-        mediaAnim:"scale-up",
-        contentAnim:"slide-right",
-        altBg:true,
-        mediaWide: true,
-        width: 1240,
-        height: 760,
-        autoplayMs: 4500,
-        pauseOnHover: true
-      },
-      {
-        title:"Gestión de Empleados y Roles Personalizados",
-        text:"Usuarios, roles, permisos granulares, PIN seguro y registro de ventas por empleado.",
-        carousel: true,
-        carouselImages: [
-          { light: "/assets/features/empleados.png", dark: "/assets/features/empleados_oscuro.png", alt: "Listado de empleados" },
-          { light: "/assets/features/empleados2.png", dark: "/assets/features/empleados_oscuro2.png", alt: "Roles y permisos" },
-        ],
-        alt:"Gestión de empleados",
-        mediaAnim:"rotate-in",
-        contentAnim:"lift-in",
-        altBg:true,
-        mediaWide: true,
-        width: 1240,
-        height: 760,
-        autoplayMs: 4500,
-        pauseOnHover: true
-      },
-      {
-        title:"Informes claros y Personalizables",
-        text:"Paneles filtrables y métricas clave. Ajusta vistas y compara periodos para tomar decisiones.",
-        carousel: true,
-        carouselImages: [
-          { light: "/assets/features/informes.png", dark: "/assets/features/informes_oscuro.png", alt: "Dashboard principal" },
-          { light: "/assets/features/informes2.png", dark: "/assets/features/informes_oscuro2.png", alt: "Filtros de informes" },
-          { light: "/assets/features/informes3.png", dark: "/assets/features/informes_oscuro3.png", alt: "Detalle por producto" },
-          { light: "/assets/features/informes4.png", dark: "/assets/features/informes_oscuro4.png", alt: "Comparativas temporales" },
-        ],
-        alt:"Panel de informes",
-        mediaAnim:"blur-in",
-        contentAnim:"fade-in",
-        altBg:true,
-        mediaWide: true,
-        width: 1240,
-        height: 760,
-        autoplayMs: 4500,
-        pauseOnHover: true
-      }
-    ]}
-  />
-
-  <section id="verifactu" class="section alt verifactu-section defer">
-    <div class="container">
-      <h2 class="h2 center">VeriFactu</h2>
-      <p class="lead center max-680">Prepárate para el sistema de verificación fiscal y evita prisas en 2026.</p>
-      <div class="cards cards-3">
-        <article class="card"><div class="card-ico">🛡️</div><h3>¿Qué es VeriFactu?</h3><p>Sistema que garantiza integridad y trazabilidad de los registros de facturación.</p></article>
-        <article class="card"><div class="card-ico">📅</div><h3>Entrada 2026</h3><p>Su obligatoriedad comienza en 2026; anticiparte reduce riesgos y costes.</p></article>
-        <article class="card"><div class="card-ico">⚙️</div><h3>Impacto técnico</h3><p>Secuencialidad, firma/hash, almacenamiento seguro y posible envío telemático.</p></article>
-      </div>
-      <p class="center" style="margin-top:26px;">
-        <span class="vf-cta">
-          <a class="btn btn-sm" href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu" target="_blank" rel="noopener">Documentación AEAT</a>
-          <img src="/assets/logos/aeat.svg" alt="Agencia Tributaria"
-               width="28" height="28"
-               loading="lazy"
-               decoding="async"
-               class="vf-cta__logo" />
-        </span>
-      </p>
-    </div>
-  </section>
-
-  <section id="precios" class="section alt defer">
-    <div class="container">
-      <h2 class="h2 center">Escoge tu plan</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <h3>Esencial</h3>
-          <p class="price">9,90<span>€</span><span>/mes</span></p>
-          <ul>
-            <li>1 terminal</li>
-            <li>Control y arqueo de caja</li>
-            <li>Creación de Productos y Categorías</li>
-            <li>Emisión y Personalización de Tickets y Facturas</li>
-            <li>Soporte por Email</li>
-          </ul>
-          <a href="#contacto" class="btn btn-block">Contactar</a>
-        </div>
-        <div class="pricing-card featured">
-          <h3>Avanzado</h3>
-          <p class="price">14,90<span>€</span><span>/mes</span></p>
-          <ul>
-            <li>2 Terminales</li>
-            <li>Plan Esencial</li>
-            <li>Creación y Personalización de empleados</li>
-            <li>Control y gestión de Inventario</li>
-            <li>Informes básicos</li>
-            <li>Soporte prioritario (&lt;24h)</li>
-          </ul>
-          <a href="#contacto" class="btn btn-block">Contactar</a>
-        </div>
-        <div class="pricing-card featured">
-          <h3>Pro</h3>
-          <p class="price">19,90<span>€</span><span>/mes</span></p>
-          <ul>
-            <li>+ de 2 Terminales</li>
-            <li>Plan Avanzado</li>
-            <li>Informes Avanzados y Personalizables</li>
-            <li>Avisos de Bajo Stock</li>
-            <li>Creación de Clientes y Plan de Fidelización</li>
-            <li>Soporte Premium (&lt;2h)</li>
-          </ul>
-          <a href="#contacto" class="btn btn-block">Contactar</a>
-        </div>
-      </div>
-
-      <div class="pricing-note" role="note" aria-labelledby="pricing-note-heading">
-        <div class="pricing-note__header">
-          <span class="pricing-note__icon" aria-hidden="true">🧩</span>
-          <span id="pricing-note-heading" class="pricing-note__lead">¿Necesitas algo distinto?</span>
-        </div>
-        <p class="pricing-note__text">
-          Si ninguno de estos planes se adapta a tu negocio, contáctanos y te prepararemos un plan de TPV a medida:
-          integración de hardware, módulos personalizados, adaptación VeriFactu y soporte cercano para tu crecimiento.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="sobre" class="section alt defer">
-    <div class="container">
-      <h2 class="h2 center">Quiénes somos</h2>
-      <p class="lead center max-680">Somos un equipo pequeño y cercano: desarrollamos este TPV pensando en las pymes para que dispongan de una herramienta completa y fácil de usar.</p>
-
-      <div class="team-grid" role="list">
-        <article class="team-member" role="listitem" aria-labelledby="team-1">
-          <img class="team-photo" src="/assets/team/diego.jpg" alt="Foto de Diego" width="280" height="280" />
-          <div class="team-body">
-            <h3 id="team-1">Diego Miret</h3>
-            <p class="muted">Ingeniero Informático</p>
-            <p>El que hace que todo funcione sin que tengas que preocuparte. Backend, infraestructura, modulos… todo lo técnico, yo lo llevo. Y si te atascas con algo, me escribes y lo resolvemos juntos.</p>
-          </div>
-        </article>
-
-        <article class="team-member" role="listitem" aria-labelledby="team-2">
-          <img class="team-photo" src="/assets/team/lara.jpg" alt="Foto de Lara" width="280" height="280" />
-          <div class="team-body">
-            <h3 id="team-2">Lara González</h3>
-            <p class="muted">Ingeniera de Telecomunicaciones</p>
-            <p>La que convierte lo complejo en fácil. Obsesionada con que todo sea claro, usable y ordenado. Si necesitas ayuda para elegir hardware o mejorar tu caja diaria, estoy para ayudarte.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
+  <VerifactuSection />
+  <PricingSection />
+  <TeamSection />
 
   <FaqSection
     defer={true}
@@ -293,77 +145,14 @@ const initialStatusClass = errCode ? 'status-error' : '';
       { question: "¿Descuentos y promociones?", answer: "Sí, reglas automáticas y precios especiales." },
       { question: "¿Multi‑empleado y cajas?", answer: "Usuarios, roles personalizados y múltiples cajas." },
     ]}
-    data-accordion="false"
-    data-persist="true"
-    data-icon="chevron"
-    data-autoscroll="true"
-    data-expand-collapse="true"
-    data-counter-target="#faq-count"
-    data-default-open="0"
-    data-scroll-block="center"
-    data-hash-prefix="faq-"
   />
 
-  <section id="contacto" class="section alt defer">
-    <div class="container">
-      <h2 class="h2 center">Contacto</h2>
-      <p class="lead center max-680">Cuéntanos tus dudas y te respondemos en menos de 24h.</p>
-      <form id="contact-form"
-            class="form"
-            method="POST"
-            action={import.meta.env.PUBLIC_CONTACT_ENDPOINT || ''}>
-        <p class="hp" aria-hidden="true">
-          <label>No rellenar: <input name="hp_field" autocomplete="off" tabindex="-1" /></label>
-        </p>
-        <div class="form-grid">
-          <div>
-            <label for="name">Nombre</label>
-            <input id="name" name="name" type="text" required placeholder="Tu nombre" autocomplete="name" />
-          </div>
-          <div>
-            <label for="email">Email</label>
-            <input id="email"
-                   name="email"
-                   type="email"
-                   required
-                   placeholder="tu@ejemplo.com"
-                   autocomplete="email"
-                   inputmode="email"
-                   pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
-                   title="Introduce un email válido (usuario@dominio.ext)" />
-          </div>
-          <div class="full">
-            <label for="message">Mensaje</label>
-            <textarea id="message" name="message" rows="4" required placeholder="¿Qué necesitas?" spellcheck="true"></textarea>
-          </div>
-          <div class="full consent-row">
-            <label class="consent" for="privacy">
-              <input id="privacy" name="privacy" type="checkbox" required />
-              <span>Acepto la <a href="/politica-privacidad" target="_blank" rel="noopener">Política de privacidad</a>.</span>
-            </label>
-          </div>
-          <div class="full captcha-wrap">
-            <div class="cf-turnstile"
-                 data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITEKEY || ''}
-                 data-theme="auto"
-                 data-size="normal"></div>
-          </div>
-        </div>
-        <div id="contact-status"
-             class={"muted " + initialStatusClass}
-             role="status"
-             aria-live="polite"
-             style="min-height:1.2em;">
-          {initialStatus}
-        </div>
-        <button type="submit" class="btn btn-lg" data-contact-submit>Enviar</button>
-        <noscript><p class="muted">JavaScript desactivado: el CAPTCHA no se aplicará.</p></noscript>
-      </form>
-      {import.meta.env.PUBLIC_TURNSTILE_SITEKEY && (
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-      )}
-    </div>
-  </section>
+  <ContactSection
+    initialStatus={initialStatus}
+    initialStatusClass={initialStatusClass}
+    endpoint={endpoint}
+    turnstileSiteKey={turnstileKey}
+  />
 
   {errCode && (
     <script is:inline>
@@ -377,94 +166,5 @@ const initialStatusClass = errCode ? 'status-error' : '';
     </script>
   )}
 
-  <!-- Script animaciones características (reveal + replay fiable hover/click/touch) + detector 1 vs 2 líneas -->
-  <script is:inline>
-    (() => {
-      const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const list = document.querySelector('[data-features]');
-      if (!list || prefersReduce) return;
-
-      const items = Array.from(list.querySelectorAll('.feature-item'));
-
-      // Mapa de clases para re-disparar las animaciones
-      const featureClassMap = {
-        cobros: 'fx-cobros',
-        facturas: 'fx-facturas',
-        informes: 'fx-informes',
-        inventario: 'fx-inventario',
-        arqueo: 'fx-arqueo',
-        empleados: 'fx-empleados',
-        verifactu: 'fx-verifactu',
-        clientes: 'fx-clientes'
-      };
-
-      const runFeature = (el) => {
-        const f = el.dataset.feature;
-        const cls = featureClassMap[f];
-        if (!cls) return;
-        el.classList.remove(cls); // quitar anterior
-        // Forzar reflow para poder reañadir la clase
-        void el.offsetWidth;
-        el.classList.add(cls);
-      };
-
-      // Reveal inicial con IO
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          const el = entry.target;
-          if (!el.classList.contains('revealed')) {
-            el.classList.add('revealed');
-            runFeature(el); // animación inicial
-          }
-          io.unobserve(el);
-        });
-      }, { threshold: .35, rootMargin: '0px 0px -5% 0px' });
-
-      items.forEach(it => io.observe(it));
-
-      // Re-disparo por interacción (desktop hover, móvil tap, foco teclado)
-      items.forEach(el => {
-        const trigger = () => runFeature(el);
-        el.addEventListener('mouseenter', trigger);
-        el.addEventListener('focus', trigger);
-        el.addEventListener('click', trigger);
-        el.addEventListener('touchstart', trigger, { passive: true });
-      });
-
-      // --- Detector 1 línea vs 2 líneas para centrar o alinear arriba en móvil ---
-      let resizeT;
-      const markMultilines = () => {
-        items.forEach(it => {
-          const title = it.querySelector('.feature-title');
-          if (!title) return;
-          const cs = getComputedStyle(title);
-          let lh = parseFloat(cs.lineHeight);
-          if (Number.isNaN(lh)) {
-            const fs = parseFloat(cs.fontSize) || 14;
-            lh = fs * 1.2; // fallback
-          }
-          const sh = title.scrollHeight;
-          // Umbral ~1.6x para distinguir 2 líneas (con clamp a 2)
-          if (sh > lh * 1.6) {
-            it.classList.add('is-multiline');
-          } else {
-            it.classList.remove('is-multiline');
-          }
-        });
-      };
-
-      // Ejecutar tras render y cuando cambie el layout
-      const scheduleMark = () => requestAnimationFrame(markMultilines);
-      scheduleMark();
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(markMultilines).catch(() => {});
-      }
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeT);
-        resizeT = setTimeout(markMultilines, 120);
-      }, { passive: true });
-      window.addEventListener('orientationchange', () => setTimeout(markMultilines, 150), { passive: true });
-    })();
-  </script>
+  <script type="module" src="/scripts/features-anim.js"></script>
 </BaseLayout>
