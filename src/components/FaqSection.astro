@@ -81,7 +81,8 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
         <details class="faq-item" id={item.id} data-index={idx}>
           <summary>
             <span class="faq-icon" aria-hidden="true">
-              <span class="faq-glyph">▾</span>
+              <!-- Flecha: derecha (cerrado) -> rota 90º abajo (abierto) -->
+              <span class="faq-glyph">▸</span>
             </span>
             <span class="faq-question">{item.question}</span>
           </summary>
@@ -116,7 +117,6 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
     const hashPrefix  = root.dataset.hashPrefix || 'faq-';
     const counterSel  = root.dataset.counterTarget || '#faq-count';
     const scrollBlock = root.dataset.scrollBlock || 'center';
-    // Mostrar controles salvo que sea explícitamente "false"
     const expandCollapseAttr = root.dataset.expandCollapse;
     const expandCollapse = expandCollapseAttr !== 'false';
 
@@ -163,22 +163,19 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
       }
     }
 
-    // Inicializar sin animación
+    // Inicializar sin animación (ya no cambiamos el glifo por texto)
     items.forEach(d => {
       const panel = d.querySelector('.faq-panel');
-      const glyph = d.querySelector('.faq-glyph');
       if(!panel) return;
       if(toOpen.has(d.id)){
         d.setAttribute('open','');
         panel.style.height='auto';
         panel.style.opacity='1';
-        if(glyph) glyph.textContent='▴';
       } else {
         d.removeAttribute('open');
         panel.style.height='0px';
         panel.style.opacity='0';
         panel.style.overflow='hidden';
-        if(glyph) glyph.textContent='▾';
       }
     });
 
@@ -194,12 +191,10 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
 
     function animate(details, opening){
       const panel = details.querySelector('.faq-panel');
-      const glyph = details.querySelector('.faq-glyph');
       if(!panel) return;
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       panel.style.overflow='hidden';
       if(opening){
-        if(glyph) glyph.textContent='▴';
         if(reduce){
           panel.style.height='auto'; panel.style.opacity='1'; return;
         }
@@ -217,7 +212,6 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
           }
         });
       } else {
-        if(glyph) glyph.textContent='▾';
         if(reduce){
           panel.style.height='0px'; panel.style.opacity='0'; return;
         }
@@ -295,7 +289,8 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
     });
 
     // Expandir / Colapsar global
-    if(controlsWrap && expandCollapse){
+    const controlsWrap = (root.closest('.faq-section') || document).querySelector('.faq-controls');
+    if(controlsWrap && (root.dataset.expandCollapse !== 'false')){
       const btnExpand = controlsWrap.querySelector('.faq-expand-all');
       const btnCollapse = controlsWrap.querySelector('.faq-collapse-all');
       btnExpand?.addEventListener('click', ()=>{
@@ -313,6 +308,7 @@ const faqJson = shouldRenderSchema ? JSON.stringify(faqSchema) : "";
     }
 
     // Scroll inicial si llegó con hash
+    const currentHash = decodeURIComponent(location.hash.replace('#',''));
     if(currentHash){
       const target = items.find(d=>d.id===currentHash);
       if(target && autoscroll){

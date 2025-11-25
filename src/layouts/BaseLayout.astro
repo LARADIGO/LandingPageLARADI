@@ -98,12 +98,10 @@ const jsonLdHead = JSON.stringify([
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Fuentes globales existentes -->
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Fuentes del splash -->
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Share+Tech+Mono&family=Saira+Stencil+One&family=Chakra+Petch:wght@500;700&display=swap"
       rel="stylesheet"
@@ -111,7 +109,6 @@ const jsonLdHead = JSON.stringify([
 
     <script type="application/ld+json" is:inline set:html={jsonLdHead}></script>
 
-    <!-- Consentimiento inicial (ad/analytics denegado hasta aceptar cookies) -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){ dataLayer.push(arguments); }
@@ -125,38 +122,18 @@ const jsonLdHead = JSON.stringify([
       });
     </script>
 
-    <!-- Google tag (gtag.js) - Carga única. Añadimos GA4 (G-6QB73LYVYN) y Google Ads (AW-723563125) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6QB73LYVYN"></script>
 
     <script is:inline>
       function gtag(){ dataLayer.push(arguments); }
       gtag('js', new Date());
-
-      /* Config GA4 */
-      gtag('config', 'G-6QB73LYVYN', {
-        anonymize_ip: true,
-        send_page_view: true,
-        transport_type: 'beacon'
-      });
-
-      /* Config Google Ads */
+      gtag('config', 'G-6QB73LYVYN', { anonymize_ip: true, send_page_view: true, transport_type: 'beacon' });
       gtag('config', 'AW-723563125');
-
-      /* Modo debug local (solo GA4) */
       if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
         gtag('config', 'G-6QB73LYVYN', { debug_mode: true });
       }
-
-      /* EJEMPLO (comenta/ajusta) de conversión:
-         gtag('event', 'conversion', {
-           'send_to': 'AW-723563125/REEMPLAZA_ETIQUETA',
-           'value': 1.0,
-           'currency': 'EUR'
-         });
-      */
     </script>
 
-    <!-- Endpoint contacto (expuesto a scripts) -->
     <script is:inline>
       window.CONTACT_ENDPOINT = {JSON.stringify(contactEndpoint)};
     </script>
@@ -218,16 +195,16 @@ const jsonLdHead = JSON.stringify([
         </a>
 
         <input id="nav-toggle" type="checkbox" class="nav-toggle" aria-label="Abrir menú" />
-        <label for="nav-toggle" class="nav-toggle-btn">
+        <label for="nav-toggle" class="nav-toggle-btn" aria-controls="nav-main" aria-expanded="false">
           <span></span><span></span><span></span>
         </label>
 
-        <nav class="nav" aria-label="Menú principal">
+        <nav id="nav-main" class="nav" aria-label="Menú principal">
           <a href="#caracteristicas">Funcionalidades</a>
           <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
-            <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
+          <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
           <ThemeToggle />
         </nav>
       </div>
@@ -242,6 +219,10 @@ const jsonLdHead = JSON.stringify([
     <script is:inline>
     (() => {
       const header = document.querySelector('.site-header');
+      const navToggle = document.getElementById('nav-toggle');
+      const nav = document.getElementById('nav-main');
+      const main = document.getElementById('inicio');
+
       const onScroll = () => {
         if (window.scrollY > 8) header.classList.add('is-scrolled');
         else header.classList.remove('is-scrolled');
@@ -249,13 +230,54 @@ const jsonLdHead = JSON.stringify([
       onScroll();
       window.addEventListener('scroll', onScroll, { passive:true });
 
+      /* === Cerrar menú móvil al hacer click en un enlace o el toggle de tema === */
+      function closeMobileMenu() {
+        if (navToggle && navToggle.checked) {
+          navToggle.checked = false;
+          const label = document.querySelector('label[for="nav-toggle"]');
+          if (label) label.setAttribute('aria-expanded', 'false');
+          if (main) main.focus();
+        }
+      }
+      function isMobileViewport() {
+        return window.matchMedia('(max-width:880px)').matches;
+      }
+
+      // Enlaces del menú
+      nav?.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          if (isMobileViewport()) setTimeout(closeMobileMenu, 50);
+        });
+      });
+
+      // NUEVO: botón de tema también cierra el menú en móvil
+      const themeBtn = document.getElementById('theme-toggle');
+      themeBtn?.addEventListener('click', () => {
+        if (isMobileViewport()) setTimeout(closeMobileMenu, 60);
+      });
+
+      // Cerrar al hacer scroll con menú abierto (opcional)
+      window.addEventListener('scroll', () => {
+        if (isMobileViewport() && navToggle?.checked) {
+          if (window.scrollY > 120) closeMobileMenu();
+        }
+      }, { passive:true });
+
+      // aria-expanded del botón hamburguesa
+      const label = document.querySelector('label[for="nav-toggle"]');
+      if (navToggle && label) {
+        navToggle.addEventListener('change', () => {
+          label.setAttribute('aria-expanded', navToggle.checked ? 'true' : 'false');
+        });
+      }
+
+      /* Hover auto en cards (móvil) */
       const hasHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!hasHover && !reduceMotion) {
         const cards = document.querySelectorAll('.card');
         const HOVER_DURATION = 900;
         const OBS_THRESHOLD = 0.35;
-
         const cardObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             const card = entry.target;
@@ -279,14 +301,11 @@ const jsonLdHead = JSON.stringify([
               }, HOVER_DURATION);
             }
           });
-        }, {
-          threshold: OBS_THRESHOLD,
-          rootMargin: '0px 0px -10% 0px'
-        });
-
+        }, { threshold: OBS_THRESHOLD, rootMargin: '0px 0px -10% 0px' });
         cards.forEach((c) => cardObserver.observe(c));
       }
 
+      /* Pricing selección táctil */
       const hasHoverFine = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
       if (!hasHoverFine) {
         const pricingGrid = document.querySelector('.pricing-grid');
@@ -311,6 +330,7 @@ const jsonLdHead = JSON.stringify([
         }
       }
 
+      /* Ripple buttons */
       const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!prefersReduce) {
         document.addEventListener('click', (e) => {
@@ -320,21 +340,18 @@ const jsonLdHead = JSON.stringify([
           const x = (e.clientX ?? (rect.left + rect.width/2)) - rect.left;
           const y = (e.clientY ?? (rect.top + rect.height/2)) - rect.top;
           const size = Math.max(rect.width, rect.height) * 1.65;
-
           const span = document.createElement('span');
           span.className = 'ripple';
           span.style.setProperty('--ripple-x', x + 'px');
           span.style.setProperty('--ripple-y', y + 'px');
           span.style.setProperty('--ripple-size', size + 'px');
-
-          if (getComputedStyle(btn).position === 'static') {
-            btn.style.position = 'relative';
-          }
+          if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
           btn.appendChild(span);
           span.addEventListener('animationend', () => span.remove(), { once:true });
         }, { passive: true });
       }
 
+      /* Contact lazy script */
       const loadContactScript = () => {
         if (!document.getElementById('contact-form')) return;
         const s = document.createElement('script');

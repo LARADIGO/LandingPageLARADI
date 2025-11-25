@@ -66,13 +66,14 @@
 }
 .dark-theme .faq-icon { color:#081121; }
 
+/* Flecha: derecha cuando está cerrado, baja cuando [open] */
 .faq-glyph {
   display: inline-block;
-  transform: translateY(-1px);
-  transition: transform .3s cubic-bezier(.25,.9,.25,1);
+  transform: translateY(-1px) rotate(0deg); /* ▸ hacia la derecha */
+  transition: transform .24s cubic-bezier(.25,.9,.25,1);
 }
 .faq-item[open] .faq-glyph {
-  transform: translateY(-1px) rotate(180deg);
+  transform: translateY(-1px) rotate(90deg); /* rota 90º hacia abajo */
 }
 
 .faq-question { flex: 1; padding-right: 6px; }
