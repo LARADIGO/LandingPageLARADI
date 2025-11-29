@@ -270,3 +270,141 @@ h2:not(.h2){font-weight:600;letter-spacing:-0.3px;}
 .breadcrumbs a{text-decoration:none;color:var(--text-strong);font-weight:600;}
 .breadcrumbs a:hover{text-decoration:underline;}
 .dark-theme .breadcrumbs a{color:var(--text);}
+
+/* =========================
+   Sección Diseño Web — cajas cuadradas y centradas
+   ========================= */
+#diseno-web .web-design-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* Grid centrado con 3 columnas de ancho fijo tipo “caja” */
+#diseno-web .web-design-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px;
+  justify-content: center;       /* centra el bloque de columnas */
+  justify-items: center;         /* centra cada tarjeta dentro de su celda */
+  margin-top: 26px;
+}
+
+/* Tarjetas más cuadradas */
+#diseno-web .web-design-card {
+  width: 100%;
+  max-width: 260px;              /* limita el ancho -> forma más cuadrada */
+  min-height: 220px;             /* altura mínima -> sensación de cuadrado */
+  padding: 16px 16px 18px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 24px rgba(2,6,23,.06);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .18s ease, background .25s ease;
+}
+
+/* =========================
+   Sección Diseño Web — cajas cuadradas, centradas
+   ========================= */
+#diseno-web .web-design-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* Grid centrado con 3 columnas */
+#diseno-web .web-design-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  justify-items: center;
+  margin-top: 26px;
+}
+
+/* Reutilizamos .card (mismo estilo que VeriFactu) pero limitamos el tamaño */
+#diseno-web .web-design-card {
+  width: 100%;
+  max-width: 260px;
+  min-height: 220px;
+  padding: 18px 16px 20px;
+}
+
+/* Icono compacto */
+#diseno-web .web-design-ico {
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+}
+
+/* Tipografía un poco más compacta */
+#diseno-web .web-design-card h3 {
+  margin: 6px 0 6px;
+  font-size: 15.5px;
+}
+
+#diseno-web .web-design-card p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+/* CTA centrada */
+#diseno-web .web-design-cta {
+  margin-top: 30px;
+}
+
+/* Responsivo */
+@media (max-width: 980px) {
+  #diseno-web .web-design-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  #diseno-web .web-design-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #diseno-web .web-design-card {
+    max-width: 280px;
+  }
+
+  #diseno-web .web-design-cta .btn {
+    width: 100%;
+  }
+}
+
+/* Estado base: sin animación por defecto */
+#diseno-web .web-design-ico {
+  position: relative;
+}
+
+#diseno-web .web-design-card:nth-child(1).is-visible .web-design-ico::after {
+  content: "Diseño";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Pacifico", "Comic Sans MS", cursive;
+  font-size: 11px;
+  color: var(--text-strong);
+  opacity: 0;
+  white-space: nowrap;
+  animation: wd-write 3.5s ease-in-out forwards;
+}
+
+#diseno-web .web-design-card:nth-child(2).is-visible .web-design-ico {
+  animation: wd-bounce 2.8s ease-in-out forwards;
+}
+
+#diseno-web .web-design-card:nth-child(3).is-visible .web-design-ico::before,
+#diseno-web .web-design-card:nth-child(3).is-visible .web-design-ico::after {
+  content: "💶";
+  position: absolute;
+  font-size: 14px;
+  opacity: 0;
+  animation: wd-money-fall 2.6s ease-in-out forwards;
+}

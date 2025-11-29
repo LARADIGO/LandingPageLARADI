@@ -204,6 +204,7 @@ const jsonLdHead = JSON.stringify([
           <a href="#verifactu">VeriFactu</a>
           <a href="#precios">Precios</a>
           <a href="#sobre">Quiénes somos</a>
+          <a href="#diseno-web">Diseño página web</a>
           <a href="#contacto" class="btn btn-sm cta-pastel">Probar gratis</a>
           <ThemeToggle />
         </nav>
@@ -364,6 +365,25 @@ const jsonLdHead = JSON.stringify([
         requestIdleCallback(loadContactScript, { timeout: 3000 });
       } else {
         setTimeout(loadContactScript, 900);
+      }
+    
+      // Animaciones sección Diseño Web: solo cuando cada tarjeta entra en pantalla
+      const webDesignCards = document.querySelectorAll('#diseno-web .web-design-card');
+      if (webDesignCards.length && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const card = entry.target;
+            card.classList.add('is-visible');
+            // Si quieres que la animación se dispare solo una vez por tarjeta:
+            obs.unobserve(card);
+          });
+        }, {
+          threshold: 0.4,
+          rootMargin: '0px 0px -10% 0px'
+        });
+
+        webDesignCards.forEach(card => observer.observe(card));
       }
     })();
     </script>
