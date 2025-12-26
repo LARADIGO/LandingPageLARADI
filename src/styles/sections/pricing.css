@@ -239,3 +239,53 @@
     transform:none !important;
   }
 }
+
+/* === Fila de precio con original tachado + rebajado === */
+
+.pricing-price-row {
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  margin:8px 0 10px;
+  flex-wrap:wrap;
+}
+
+.pricing-price {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+/* Precio original tachado */
+.pricing-price--original .pricing-price__amount {
+  text-decoration:line-through;
+  opacity:0.7;
+}
+
+/* Precio rebajado destacado */
+.pricing-price--discounted .pricing-price__amount {
+  color:var(--text-strong);
+}
+.dark-theme .pricing-price--discounted .pricing-price__amount {
+  color:var(--text);
+}
+
+.pricing-price__amount {
+  font-size:24px;
+  font-weight:700;
+  font-family:var(--font-display);
+  line-height:1.1;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-0.3px;
+}
+
+.pricing-price__label {
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* Flecha entre precios */
+.pricing-price__arrow {
+  font-size:18px;
+  color:var(--muted);
+}
