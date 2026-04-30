@@ -31,8 +31,10 @@
     el.classList.add(cls);
   };
 
+  const REVEAL_STAGGER = 65; // ms entre cada tarjeta
   function revealAllNow() {
-    items.forEach(it => {
+    items.forEach((it, i) => {
+      it.style.setProperty('--reveal-delay', (prefersReduce ? 0 : i * REVEAL_STAGGER) + 'ms');
       if (!it.classList.contains('revealed')) {
         it.classList.add('revealed');
       }
