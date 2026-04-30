@@ -2,6 +2,7 @@ export const prerender = true;
 
 const pages = [
   '/',          // Home
+  '/verifactu',
   '/politica-privacidad',
   '/aviso-legal',
   '/terminos',

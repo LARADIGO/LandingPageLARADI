@@ -1,0 +1,130 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+
+const pageTitle = "VeriFactu y tu TPV: todo lo que necesitas saber";
+const pageDescription = "Qué es VeriFactu, a quién afecta, cuándo entra en vigor y cómo TePeuVe te prepara para cumplir con la normativa de facturación verificable de la AEAT.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <Breadcrumbs items={[
+    { name:"Inicio", href:"/" },
+    { name:"VeriFactu" }
+  ]} />
+
+  <section class="section">
+    <div class="container max-680">
+      <h1 class="h2 center">{pageTitle}</h1>
+      <p class="lead center">La normativa de facturación verificable llega en 2026. Te explicamos qué supone para tu negocio y cómo TePeuVe te tiene cubierto.</p>
+
+      <article class="card">
+        <h2>¿Qué es VeriFactu?</h2>
+        <p>
+          VeriFactu es el sistema de verificación de registros de facturación impulsado por la Agencia Tributaria
+          (AEAT) en el marco del Real Decreto 1007/2023. Su objetivo es garantizar la <strong>integridad, trazabilidad
+          e inalterabilidad</strong> de todos los registros de facturación generados por el software empresarial.
+        </p>
+        <p>
+          Cada factura emitida queda encadenada criptográficamente a la anterior mediante un sistema de
+          huellas digitales (hash), de modo que cualquier modificación posterior resulta detectable. De forma
+          opcional, los registros pueden enviarse en tiempo real a la AEAT para su validación telemática.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>¿A quién afecta?</h2>
+        <p>
+          La normativa afecta a todas las <strong>empresas y autónomos</strong> que utilicen software informático
+          para expedir facturas, independientemente de su tamaño o sector. Si usas un TPV, programa de facturación
+          o ERP para emitir tickets o facturas, tu software deberá cumplir con los requisitos VeriFactu.
+        </p>
+        <p>
+          Los negocios que continúen usando métodos manuales o software no certificado quedan expuestos a
+          sanciones y a la imposibilidad de deducir gastos relacionados.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>¿Cuándo entra en vigor?</h2>
+        <p>
+          La obligatoriedad de cumplir con la normativa de facturación verificable está prevista para <strong>2026</strong>.
+          Aunque los plazos exactos pueden ajustarse según las disposiciones de la AEAT, anticiparse evita
+          prisas de última hora y posibles sanciones por incumplimiento.
+        </p>
+        <p>
+          Cuanto antes tengas tu software certificado, más tiempo llevas operando bajo la normativa sin
+          interrupciones en tu actividad.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Requisitos técnicos clave</h2>
+        <ul>
+          <li><strong>Numeración secuencial:</strong> cada registro debe tener un identificador único y correlativo que no permita huecos ni reordenaciones.</li>
+          <li><strong>Huella digital (hash):</strong> cada registro incorpora una firma criptográfica encadenada al registro anterior, garantizando la inalterabilidad del histórico.</li>
+          <li><strong>Almacenamiento seguro:</strong> los registros deben conservarse durante al menos 4 años y estar disponibles ante una inspección de la AEAT.</li>
+          <li><strong>Envío telemático (opcional):</strong> en la modalidad VeriFactu, los registros se remiten en tiempo real a la AEAT; en la modalidad no-VeriFactu, se mantienen localmente con las mismas garantías de integridad.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Cómo TePeuVe te prepara</h2>
+        <p>
+          TePeuVe está diseñado desde su base para cumplir con los requisitos de la normativa de facturación verificable:
+        </p>
+        <ul>
+          <li>Generación automática de registros con numeración secuencial sin huecos.</li>
+          <li>Encadenamiento criptográfico de cada ticket y factura emitida.</li>
+          <li>Almacenamiento seguro con exportación de registros para auditorías.</li>
+          <li>Actualizaciones incluidas en todos los planes para adaptarse a los plazos definitivos de la AEAT.</li>
+        </ul>
+        <p>
+          No necesitas hacer nada especial: el cumplimiento está integrado en el software. Cuando entre en vigor,
+          tu negocio ya estará operando correctamente.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Preguntas frecuentes</h2>
+
+        <h3>¿Tengo que cambiar de TPV para cumplir con VeriFactu?</h3>
+        <p>
+          Solo si tu software actual no se actualiza para cumplir con la normativa. Con TePeuVe, las
+          actualizaciones de cumplimiento están incluidas en tu plan sin coste adicional.
+        </p>
+
+        <h3>¿VeriFactu afecta también a los tickets de venta al por menor?</h3>
+        <p>
+          Sí. La normativa se aplica a todos los documentos de facturación generados por software, incluyendo
+          los tickets simplificados emitidos en punto de venta.
+        </p>
+
+        <h3>¿Es obligatorio enviar los datos a la AEAT en tiempo real?</h3>
+        <p>
+          No necesariamente. Existen dos modalidades: envío telemático en tiempo real (VeriFactu) o
+          conservación local con garantías de integridad (no-VeriFactu). Ambas son válidas para cumplir
+          con la normativa.
+        </p>
+
+        <h3>¿Qué pasa si no cumplo?</h3>
+        <p>
+          El incumplimiento puede acarrear sanciones económicas y dificultades para deducir gastos ante
+          la AEAT. Además, en una inspección, los registros sin garantías de integridad pueden ser impugnados.
+        </p>
+      </article>
+
+      <div style="text-align:center; margin-top:2rem;">
+        <p class="lead">¿Tienes dudas sobre cómo afecta VeriFactu a tu negocio?</p>
+        <a href="/#contacto" class="btn btn-lg">Hablar con nosotros</a>
+        <p style="margin-top:1rem;">
+          <a href="https://www2.agenciatributaria.gob.es/wlpl/AVAC-CALC/InformadorVerifactu"
+             target="_blank" rel="noopener"
+             class="muted" style="font-size:14px;">
+            Consultar documentación oficial de la AEAT →
+          </a>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
