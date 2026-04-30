@@ -1,8 +1,6 @@
 ---
 import "../../styles/sections/pricing.css";
-import { PLANS, PROMO_YEAR, PROMO_DISCOUNT } from '@data/prices';
-
-const is2026 = new Date().getFullYear() === PROMO_YEAR;
+import { PLANS } from '@data/prices';
 
 const priceEsencial = PLANS[0].price;
 const priceAvanzado = PLANS[1].price;
@@ -13,49 +11,14 @@ const formatPrice = (p: number) => p.toFixed(2).replace(".", ",");
 <section id="precios" class="section alt defer">
   <div class="container">
     <h2 class="h2 center">Escoge tu plan</h2>
-    {is2026 && (
-      <div class="pricing-note" role="note" aria-labelledby="pricing-promo-heading">
-        <div class="pricing-note__header">
-          <span class="pricing-note__icon" aria-hidden="true">💸</span>
-          <span id="pricing-promo-heading" class="pricing-note__lead">
-            Precios primer año 2026 al 50% antes de la implantación de VeriFactu
-          </span>
-        </div>
-        <p class="pricing-note__text">
-          Durante todo 2026 aplicamos un <strong>50% de descuento</strong> en todos los planes de TePeuVe.
-          Así puedes probar el TPV con calma, asegurarte de que todo funciona bien en tu negocio
-          y llegar a 2027 con VeriFactu preparado.
-        </p>
-      </div>
-    )}
     <div class="pricing-grid" role="list" data-pricing-grid>
       <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="esencial" aria-label="Plan Esencial 9,90 euros al mes">
                 <h3>Esencial</h3>
         <div class="pricing-price-row">
-          {is2026 ? (
-            <>
-              <div class="pricing-price pricing-price--original">
-                <span class="pricing-price__amount">
-                  {formatPrice(priceEsencial)} €
-                </span>
-                <span class="pricing-price__label">Precio habitual</span>
-              </div>
-              <span class="pricing-price__arrow">→</span>
-              <div class="pricing-price pricing-price--discounted">
-                <span class="pricing-price__amount">
-                  {formatPrice(priceEsencial / 2)} €
-                </span>
-                <span class="pricing-price__label">50% durante 2026</span>
-              </div>
-            </>
-          ) : (
-            <div class="pricing-price">
-              <span class="pricing-price__amount">
-                {formatPrice(priceEsencial)} €
-              </span>
-              <span class="pricing-price__label">Precio por mes</span>
-            </div>
-          )}
+          <div class="pricing-price">
+            <span class="pricing-price__amount">{formatPrice(priceEsencial)} €</span>
+            <span class="pricing-price__label">Precio por mes</span>
+          </div>
         </div>
         <ul>
           <li>1 terminal</li>
@@ -69,30 +32,10 @@ const formatPrice = (p: number) => p.toFixed(2).replace(".", ",");
       <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="avanzado" aria-label="Plan Avanzado 14,90 euros al mes">
         <h3>Avanzado</h3>
         <div class="pricing-price-row">
-          {is2026 ? (
-            <>
-              <div class="pricing-price pricing-price--original">
-                <span class="pricing-price__amount">
-                  {formatPrice(priceAvanzado)} €
-                </span>
-                <span class="pricing-price__label">Precio habitual</span>
-              </div>
-              <span class="pricing-price__arrow">→</span>
-              <div class="pricing-price pricing-price--discounted">
-                <span class="pricing-price__amount">
-                  {formatPrice(priceAvanzado / 2)} €
-                </span>
-                <span class="pricing-price__label">50% durante 2026</span>
-              </div>
-            </>
-          ) : (
-            <div class="pricing-price">
-              <span class="pricing-price__amount">
-                {formatPrice(priceAvanzado)} €
-              </span>
-              <span class="pricing-price__label">Precio por mes</span>
-            </div>
-          )}
+          <div class="pricing-price">
+            <span class="pricing-price__amount">{formatPrice(priceAvanzado)} €</span>
+            <span class="pricing-price__label">Precio por mes</span>
+          </div>
         </div>
         <ul>
           <li>2 Terminales</li>
@@ -107,30 +50,10 @@ const formatPrice = (p: number) => p.toFixed(2).replace(".", ",");
       <div class="pricing-card featured" role="listitem" tabindex="0" data-plan="pro" aria-label="Plan Pro 19,90 euros al mes">
         <h3>Pro</h3>
         <div class="pricing-price-row">
-          {is2026 ? (
-            <>
-              <div class="pricing-price pricing-price--original">
-                <span class="pricing-price__amount">
-                  {formatPrice(pricePro)} €
-                </span>
-                <span class="pricing-price__label">Precio habitual</span>
-              </div>
-              <span class="pricing-price__arrow">→</span>
-              <div class="pricing-price pricing-price--discounted">
-                <span class="pricing-price__amount">
-                  {formatPrice(pricePro / 2)} €
-                </span>
-                <span class="pricing-price__label">50% durante 2026</span>
-              </div>
-            </>
-          ) : (
-            <div class="pricing-price">
-              <span class="pricing-price__amount">
-                {formatPrice(pricePro)} €
-              </span>
-              <span class="pricing-price__label">Precio por mes</span>
-            </div>
-          )}
+          <div class="pricing-price">
+            <span class="pricing-price__amount">{formatPrice(pricePro)} €</span>
+            <span class="pricing-price__label">Precio por mes</span>
+          </div>
         </div>
         <ul>
           <li>+ de 2 Terminales</li>
