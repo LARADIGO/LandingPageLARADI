@@ -5,6 +5,7 @@ import IntroSplash from "@components/IntroSplash.astro";
 import ThemeToggle from '@components/ThemeToggle.astro';
 import CookieConsent from '@components/CookieConsent.astro';
 import SiteFooter from '@components/SiteFooter.astro';
+import { PLANS } from '@data/prices';
 
 const {
   title = "TePeuVe",
@@ -47,11 +48,12 @@ const jsonLdHead = JSON.stringify([
     "name":"TePeuVe TPV",
     "applicationCategory":"BusinessApplication",
     "operatingSystem":"Web",
-      "offers": {
-      "@type":"Offer",
-      "price":"9.90",
-      "priceCurrency":"EUR"
-    }
+    "offers": PLANS.map(p => ({
+      "@type": "Offer",
+      "name": `Plan ${p.name}`,
+      "price": p.price.toFixed(2),
+      "priceCurrency": "EUR"
+    }))
   }
 ]);
 ---
