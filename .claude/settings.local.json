@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(magick --version)",
+      "Bash(convert --version)",
+      "Bash(ffmpeg -version)",
+      "Bash(node -e \"require\\('sharp'\\) && console.log\\('sharp_ok'\\)\")",
+      "Bash(npm install *)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}
