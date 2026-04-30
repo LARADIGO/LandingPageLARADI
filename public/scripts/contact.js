@@ -116,6 +116,8 @@
     const fd = new FormData(form);
     const name = (fd.get('name')||'').toString().trim();
     const email = (fd.get('email')||'').toString().trim();
+    const phone = (fd.get('phone')||'').toString().trim();
+    const plan = (fd.get('plan')||'').toString().trim();
     const message = (fd.get('message')||'').toString().trim();
     const hp = (fd.get('hp_field')||'').toString().trim();
     const privacy = form.querySelector('#privacy');
@@ -158,7 +160,7 @@
     sendGA('sending');
 
     try {
-      const payload = { name, email, message, url: location.href, ua: navigator.userAgent, captchaToken };
+      const payload = { name, email, phone, plan, message, url: location.href, ua: navigator.userAgent, captchaToken };
       const res = await fetch(endpoint, {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },

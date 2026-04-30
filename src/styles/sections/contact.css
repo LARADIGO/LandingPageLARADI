@@ -38,9 +38,10 @@
   color:var(--text);
 }
 
-/* Inputs / Textarea */
+/* Inputs / Textarea / Select */
 .contact-section input,
-.contact-section textarea {
+.contact-section textarea,
+.contact-section select {
   width:100%;
   color:var(--text-strong);
   background:rgba(0,0,0,.03);
@@ -54,17 +55,33 @@
   transition:border-color .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease;
   resize:vertical;
 }
+.contact-section select {
+  resize:none;
+  cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:36px;
+}
 .contact-section textarea {
   min-height:140px;
 }
 .dark-theme .contact-section input,
-.dark-theme .contact-section textarea {
+.dark-theme .contact-section textarea,
+.dark-theme .contact-section select {
   background:rgba(255,255,255,.05);
   color:var(--text);
 }
+.dark-theme .contact-section select {
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+}
 
 .contact-section input:focus,
-.contact-section textarea:focus {
+.contact-section textarea:focus,
+.contact-section select:focus {
   border-color:var(--primary);
   box-shadow:0 0 0 3px var(--ring);
 }
@@ -79,6 +96,13 @@
 .dark-theme .contact-section textarea::placeholder {
   color:var(--muted);
   opacity:.9;
+}
+
+/* Etiqueta opcional */
+.contact-section .label-optional {
+  font-weight:400;
+  color:var(--muted);
+  font-size:12px;
 }
 
 /* Consent row */

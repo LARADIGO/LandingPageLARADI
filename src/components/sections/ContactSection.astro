@@ -36,6 +36,25 @@ const { initialStatus = "", initialStatusClass = "", endpoint = "", turnstileSit
                  pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$"
                  title="Introduce un email válido (usuario@dominio.ext)" />
         </div>
+        <div>
+          <label for="phone">Teléfono <span class="label-optional">(opcional)</span></label>
+          <input id="phone"
+                 name="phone"
+                 type="tel"
+                 placeholder="+34 600 000 000"
+                 autocomplete="tel"
+                 inputmode="tel"
+                 maxlength="20" />
+        </div>
+        <div>
+          <label for="plan">Plan de interés <span class="label-optional">(opcional)</span></label>
+          <select id="plan" name="plan">
+            <option value="">— Sin especificar —</option>
+            <option value="Esencial">Plan Esencial — 9,90 €/mes</option>
+            <option value="Avanzado">Plan Avanzado — 14,90 €/mes</option>
+            <option value="Pro">Plan Pro — 19,90 €/mes</option>
+          </select>
+        </div>
         <div class="full">
           <label for="message">Mensaje</label>
           <textarea id="message" name="message" rows="4" required placeholder="¿Qué necesitas?" spellcheck="true"></textarea>
